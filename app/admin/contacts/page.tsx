@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search, Mail, Phone, MessageCircle, Trash2, Edit, X, Send, Filter, FileSpreadsheet, CheckCircle, Eye
 } from "lucide-react";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
-export default function AdminContactsPage() {
+function AdminContactsContent() {
+  const searchParams = useSearchParams();
+  const targetId = searchParams ? searchParams.get("id") : null;
+
   const [contacts, setContacts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -17,6 +22,14 @@ export default function AdminContactsPage() {
   const load = async () => {
     const list = await dbHelper.contacts.list();
     setContacts(list);
+
+    if (targetId) {
+      const match = list.find((c: any) => c.id === targetId);
+      if (match) {
+        setReplyModal(match);
+        setReplyText(match.admin_reply || "");
+      }
+    }
   };
 
   useEffect(() => {
@@ -24,12 +37,24 @@ export default function AdminContactsPage() {
     const handler = () => load();
     window.addEventListener("nexbyte-realtime", handler);
     return () => window.removeEventListener("nexbyte-realtime", handler);
-  }, []);
+  }, [targetId]);
 
   const handleReply = async () => {
     if (!replyModal || !replyText.trim()) return;
     setSending(true);
     await dbHelper.contacts.reply(replyModal.id, replyText);
+
+    // Dispatch real-time Customer notification
+    await dispatchPipelineEvent({
+      eventType: "MESSAGE_RECEIVED",
+      title: "💬 New reply from NexByte Support",
+      message: replyText.trim().substring(0, 100),
+      recipientUserId: replyModal.user_id || replyModal.customer_id,
+      referenceType: "message",
+      referenceId: replyModal.id,
+      metadata: { contactId: replyModal.id, reply: replyText }
+    });
+
     setReplyModal(null);
     setReplyText("");
     setSending(false);
@@ -177,5 +202,13 @@ export default function AdminContactsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminContactsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-white text-xs font-semibold">Loading Contact Enquiries...</div>}>
+      <AdminContactsContent />
+    </Suspense>
   );
 }

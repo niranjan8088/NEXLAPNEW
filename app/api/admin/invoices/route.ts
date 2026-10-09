@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireRole, authErrorResponse } from "@/lib/auth";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 import {
   calculateInvoiceTotals,
+  sanitizeInvoiceItems,
   validateMobile,
   validateEmail,
   validatePincode,
@@ -21,7 +23,6 @@ export async function GET(request: Request) {
     const allInvoices = await dbHelper.invoices.list();
 
     let filtered = allInvoices.filter((inv: any) => {
-      // Search by Invoice Number, Customer Name, or Mobile
       const numStr = (inv.invoiceNumber || inv.invoice_number || "").toLowerCase();
       const nameStr = (inv.customerName || inv.customer_name || "").toLowerCase();
       const mobileStr = (inv.mobile || "").toLowerCase();
@@ -32,11 +33,9 @@ export async function GET(request: Request) {
         nameStr.includes(query) ||
         mobileStr.includes(query);
 
-      // Filter by Payment Status
       const payStatus = inv.paymentStatus || inv.payment_status || "pending";
       const matchesStatus = status === "all" || payStatus === status;
 
-      // Filter by GST
       const isGst = !!(inv.gstEnabled ?? inv.gst_enabled);
       const matchesGst =
         gstFilter === "all" ||
@@ -76,7 +75,6 @@ export async function POST(request: Request) {
       amountPaid,
     } = body;
 
-    // 1. Validation of Customer Details
     if (!customerName || !String(customerName).trim()) {
       return NextResponse.json(
         { error: "Customer Name is required." },
@@ -113,15 +111,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Line items check
-    if (!Array.isArray(items) || items.length === 0) {
+    const sanitizedItems = sanitizeInvoiceItems(items);
+    if (sanitizedItems.length === 0) {
       return NextResponse.json(
-        { error: "At least one product/service item is required." },
+        { error: "At least one valid product/service item with a name is required." },
         { status: 400 }
       );
     }
 
-    // 3. SERVER-SIDE FINANCIAL RECALCULATION (Do NOT trust client totals!)
     const calculated = calculateInvoiceTotals({
       items,
       globalDiscount: Number(globalDiscount) || 0,
@@ -131,7 +128,6 @@ export async function POST(request: Request) {
       amountPaid: Number(amountPaid) || 0,
     });
 
-    // 4. Save Invoice with recalculated server totals & server timestamp
     const invoiceRecord = await dbHelper.invoices.create({
       customerId: customerId || null,
       customerName: String(customerName).trim(),
@@ -165,6 +161,19 @@ export async function POST(request: Request) {
       balanceDuePaise: calculated.balanceDuePaise,
       balanceDue: calculated.balanceDue,
       createdBy: admin.name || admin.email || "Admin Officer",
+    });
+
+    // PIPELINE EVENT (ADMIN → CUSTOMER BILLING INVOICE)
+    const invNum = invoiceRecord.invoiceNumber || invoiceRecord.invoice_number;
+    await dispatchPipelineEvent({
+      eventType: "INVOICE_CREATED",
+      title: "New Tax Invoice Issued 📄",
+      message: `Your official invoice ${invNum} for ₹${calculated.grandTotal.toLocaleString("en-IN")} is now available.`,
+      recipientRole: "user",
+      recipientUserId: customerId || undefined,
+      referenceType: "invoice",
+      referenceId: invNum,
+      actorRole: "admin",
     });
 
     return NextResponse.json({ invoice: invoiceRecord }, { status: 201 });

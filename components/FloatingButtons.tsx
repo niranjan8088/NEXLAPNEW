@@ -17,7 +17,7 @@ export default function FloatingButtons() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  if (pathname && pathname.startsWith("/admin")) {
+  if (pathname && (pathname.startsWith("/admin") || pathname.startsWith("/customer"))) {
     return null;
   }
 

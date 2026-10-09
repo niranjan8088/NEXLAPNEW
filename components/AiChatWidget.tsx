@@ -216,11 +216,11 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full bg-nex-blue px-4 py-3 text-xs font-bold text-white shadow-glow-blue transition-all duration-300 hover:scale-105"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full bg-[#2563EB] px-4 py-3 text-xs font-bold text-white shadow-lg shadow-[#2563EB]/25 hover:shadow-xl hover:scale-105 transition-all duration-300"
         >
           <div className="relative">
             <Bot className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-400 animate-ping" />
+            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
           </div>
           <span>
             {portal === "customer" ? "Ask NexByte AI" : portal === "reseller" ? "Reseller AI" : "Admin AI"}
@@ -231,23 +231,33 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
       {/* Chat Panel Window */}
       {open && (
         <div
-          className={`fixed z-50 bg-nex-ink border border-white/10 rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden transition-all duration-300 ${
+          className={`fixed z-50 ${
+            portal === "customer"
+              ? "bg-white border border-[#E2E8F0] text-[#0F172A]"
+              : "bg-nex-ink border border-white/10 text-white"
+          } rounded-3xl shadow-2xl flex flex-col justify-between overflow-hidden transition-all duration-300 ${
             expanded
               ? "inset-4 sm:inset-10"
               : "bottom-6 right-6 w-[90vw] sm:w-[420px] h-[580px]"
           }`}
         >
           {/* Header */}
-          <div className="h-14 bg-nex-black border-b border-white/10 px-4 flex items-center justify-between shrink-0">
+          <div
+            className={`h-14 ${
+              portal === "customer"
+                ? "bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#0F172A]"
+                : "bg-nex-black border-b border-white/10 text-white"
+            } px-4 flex items-center justify-between shrink-0`}
+          >
             <div className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded-xl bg-nex-blue/20 border border-nex-blue/40 flex items-center justify-center">
-                <Bot className="h-4 w-4 text-nex-blueLight" />
+              <div className="h-7 w-7 rounded-xl bg-[#2563EB]/15 border border-[#2563EB]/30 flex items-center justify-center">
+                <Bot className="h-4 w-4 text-[#2563EB]" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wide">
+                <h3 className={`text-xs font-bold ${portal === "customer" ? "text-[#0F172A]" : "text-white"} uppercase tracking-wide`}>
                   {portal === "customer" ? "Customer AI Assistant" : portal === "reseller" ? "Reseller AI Assistant" : "Admin AI Assistant"}
                 </h3>
-                <span className="text-[9px] text-emerald-400 font-mono">Grounded Database AI</span>
+                <span className="text-[9px] text-emerald-600 font-mono font-bold">Grounded Database AI</span>
               </div>
             </div>
 
@@ -255,16 +265,20 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
               <button
                 onClick={() => setWebSearch(!webSearch)}
                 className={`p-1.5 rounded-lg border text-[10px] flex items-center gap-1 ${
-                  webSearch ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300" : "border-white/10 text-nex-mist"
+                  webSearch
+                    ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-700 dark:text-cyan-300"
+                    : portal === "customer"
+                    ? "border-[#E2E8F0] text-[#64748B]"
+                    : "border-white/10 text-nex-mist"
                 }`}
                 title="Toggle Web Search"
               >
                 <Globe className="h-3 w-3" />
               </button>
-              <button onClick={() => setExpanded(!expanded)} className="p-1.5 text-nex-mist hover:text-white">
+              <button onClick={() => setExpanded(!expanded)} className={`p-1.5 ${portal === "customer" ? "text-[#64748B] hover:text-[#0F172A]" : "text-nex-mist hover:text-white"}`}>
                 {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
               </button>
-              <button onClick={() => setOpen(false)} className="p-1.5 text-nex-mist hover:text-white">
+              <button onClick={() => setOpen(false)} className={`p-1.5 ${portal === "customer" ? "text-[#64748B] hover:text-[#0F172A]" : "text-nex-mist hover:text-white"}`}>
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -272,19 +286,19 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
 
           {/* Action notification banner */}
           {actionSuccess && (
-            <div className="p-3 bg-emerald-500/10 border-b border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+            <div className="p-3 bg-emerald-500/10 border-b border-emerald-500/30 text-emerald-700 text-xs flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span>{actionSuccess}</span>
             </div>
           )}
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs scrollbar-thin scrollbar-thumb-white/10">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {messages.map((m) => (
               <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
                   {m.fileAttachment && (
-                    <div className="mb-1 text-[10px] text-nex-blueLight flex items-center gap-1">
+                    <div className="mb-1 text-[10px] text-[#2563EB] flex items-center gap-1">
                       <FileText className="h-3 w-3" /> {m.fileAttachment.name}
                     </div>
                   )}
@@ -292,7 +306,9 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
                   <div
                     className={`p-3 rounded-2xl leading-relaxed ${
                       m.role === "user"
-                        ? "bg-nex-blue/30 border border-nex-blue/40 text-white rounded-tr-none"
+                        ? "bg-[#2563EB] text-white rounded-tr-none shadow-xs font-medium"
+                        : portal === "customer"
+                        ? "bg-[#F1F5F9] border border-[#E2E8F0] text-[#0F172A] rounded-tl-none font-medium"
                         : "bg-white/[0.04] border border-white/10 text-white/90 rounded-tl-none"
                     }`}
                     dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }}
@@ -300,14 +316,14 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
 
                   {/* Action Confirmation Buttons if payload exists */}
                   {m.actionRequired && (
-                    <div className="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
-                      <p className="text-xs font-bold text-amber-300">{m.actionRequired.title}</p>
-                      <p className="text-[11px] text-white/80">{m.actionRequired.description}</p>
+                    <div className="mt-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 space-y-2">
+                      <p className="text-xs font-bold text-amber-800 dark:text-amber-300">{m.actionRequired.title}</p>
+                      <p className="text-[11px] text-[#475569] dark:text-white/80">{m.actionRequired.description}</p>
                       <div className="flex items-center gap-2 pt-1">
                         <button
                           onClick={() => handleExecuteTool(m.actionRequired!.tool)}
                           disabled={toolExecuting}
-                          className="btn-primary py-1.5 px-3 text-[11px] font-bold shadow-glow-blue"
+                          className="btn-primary py-1.5 px-3 text-[11px] font-bold shadow-xs"
                         >
                           {toolExecuting ? "Executing..." : m.actionRequired.confirmText}
                         </button>
@@ -325,8 +341,8 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
             ))}
 
             {isGenerating && (
-              <div className="flex items-center gap-2 text-xs text-nex-mist">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-nex-blueLight" />
+              <div className="flex items-center gap-2 text-xs text-[#64748B]">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#2563EB]" />
                 <span>AI processing grounded data...</span>
               </div>
             )}
@@ -335,11 +351,11 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
           </div>
 
           {/* Input Section */}
-          <div className="p-3 bg-nex-black border-t border-white/10 shrink-0">
+          <div className={`p-3 ${portal === "customer" ? "bg-[#F8FAFC] border-t border-[#E2E8F0]" : "bg-nex-black border-t border-white/10"} shrink-0`}>
             {attachedFile && (
-              <div className="mb-2 text-[10px] text-nex-blueLight flex items-center justify-between bg-white/[0.04] p-1.5 rounded-lg">
+              <div className="mb-2 text-[10px] text-[#2563EB] flex items-center justify-between bg-white border border-[#E2E8F0] p-1.5 rounded-lg">
                 <span>📎 {attachedFile.name}</span>
-                <button onClick={() => setAttachedFile(null)} className="hover:text-red-400">
+                <button onClick={() => setAttachedFile(null)} className="hover:text-red-500">
                   <X className="h-3 w-3" />
                 </button>
               </div>
@@ -349,7 +365,7 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
               <input type="file" ref={fileRef} onChange={handleFileUpload} className="hidden" />
               <button
                 onClick={() => fileRef.current?.click()}
-                className="p-2 text-nex-mist hover:text-white rounded-lg"
+                className={`p-2 ${portal === "customer" ? "text-[#64748B] hover:text-[#0F172A]" : "text-nex-mist hover:text-white"} rounded-lg`}
                 title="Attach Document"
               >
                 <Paperclip className="h-4 w-4" />
@@ -361,13 +377,17 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder="Ask NexByte AI..."
-                className="flex-1 rounded-xl bg-white/[0.04] border border-white/10 px-3 py-2 text-xs text-white placeholder-white/30 focus:border-nex-blue focus:outline-none"
+                className={`flex-1 rounded-xl ${
+                  portal === "customer"
+                    ? "bg-white border border-[#E2E8F0] text-[#0F172A] placeholder-[#94A3B8]"
+                    : "bg-white/[0.04] border border-white/10 text-white placeholder-white/30"
+                } px-3 py-2 text-xs focus:border-[#2563EB] focus:outline-none`}
               />
 
               <button
                 onClick={handleSendMessage}
                 disabled={!input.trim() && !attachedFile}
-                className="p-2 rounded-xl btn-primary shadow-glow-blue disabled:opacity-40"
+                className="p-2 rounded-xl bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-xs disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
               </button>

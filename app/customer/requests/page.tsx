@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import {
   Package,
   Wrench,
@@ -126,11 +124,7 @@ export default function CustomerRequestsPage() {
   });
 
   return (
-    <>
-      <Navbar />
-
-      <main className="relative min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
+    <div className="space-y-6">
           
           {/* Header Banner */}
           <div className="text-center max-w-2xl mx-auto mb-8">
@@ -297,9 +291,5 @@ export default function CustomerRequestsPage() {
           )}
 
         </div>
-      </main>
-
-      <Footer />
-    </>
   );
 }

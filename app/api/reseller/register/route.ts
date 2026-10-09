@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
 export async function POST(request: NextRequest) {
   let body: any;
@@ -29,7 +30,6 @@ export async function POST(request: NextRequest) {
   try {
     const { dbHelper } = await import("@/lib/dbHelper");
 
-    // Check duplicate email
     const existing = await dbHelper.resellers.getByEmail(cleanEmail);
     if (existing) {
       return NextResponse.json(
@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Supabase Auth Registration (if configured)
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     let authUserId = null;
     if (supabaseUrl) {
@@ -67,7 +66,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2. Create authoritative Reseller record (no plaintext password)
     const newReseller = await dbHelper.resellers.create({
       auth_user_id: authUserId,
       business_name: businessName,
@@ -80,17 +78,30 @@ export async function POST(request: NextRequest) {
       business_type: businessType || "individual",
       gstin: gstin || "",
       description: description || "",
-      status: "pending", // Admin must approve
+      status: "pending",
       role: "reseller",
     });
 
-    // 3. Create Admin notification
-    await dbHelper.notifications.create({
-      title: "🏪 New Reseller Application",
-      message: `${businessName} (${ownerName}) applied for a reseller account. City: ${city}`,
-      type: "reseller_application",
-      status: "unread",
-      meta: { reseller_id: newReseller.id, email: cleanEmail },
+    // PIPELINE EVENT (RESELLER → ADMIN & ADMIN → RESELLER)
+    await dispatchPipelineEvent({
+      eventType: "RESELLER_APPLIED",
+      title: "New Reseller Partner Application 🏪",
+      message: `${businessName} (${ownerName}) registered for a reseller account in ${city}.`,
+      recipientRole: "admin",
+      referenceType: "reseller",
+      referenceId: newReseller.id,
+      actorRole: "reseller",
+    });
+
+    await dispatchPipelineEvent({
+      eventType: "RESELLER_APPLIED",
+      title: "Reseller Application Submitted 🏪",
+      message: "Your NexByte reseller application has been submitted and is under admin review.",
+      recipientRole: "reseller",
+      recipientUserId: newReseller.id,
+      referenceType: "reseller",
+      referenceId: newReseller.id,
+      actorRole: "system",
     });
 
     return NextResponse.json({
@@ -103,4 +114,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err.message || "Internal server error." }, { status: 500 });
   }
 }
-

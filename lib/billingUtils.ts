@@ -103,12 +103,32 @@ export function formatPaise(paise: number | undefined | null): string {
   return formatRupees(toRupees(paise ?? 0));
 }
 
+/**
+ * Shared Sanitization Function for Invoice Line Items
+ * Removes empty placeholder rows while preserving valid zero-priced items (e.g., Free Diagnostics).
+ */
+export function sanitizeInvoiceItems(items: LineItemInput[] | undefined | null): LineItemInput[] {
+  if (!Array.isArray(items)) return [];
+  return items.filter((item) => {
+    if (!item) return false;
+    const cleanName = (item.name || "").trim();
+    if (!cleanName) return false;
+    // Reject default empty placeholder "Item" when unitPrice is 0 and description is empty
+    if (cleanName === "Item" && (Number(item.unitPrice) || 0) === 0 && !(item.description || "").trim()) {
+      return false;
+    }
+    const qty = Number(item.quantity);
+    if (isNaN(qty) || qty <= 0) return false;
+    return true;
+  });
+}
+
 /** 
  * Central Calculation Function for Invoice & Offer Totals
  * Used by UI form, live preview, backend API, PDF generator, and verification tests.
  */
 export function calculateInvoiceTotals(input: CalculationInput): CalculationResult {
-  const rawItems = input.items || [];
+  const rawItems = sanitizeInvoiceItems(input.items);
   
   let subtotalPaise = 0;
   const calculatedItems: CalculatedLineItem[] = rawItems.map((item, idx) => {
@@ -125,7 +145,7 @@ export function calculateInvoiceTotals(input: CalculationInput): CalculationResu
 
     return {
       id: item.id || `item-${idx + 1}-${Date.now()}`,
-      name: (item.name || "").trim() || "Item",
+      name: (item.name || "").trim(),
       description: (item.description || "").trim(),
       quantity: qty,
       unitPrice: toRupees(unitPricePaise),

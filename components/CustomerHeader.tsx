@@ -3,35 +3,62 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Search,
   ShoppingBag,
   Bell,
   Menu,
   User,
-  MapPin,
   ChevronDown,
   LogOut,
   Settings,
   Package,
+  Calendar,
+  Sun,
+  Moon,
+  Tag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cartStore";
+import { useTheme } from "@/components/ThemeProvider";
 import GlobalSearchModal from "@/components/GlobalSearchModal";
+import QuickNotificationsPopover from "@/components/QuickNotificationsPopover";
 
 interface CustomerHeaderProps {
-  onOpenMobileMenu: () => void;
+  onOpenMobileMenu?: () => void;
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  "/customer": "Home",
+  "/customer/shop": "Products",
+  "/customer/offers": "Offers & Deals",
+  "/customer/favorites": "Wishlist",
+  "/customer/orders": "My Orders",
+  "/customer/bookings": "My Bookings",
+  "/customer/services": "IT Services",
+  "/customer/laptop-enquiry": "Laptop Enquiry",
+  "/customer/messages": "Messages",
+  "/customer/notifications": "Notifications",
+  "/customer/training": "Training",
+  "/customer/internship": "Internship",
+  "/customer/certificates": "Certificates",
+  "/customer/ewarranty": "E-Warranty",
+  "/customer/ai": "AI Assistant",
+  "/customer/support": "Contact Support",
+  "/customer/profile": "My Profile",
+  "/customer/settings": "Settings",
+  "/customer/billing": "Billing & Invoices",
+};
+
 export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps) {
-  const router = useRouter();
+  const pathname = usePathname() || "/customer";
+  const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [unreadNotifs, setUnreadNotifs] = useState(1);
 
   const cartOpen = useCartStore((s) => s.openCart);
   const cartItemCount = useCartStore((s) => s.getItemCount());
@@ -52,7 +79,7 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
       } else {
         setIsAuthenticated(false);
       }
-    } catch (e) {
+    } catch {
       setIsAuthenticated(false);
     }
   };
@@ -60,82 +87,111 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
   const getInitials = (name?: string) => {
     if (!name) return "CU";
     const parts = name.trim().split(" ");
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return name.substring(0, 2).toUpperCase();
+  };
+
+  const getPageTitle = () => {
+    // Exact match first
+    if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
+    // Prefix match
+    for (const [key, val] of Object.entries(PAGE_TITLES)) {
+      if (key !== "/customer" && pathname.startsWith(key)) return val;
+    }
+    return "Customer Portal";
   };
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-[#E6EAF0] dark:border-white/10 px-4 sm:px-6 py-3 transition-all">
-        <div className="flex items-center justify-between gap-3">
-          
-          {/* Left Section: Mobile Menu Toggle + Search Bar */}
-          <div className="flex items-center gap-3 flex-1 max-w-xl">
-            {/* Mobile Hamburger Toggle */}
+      <header className="sticky top-0 z-30 bg-white/85 dark:bg-[#101B2B]/85 backdrop-blur-md border-b border-[#DCEAF2] dark:border-[#2A3B50] px-4 sm:px-6 py-3 transition-all shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+
+          {/* Left: Menu + Title */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <button
               onClick={onOpenMobileMenu}
               aria-label="Open sidebar menu"
-              className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+              id="customer-menu-btn"
+              className="lg:hidden p-2 rounded-xl border border-[#DCEAF2] dark:border-[#2A3B50] text-[#475569] dark:text-[#CBD5E1] hover:bg-[#ECFEFF] dark:hover:bg-[#162438] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors shrink-0"
             >
               <Menu className="h-5 w-5" />
             </button>
 
-            {/* Smart Search Trigger Bar */}
+            {/* Page title — desktop only */}
+            <div className="hidden sm:flex flex-col min-w-0">
+              <span className="text-[10px] font-bold text-[#0891B2] dark:text-[#0891B2] tracking-wider uppercase">
+                NexByte Technologies
+              </span>
+              <h1 className="text-base font-extrabold text-[#0F172A] dark:text-[#F8FAFC] truncate">
+                {getPageTitle()}
+              </h1>
+            </div>
+
+            {/* Search bar */}
             <button
               onClick={() => setSearchOpen(true)}
-              className="w-full flex items-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 px-3.5 py-2 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors shadow-inner text-left"
+              id="customer-search-btn"
+              className="flex items-center gap-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2 text-xs text-[#475569] hover:bg-[#F1F5F9] hover:border-[#2563EB]/40 transition-colors text-left w-48 sm:w-64"
             >
-              <Search className="h-4 w-4 text-slate-400 shrink-0" />
-              <span className="truncate">Search for laptops, services, CCTV, accessories...</span>
+              <Search className="h-4 w-4 shrink-0 text-[#0891B2]" />
+              <span className="truncate">Search products, services, orders...</span>
             </button>
           </div>
 
-          {/* Right Utility Section */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Service Areas Tag */}
-            <div className="hidden md:flex items-center gap-1.5 rounded-full border border-sky-200 dark:border-sky-900 bg-sky-50/80 dark:bg-sky-950/40 px-3 py-1 text-[11px] font-semibold text-sky-700 dark:text-sky-300">
-              <MapPin className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
-              <span>Bengaluru · Tumkur · Hiriyur (soon)</span>
-            </div>
+          {/* Right: Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Offers shortcut */}
+            <Link
+              href="/customer/offers"
+              aria-label="Offers"
+              className="hidden sm:flex p-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] text-[#F59E0B] hover:bg-[#FFFBEB] dark:hover:bg-[#422006]/50 transition-colors"
+              title="Offers & Deals"
+            >
+              <Tag className="h-4.5 w-4.5" />
+            </Link>
 
-            {/* Cart Trigger */}
+            {/* Cart */}
             <button
               onClick={cartOpen}
               aria-label="Shopping Cart"
-              className="relative p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+              id="customer-cart-btn"
+              className="relative p-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] text-[#111827] dark:text-[#F8FAFC] hover:bg-[#EEF6FF] dark:hover:bg-[#1a2744] hover:border-[#2563EB]/40 transition-colors"
             >
               <ShoppingBag className="h-4.5 w-4.5" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-sky-600 text-[10px] font-bold text-white shadow-sm">
+                <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#2563EB] dark:bg-[#60A5FA] text-[10px] font-bold text-white dark:text-[#080B12] shadow-sm">
                   {cartItemCount}
                 </span>
               )}
             </button>
 
-            {/* Notifications Bell */}
-            <Link
-              href="/customer/notifications"
-              aria-label="Notifications"
-              className="relative p-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors hidden sm:flex"
-            >
-              <Bell className="h-4.5 w-4.5" />
-              {unreadNotifs > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white shadow-sm">
-                  {unreadNotifs}
-                </span>
-              )}
-            </Link>
+            {/* Notifications */}
+            <QuickNotificationsPopover role="customer" />
 
-            {/* AUTHENTICATION / PROFILE BUTTON */}
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              id="customer-theme-btn"
+              className="p-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] text-[#111827] dark:text-[#F8FAFC] hover:bg-[#EEF6FF] dark:hover:bg-[#1a2744] transition-colors"
+              title={theme === "day" ? "Switch to Night Mode" : "Switch to Day Mode"}
+            >
+              {theme === "day" ? (
+                <Moon className="h-4.5 w-4.5" />
+              ) : (
+                <Sun className="h-4.5 w-4.5 text-[#60A5FA]" />
+              )}
+            </button>
+
+            {/* Profile Dropdown */}
             {isAuthenticated && userProfile ? (
               <div className="relative">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-1.5 pr-3 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                  id="customer-profile-btn"
+                  className="flex items-center gap-2 rounded-xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] p-1.5 pr-2.5 text-xs font-semibold text-[#111827] dark:text-[#F8FAFC] hover:bg-[#EEF6FF] dark:hover:bg-[#1a2744] hover:border-[#2563EB]/40 transition-colors"
                 >
-                  <div className="h-7 w-7 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs font-bold shadow-sm overflow-hidden relative">
+                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#7C3AED] text-white flex items-center justify-center text-xs font-bold shadow-sm overflow-hidden relative shrink-0">
                     {userProfile.avatar_url ? (
                       <Image
                         src={userProfile.avatar_url}
@@ -147,10 +203,10 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
                       getInitials(userProfile.full_name)
                     )}
                   </div>
-                  <span className="hidden md:inline font-bold truncate max-w-[120px]">
+                  <span className="hidden md:inline font-bold truncate max-w-[100px]">
                     {userProfile.full_name?.split(" ")[0] || "Customer"}
                   </span>
-                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform text-slate-400", userDropdownOpen && "rotate-180")} />
+                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform text-[#94A3B8]", userDropdownOpen && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
@@ -160,43 +216,34 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 6, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-2 shadow-xl z-50 space-y-1"
+                      className="absolute right-0 mt-2 w-60 rounded-2xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] p-2 shadow-xl z-50 space-y-1"
                     >
-                      <div className="px-3 py-2 border-b border-slate-100 dark:border-white/5">
-                        <p className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                      {/* User info */}
+                      <div className="px-3 py-2.5 border-b border-[#E2E8F0] dark:border-[#263247] mb-1">
+                        <p className="font-bold text-xs text-[#111827] dark:text-[#F8FAFC] truncate">
                           {userProfile.full_name || "NexByte Customer"}
                         </p>
-                        <p className="text-[10px] text-slate-500 truncate mt-0.5">{userProfile.email}</p>
+                        <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] truncate mt-0.5">{userProfile.email}</p>
                       </div>
 
-                      <Link
-                        href="/customer/profile"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                      >
-                        <User className="h-4 w-4 text-sky-600 shrink-0" />
-                        <span>My Profile</span>
-                      </Link>
+                      {[
+                        { href: "/customer/profile", label: "My Profile", icon: User },
+                        { href: "/customer/orders", label: "Orders", icon: Package },
+                        { href: "/customer/bookings", label: "Bookings", icon: Calendar },
+                        { href: "/customer/settings", label: "Settings", icon: Settings },
+                      ].map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#111827] dark:text-[#F8FAFC] hover:bg-[#EEF6FF] dark:hover:bg-[#1a2744] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
+                        >
+                          <item.icon className="h-4 w-4 text-[#2563EB] dark:text-[#60A5FA] shrink-0" />
+                          {item.label}
+                        </Link>
+                      ))}
 
-                      <Link
-                        href="/customer/orders"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                      >
-                        <Package className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>My Orders &amp; Requests</span>
-                      </Link>
-
-                      <Link
-                        href="/customer/settings"
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                      >
-                        <Settings className="h-4 w-4 text-slate-500 shrink-0" />
-                        <span>Account Settings</span>
-                      </Link>
-
-                      <div className="border-t border-slate-100 dark:border-white/5 pt-1">
+                      <div className="border-t border-[#E2E8F0] dark:border-[#263247] pt-1">
                         <button
                           onClick={async () => {
                             setUserDropdownOpen(false);
@@ -206,29 +253,29 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
                           className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                         >
                           <LogOut className="h-4 w-4 shrink-0" />
-                          <span>Sign Out</span>
+                          Sign Out
                         </button>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* Click-away overlay */}
+                {userDropdownOpen && (
+                  <div className="fixed inset-0 z-40" onClick={() => setUserDropdownOpen(false)} />
+                )}
               </div>
             ) : (
-              /* CRITICAL SIGN IN BUTTON REQUIREMENT (#14, #15) */
-              <Link
-                href="/customer/signin"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-4 py-2 shadow-sm transition-all"
-              >
+              <Link href="/customer/signin" id="customer-signin-btn" className="btn-primary !px-4 !py-2 text-xs">
                 <User className="h-3.5 w-3.5" />
                 <span>Sign In</span>
               </Link>
             )}
-
           </div>
         </div>
       </header>
 
-      {/* Global Intent-Aware Search Modal */}
+      {/* Global Search Modal */}
       <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );

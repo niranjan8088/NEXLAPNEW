@@ -49,7 +49,7 @@ ACADEMY PROGRAMS:
 
 LOCATIONS:
 1. Bengaluru Head Office:
-   #372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road, Padmanabhanagar, 560070
+   Padmanabhanagar, Bengaluru, Karnataka
 2. Tumkur Branch:
    Upparahalli, Tumkur, 572101
 3. Hiriyur Branch:
@@ -201,7 +201,7 @@ Trusted · Reliable · Affordable`;
                     <MapPin className="h-3.5 w-3.5 text-nex-blueLight" /> Bengaluru Branch (Head Office)
                   </h4>
                   <p className="text-nex-mist leading-relaxed pl-5">
-                    #372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road, Padmanabhanagar, Bengaluru – 560070
+                    Padmanabhanagar, Bengaluru, Karnataka
                   </p>
                 </div>
 

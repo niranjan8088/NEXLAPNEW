@@ -27,17 +27,30 @@ import Image from "next/image";
 import { getSafeImageSrc } from "@/lib/utils";
 
 const CATEGORIES = [
-  { val: "gaming_pcs", label: "Gaming PCs" },
+  { val: "storage", label: "1. Storage (SSD / HDD / Enclosures)" },
+  { val: "ram", label: "2. RAM / Memory (DDR3 / DDR4 / DDR5)" },
+  { val: "laptop_components", label: "3. Laptop Components & Parts" },
+  { val: "desktop_components", label: "4. Desktop Components & PC Parts" },
+  { val: "peripherals", label: "5. Keyboard / Mouse / Peripherals" },
+  { val: "usb_typec", label: "6. USB & Type-C Accessories" },
+  { val: "display_video", label: "7. Display & Video Adapters/Cables" },
+  { val: "networking", label: "8. Networking & WiFi Devices" },
+  { val: "repair_tools", label: "9. Laptop / PC Repair Tools" },
+  { val: "thermal_cooling", label: "10. Thermal Paste & Cooling Solutions" },
+  { val: "laptop_cleaning", label: "11. Laptop Cleaning & Maintenance" },
+  { val: "power", label: "12. Power Adapters & SMPS Supplies" },
+  { val: "memory_cards", label: "13. Memory Cards & Readers" },
+  { val: "audio", label: "14. Audio Accessories & Microphones" },
+  { val: "cctv_security", label: "15. CCTV & Security Accessories" },
+  { val: "small_components", label: "16. Small Repair Components & ICs" },
+  { val: "gaming_pcs", label: "Gaming PCs & Workstations" },
   { val: "business_laptops", label: "Business Laptops" },
   { val: "premium_used_laptops", label: "Premium Used Laptops" },
-  { val: "second_hand_laptops", label: "Second-Hand Laptops" },
+  { val: "second_hand_laptops", label: "Refurbished Laptops" },
   { val: "servers", label: "Servers" },
-  { val: "desktop_systems", label: "Desktop Systems" },
-  { val: "accessories", label: "Accessories" },
-  { val: "storage", label: "Storage" },
-  { val: "networking", label: "Networking" },
+  { val: "desktop_systems", label: "Desktop Workstations" },
   { val: "monitors", label: "Monitors" },
-  { val: "cctv", label: "CCTV" },
+  { val: "cctv", label: "Complete CCTV Systems" },
 ];
 
 export type ProductImageItem = {
@@ -62,16 +75,75 @@ export default function AdminProductsManager() {
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
 
   // Form Fields
+  const [sku, setSku] = useState("");
+  const [skuError, setSkuError] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("gaming_pcs");
+  const [brand, setBrand] = useState("Kingston");
+  const [category, setCategory] = useState("storage");
   const [price, setPrice] = useState("");
+  const [compareAtPrice, setCompareAtPrice] = useState("");
+  const [costPrice, setCostPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const [stock, setStock] = useState("");
-  const [warranty, setWarranty] = useState("");
+  const [lowStockThreshold, setLowStockThreshold] = useState("5");
+
+  // Warranty Config
+  const [warrantyEnabled, setWarrantyEnabled] = useState(true);
+  const [warrantyDuration, setWarrantyDuration] = useState("3 Years");
+  const [warrantyText, setWarrantyText] = useState("3 Years Brand Warranty");
+
+  // Return Policy Config
+  const [returnEnabled, setReturnEnabled] = useState(true);
+  const [returnWindowDays, setReturnWindowDays] = useState("7");
+  const [returnPolicyText, setReturnPolicyText] = useState("7-Day Replacement Guarantee");
+
+  // Delivery Estimate Config
+  const [deliveryEnabled, setDeliveryEnabled] = useState(false);
+  const [deliveryEstimate, setDeliveryEstimate] = useState("3–5 business days");
+  const [deliveryMinDays, setDeliveryMinDays] = useState("3");
+  const [deliveryMaxDays, setDeliveryMaxDays] = useState("5");
+
+  // Compatibility Config
+  const [compBrand, setCompBrand] = useState("");
+  const [compSeries, setCompSeries] = useState("");
+  const [compModel, setCompModel] = useState("");
+  const [compPartNumber, setCompPartNumber] = useState("");
+
   const [condition, setCondition] = useState("new");
   const [featured, setFeatured] = useState(false);
   const [latest, setLatest] = useState(false);
+
+  // Dynamic Category Specs State
+  const [specProcBrand, setSpecProcBrand] = useState("Intel");
+  const [specProcessor, setSpecProcessor] = useState("Intel Core i5");
+  const [specProcGen, setSpecProcGen] = useState("13th Gen");
+  const [specRamCap, setSpecRamCap] = useState("16 GB");
+  const [specRamType, setSpecRamType] = useState("DDR5");
+  const [specSsdCap, setSpecSsdCap] = useState("512 GB");
+  const [specStorageType, setSpecStorageType] = useState("NVMe SSD");
+  const [specGraphics, setSpecGraphics] = useState("Intel Iris Xe");
+  const [specVram, setSpecVram] = useState("Shared");
+  const [specScreenSize, setSpecScreenSize] = useState("14 inch");
+  const [specDisplayType, setSpecDisplayType] = useState("FHD IPS");
+  const [specOs, setSpecOs] = useState("Windows 11 Pro");
+  const [specWeight, setSpecWeight] = useState("1.4 kg");
+  const [specTouchScreen, setSpecTouchScreen] = useState(false);
+  const [specGstInvoice, setSpecGstInvoice] = useState(true);
+  const [specCountry, setSpecCountry] = useState("India");
+
+  const [specSsdInterface, setSpecSsdInterface] = useState("PCIe Gen 4.0 x4");
+  const [specSsdFormFactor, setSpecSsdFormFactor] = useState("M.2 2280");
+  const [specSsdReadSpeed, setSpecSsdReadSpeed] = useState("7000 MB/s");
+  const [specSsdWriteSpeed, setSpecSsdWriteSpeed] = useState("5100 MB/s");
+
+  const [specRamSpeed, setSpecRamSpeed] = useState("3200MHz");
+  const [specRamFormFactor, setSpecRamFormFactor] = useState("SO-DIMM");
+
+  const [specCctvCameraType, setSpecCctvCameraType] = useState("Dome");
+  const [specCctvResolution, setSpecCctvResolution] = useState("4MP");
+  const [specCctvNightVision, setSpecCctvNightVision] = useState("Color Night Vision");
+  const [specCctvConnectivity, setSpecCctvConnectivity] = useState("PoE");
 
   // Multi-Image Upload State
   const [productImages, setProductImages] = useState<ProductImageItem[]>([]);
@@ -93,13 +165,37 @@ export default function AdminProductsManager() {
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
+    setSku(`NEX-SKU-${Math.floor(1000 + Math.random() * 9000)}`);
+    setSkuError("");
     setTitle("");
     setDescription("");
-    setCategory("gaming_pcs");
-    setPrice("45000");
-    setDiscount("10");
+    setBrand("Kingston");
+    setCategory("storage");
+    setPrice("5499");
+    setCompareAtPrice("6499");
+    setCostPrice("4200");
+    setDiscount("15");
     setStock("12");
-    setWarranty("1 Year Warranty");
+    setLowStockThreshold("5");
+
+    setWarrantyEnabled(true);
+    setWarrantyDuration("3 Years");
+    setWarrantyText("3 Years Brand Warranty");
+
+    setReturnEnabled(true);
+    setReturnWindowDays("7");
+    setReturnPolicyText("7-Day Replacement Guarantee");
+
+    setDeliveryEnabled(false);
+    setDeliveryEstimate("3–5 business days");
+    setDeliveryMinDays("3");
+    setDeliveryMaxDays("5");
+
+    setCompBrand("");
+    setCompSeries("");
+    setCompModel("");
+    setCompPartNumber("");
+
     setCondition("new");
     setFeatured(false);
     setLatest(false);
@@ -110,13 +206,37 @@ export default function AdminProductsManager() {
 
   const handleOpenEdit = (p: any) => {
     setEditingProduct(p);
+    setSku(p.sku || `NEX-SKU-${Math.floor(1000 + Math.random() * 9000)}`);
+    setSkuError("");
     setTitle(p.title);
     setDescription(p.description || "");
-    setCategory(p.category);
+    setBrand(p.brand || "Kingston");
+    setCategory(p.category || "storage");
     setPrice(String(p.price ?? ""));
+    setCompareAtPrice(p.compareAtPrice != null ? String(p.compareAtPrice) : "");
+    setCostPrice(p.costPrice != null ? String(p.costPrice) : "");
     setDiscount(String(p.discount || 0));
     setStock(String(p.stock || 0));
-    setWarranty(p.warranty || "");
+    setLowStockThreshold(String(p.lowStockThreshold || 5));
+
+    setWarrantyEnabled(p.warrantyEnabled !== undefined ? Boolean(p.warrantyEnabled) : true);
+    setWarrantyDuration(p.warrantyDuration || "3 Years");
+    setWarrantyText(p.warrantyText || p.warranty || "3 Years Brand Warranty");
+
+    setReturnEnabled(p.returnEnabled !== undefined ? Boolean(p.returnEnabled) : true);
+    setReturnWindowDays(String(p.returnWindowDays || 7));
+    setReturnPolicyText(p.returnPolicyText || "7-Day Replacement Guarantee");
+
+    setDeliveryEnabled(Boolean(p.deliveryEnabled));
+    setDeliveryEstimate(p.deliveryEstimate || "3–5 business days");
+    setDeliveryMinDays(String(p.deliveryMinDays || 3));
+    setDeliveryMaxDays(String(p.deliveryMaxDays || 5));
+
+    setCompBrand(p.compatibility?.brand || "");
+    setCompSeries(p.compatibility?.series || "");
+    setCompModel(p.compatibility?.model || "");
+    setCompPartNumber(p.compatibility?.partNumber || "");
+
     setCondition(p.condition || "new");
     setFeatured(p.featured || false);
     setLatest(p.latest || false);
@@ -252,6 +372,32 @@ export default function AdminProductsManager() {
     e.preventDefault();
     if (!title || !price || !category) return;
 
+    const cleanSku = sku ? sku.trim().toUpperCase() : `NEX-SKU-${Date.now()}`;
+    const duplicateSku = products.find(
+      (p) => (p.sku || "").toUpperCase() === cleanSku && p.id !== editingProduct?.id && p.status !== "deleted"
+    );
+    if (duplicateSku) {
+      setSkuError(`SKU "${cleanSku}" is already taken by another product. SKU must be unique.`);
+      return;
+    }
+    const numPrice = Number(price);
+    if (isNaN(numPrice) || numPrice <= 0) {
+      setImageError("Selling Price must be a valid positive number.");
+      return;
+    }
+
+    const numDiscount = Number(discount || 0);
+    if (isNaN(numDiscount) || numDiscount < 0 || numDiscount > 100) {
+      setImageError("Discount percentage must be between 0% and 100%.");
+      return;
+    }
+
+    const numStock = Number(stock || 0);
+    if (isNaN(numStock) || numStock < 0) {
+      setImageError("Stock quantity cannot be negative.");
+      return;
+    }
+
     if (productImages.length === 0) {
       setImageError("At least 1 product image is required.");
       return;
@@ -259,6 +405,7 @@ export default function AdminProductsManager() {
 
     setUploading(true);
     setImageError("");
+    setSkuError("");
     setUploadProgress("Uploading product images...");
 
     try {
@@ -303,13 +450,39 @@ export default function AdminProductsManager() {
       const primaryImageUrl = uploadedImages.find((img) => img.is_primary)?.url || uploadedImages[0]?.url || "/images/poster-products.png";
 
       const payload = {
-        title,
-        description,
-        category,
+        sku: cleanSku,
+        title: title.trim(),
+        description: description.trim(),
+        brand: brand.trim(),
+        category: category.trim(),
         price: Number(price),
-        discount: Number(discount),
-        stock: Number(stock),
-        warranty,
+        compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
+        costPrice: costPrice ? Number(costPrice) : undefined,
+        discount: Number(discount) || 0,
+        stock: Number(stock) || 0,
+        lowStockThreshold: Number(lowStockThreshold) || 5,
+
+        warrantyEnabled: Boolean(warrantyEnabled),
+        warrantyDuration: warrantyDuration || "3 Years",
+        warranty: warrantyText || warrantyDuration || "3 Years Brand Warranty",
+        warrantyText: warrantyText || warrantyDuration || "3 Years Brand Warranty",
+
+        returnEnabled: Boolean(returnEnabled),
+        returnWindowDays: Number(returnWindowDays) || 7,
+        returnPolicyText: returnPolicyText || "7-Day Replacement Guarantee",
+
+        deliveryEnabled: Boolean(deliveryEnabled),
+        deliveryEstimate: deliveryEstimate || "3–5 business days",
+        deliveryMinDays: Number(deliveryMinDays) || 3,
+        deliveryMaxDays: Number(deliveryMaxDays) || 5,
+
+        compatibility: {
+          brand: compBrand,
+          series: compSeries,
+          model: compModel,
+          partNumber: compPartNumber
+        },
+
         condition,
         featured,
         latest,
@@ -322,7 +495,35 @@ export default function AdminProductsManager() {
           alt_text: img.alt_text || ""
         })),
         status: editingProduct ? editingProduct.status : "show",
-        specs: editingProduct ? editingProduct.specs : { Processor: "Intel Core i5", RAM: "8GB", Storage: "512GB SSD" }
+        specs: {
+          "Processor Brand": specProcBrand,
+          Processor: specProcessor,
+          "Processor Generation": specProcGen,
+          "RAM Capacity": specRamCap,
+          "RAM Type": specRamType,
+          "SSD Capacity": specSsdCap,
+          "Storage Type": specStorageType,
+          Graphics: specGraphics,
+          "Dedicated Graphics Memory": specVram,
+          "Screen Size": specScreenSize,
+          "Display Type": specDisplayType,
+          "Operating System": specOs,
+          Weight: specWeight,
+          "Touch Screen": specTouchScreen ? "Yes" : "No",
+          "GST Invoice Available": specGstInvoice ? "Yes" : "No",
+          "Country Of Origin": specCountry,
+          Capacity: category === "ram" ? specRamCap : specSsdCap,
+          Interface: specSsdInterface,
+          FormFactor: category === "ram" ? specRamFormFactor : specSsdFormFactor,
+          ReadSpeed: specSsdReadSpeed,
+          WriteSpeed: specSsdWriteSpeed,
+          Speed: specRamSpeed,
+          CameraType: specCctvCameraType,
+          Resolution: specCctvResolution,
+          NightVision: specCctvNightVision,
+          Connectivity: specCctvConnectivity,
+          ...(editingProduct?.specs || {})
+        }
       };
 
       if (editingProduct) {
@@ -716,22 +917,43 @@ export default function AdminProductsManager() {
             </h3>
 
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Title */}
-                <div className="space-y-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* SKU */}
+                <div className="space-y-1 sm:col-span-1">
+                  <label className="text-xs text-white/80 font-semibold">SKU *</label>
+                  <input
+                    type="text"
+                    required
+                    value={sku}
+                    onChange={(e) => {
+                      setSku(e.target.value);
+                      setSkuError("");
+                    }}
+                    placeholder="NEX-SSD-1001"
+                    className={`w-full rounded-xl bg-white/[0.03] border px-3.5 py-2.5 text-xs text-white focus:outline-none ${
+                      skuError ? "border-red-500 font-bold" : "border-white/10"
+                    }`}
+                  />
+                  {skuError && <p className="text-[10px] text-red-400 font-semibold">{skuError}</p>}
+                </div>
+
+                {/* Product Title */}
+                <div className="space-y-1 sm:col-span-2">
                   <label className="text-xs text-white/80 font-semibold">Product Title *</label>
                   <input
                     type="text"
                     required
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Lenovo ThinkPad T480"
+                    placeholder="e.g. EVM 512GB NVMe M.2 SSD"
                     className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none"
                   />
                 </div>
+              </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Category */}
-                <div className="space-y-1">
+                <div className="space-y-1 sm:col-span-1">
                   <label className="text-xs text-white/80 font-semibold">Category *</label>
                   <select
                     value={category}
@@ -743,74 +965,22 @@ export default function AdminProductsManager() {
                     ))}
                   </select>
                 </div>
-              </div>
 
-              {/* Description */}
-              <div className="space-y-1">
-                <label className="text-xs text-white/80 font-semibold">Item Description</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Summarize processor, graphics, memory configurations..."
-                  rows={3}
-                  className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none resize-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Price */}
-                <div className="space-y-1">
-                  <label className="text-xs text-white/80 font-semibold">Price (Rs.) *</label>
-                  <input
-                    type="number"
-                    required
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="45000"
-                    className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none"
-                  />
-                </div>
-
-                {/* Discount */}
-                <div className="space-y-1">
-                  <label className="text-xs text-white/80 font-semibold">Discount (%)</label>
-                  <input
-                    type="number"
-                    value={discount}
-                    onChange={(e) => setDiscount(e.target.value)}
-                    placeholder="10"
-                    className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none"
-                  />
-                </div>
-
-                {/* Stock */}
-                <div className="space-y-1">
-                  <label className="text-xs text-white/80 font-semibold">Stock Quantity</label>
-                  <input
-                    type="number"
-                    value={stock}
-                    onChange={(e) => setStock(e.target.value)}
-                    placeholder="12"
-                    className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Warranty */}
-                <div className="space-y-1">
-                  <label className="text-xs text-white/80 font-semibold">Warranty Terms</label>
+                {/* Brand */}
+                <div className="space-y-1 sm:col-span-1">
+                  <label className="text-xs text-white/80 font-semibold">Brand *</label>
                   <input
                     type="text"
-                    value={warranty}
-                    onChange={(e) => setWarranty(e.target.value)}
-                    placeholder="e.g. 1 Year Brand Warranty"
+                    required
+                    value={brand}
+                    onChange={(e) => setBrand(e.target.value)}
+                    placeholder="e.g. EVM, Kingston, Lenovo, Corsair"
                     className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none"
                   />
                 </div>
 
                 {/* Condition */}
-                <div className="space-y-1">
+                <div className="space-y-1 sm:col-span-1">
                   <label className="text-xs text-white/80 font-semibold">Product Condition</label>
                   <select
                     value={condition}
@@ -822,6 +992,430 @@ export default function AdminProductsManager() {
                     <option value="refurbished">Refurbished</option>
                   </select>
                 </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1">
+                <label className="text-xs text-white/80 font-semibold">Item Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Summarize processor, memory, speeds, read/write rate..."
+                  rows={2}
+                  className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3.5 py-2.5 text-xs text-white focus:outline-none resize-none"
+                />
+              </div>
+
+              {/* PRICING & INVENTORY BREAKDOWN */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                <h4 className="text-xs text-nex-blueLight font-bold uppercase tracking-wider">Pricing &amp; Inventory</h4>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {/* Selling Price */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-white/80 font-semibold">Selling Price (Rs.) *</label>
+                    <input
+                      type="number"
+                      required
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="45000"
+                      className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Compare-at Price */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-white/80 font-semibold">Compare Price (MRP)</label>
+                    <input
+                      type="number"
+                      value={compareAtPrice}
+                      onChange={(e) => setCompareAtPrice(e.target.value)}
+                      placeholder="55000"
+                      className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Cost Price (Admin confidential) */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-amber-300 font-semibold">Cost Price (Admin Only)</label>
+                    <input
+                      type="number"
+                      value={costPrice}
+                      onChange={(e) => setCostPrice(e.target.value)}
+                      placeholder="38000"
+                      className="w-full rounded-xl bg-white/[0.03] border border-amber-500/30 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Discount */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-white/80 font-semibold">Discount (%)</label>
+                    <input
+                      type="number"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                      placeholder="10"
+                      className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/5">
+                  {/* Stock Quantity */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-white/80 font-semibold">Stock Quantity *</label>
+                    <input
+                      type="number"
+                      value={stock}
+                      onChange={(e) => setStock(e.target.value)}
+                      placeholder="12"
+                      className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Low Stock Threshold */}
+                  <div className="space-y-1">
+                    <label className="text-[11px] text-white/80 font-semibold">Low Stock Alert Threshold</label>
+                    <input
+                      type="number"
+                      value={lowStockThreshold}
+                      onChange={(e) => setLowStockThreshold(e.target.value)}
+                      placeholder="5"
+                      className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* POLICIES & DELIVERY TOGGLES */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Warranty Config */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-xs text-white font-bold">Warranty Policy</span>
+                    <input
+                      type="checkbox"
+                      checked={warrantyEnabled}
+                      onChange={(e) => setWarrantyEnabled(e.target.checked)}
+                      className="rounded bg-nex-black border-white/20 text-nex-blue"
+                    />
+                  </label>
+                  {warrantyEnabled && (
+                    <div className="space-y-1.5 pt-1">
+                      <input
+                        type="text"
+                        value={warrantyDuration}
+                        onChange={(e) => setWarrantyDuration(e.target.value)}
+                        placeholder="Duration (e.g. 3 Years)"
+                        className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                      />
+                      <input
+                        type="text"
+                        value={warrantyText}
+                        onChange={(e) => setWarrantyText(e.target.value)}
+                        placeholder="Text (e.g. 3 Years Brand Warranty)"
+                        className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Return Policy Config */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-xs text-white font-bold">Return Guarantee</span>
+                    <input
+                      type="checkbox"
+                      checked={returnEnabled}
+                      onChange={(e) => setReturnEnabled(e.target.checked)}
+                      className="rounded bg-nex-black border-white/20 text-nex-blue"
+                    />
+                  </label>
+                  {returnEnabled && (
+                    <div className="space-y-1.5 pt-1">
+                      <input
+                        type="number"
+                        value={returnWindowDays}
+                        onChange={(e) => setReturnWindowDays(e.target.value)}
+                        placeholder="Days (e.g. 7)"
+                        className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                      />
+                      <input
+                        type="text"
+                        value={returnPolicyText}
+                        onChange={(e) => setReturnPolicyText(e.target.value)}
+                        placeholder="Text (e.g. 7-Day Replacement)"
+                        className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Delivery Estimate Config */}
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-xs text-white font-bold">Delivery Estimate</span>
+                    <input
+                      type="checkbox"
+                      checked={deliveryEnabled}
+                      onChange={(e) => setDeliveryEnabled(e.target.checked)}
+                      className="rounded bg-nex-black border-white/20 text-nex-blue"
+                    />
+                  </label>
+                  {deliveryEnabled ? (
+                    <div className="space-y-1.5 pt-1">
+                      <div className="grid grid-cols-2 gap-1">
+                        <input
+                          type="number"
+                          value={deliveryMinDays}
+                          onChange={(e) => setDeliveryMinDays(e.target.value)}
+                          placeholder="Min Days"
+                          className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-[11px] text-white"
+                        />
+                        <input
+                          type="number"
+                          value={deliveryMaxDays}
+                          onChange={(e) => setDeliveryMaxDays(e.target.value)}
+                          placeholder="Max Days"
+                          className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-[11px] text-white"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={deliveryEstimate}
+                        onChange={(e) => setDeliveryEstimate(e.target.value)}
+                        placeholder="Estimate text (3-5 days)"
+                        className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-nex-mist italic pt-1">Disabled: Hidden on customer shop</p>
+                  )}
+                </div>
+              </div>
+
+              {/* COMPATIBILITY METADATA */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                <h4 className="text-xs text-nex-blueLight font-bold uppercase tracking-wider">Hardware Compatibility Details</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <input
+                    type="text"
+                    value={compBrand}
+                    onChange={(e) => setCompBrand(e.target.value)}
+                    placeholder="Compatible Brand (e.g. Dell)"
+                    className="rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                  />
+                  <input
+                    type="text"
+                    value={compSeries}
+                    onChange={(e) => setCompSeries(e.target.value)}
+                    placeholder="Series (e.g. ThinkPad / Latitude)"
+                    className="rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                  />
+                  <input
+                    type="text"
+                    value={compModel}
+                    onChange={(e) => setCompModel(e.target.value)}
+                    placeholder="Model (e.g. T480 / XPS 13)"
+                    className="rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                  />
+                  <input
+                    type="text"
+                    value={compPartNumber}
+                    onChange={(e) => setCompPartNumber(e.target.value)}
+                    placeholder="Part Number"
+                    className="rounded-lg bg-white/[0.03] border border-white/10 px-2.5 py-1.5 text-[11px] text-white"
+                  />
+                </div>
+              </div>
+
+              {/* CATEGORY-AWARE SPECIFICATIONS SECTION */}
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs text-nex-blueLight font-bold uppercase tracking-wider">
+                    Category Specifications ({category.replace("_", " ")})
+                  </h4>
+                  <span className="text-[10px] text-nex-mist">Powers Customer Catalog Filters</span>
+                </div>
+
+                {["business_laptops", "premium_used_laptops", "second_hand_laptops"].includes(category) ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Processor Brand</label>
+                        <select value={specProcBrand} onChange={(e) => setSpecProcBrand(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="Intel">Intel</option>
+                          <option value="AMD">AMD</option>
+                          <option value="Apple">Apple</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Processor Family</label>
+                        <input type="text" value={specProcessor} onChange={(e) => setSpecProcessor(e.target.value)} placeholder="Intel Core i5" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Processor Gen</label>
+                        <select value={specProcGen} onChange={(e) => setSpecProcGen(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="11th Gen">11th Gen</option>
+                          <option value="12th Gen">12th Gen</option>
+                          <option value="13th Gen">13th Gen</option>
+                          <option value="14th Gen">14th Gen</option>
+                          <option value="Apple Silicon">Apple Silicon</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">RAM Capacity</label>
+                        <select value={specRamCap} onChange={(e) => setSpecRamCap(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="4 GB">4 GB</option>
+                          <option value="8 GB">8 GB</option>
+                          <option value="16 GB">16 GB</option>
+                          <option value="32 GB">32 GB</option>
+                          <option value="64 GB">64 GB</option>
+                          <option value="128 GB">128 GB</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">RAM Type</label>
+                        <select value={specRamType} onChange={(e) => setSpecRamType(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="DDR4">DDR4</option>
+                          <option value="DDR5">DDR5</option>
+                          <option value="LPDDR5">LPDDR5</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">SSD Capacity</label>
+                        <select value={specSsdCap} onChange={(e) => setSpecSsdCap(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="128 GB">128 GB</option>
+                          <option value="256 GB">256 GB</option>
+                          <option value="512 GB">512 GB</option>
+                          <option value="1 TB">1 TB</option>
+                          <option value="2 TB">2 TB</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Storage Type</label>
+                        <select value={specStorageType} onChange={(e) => setSpecStorageType(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="NVMe SSD">NVMe SSD</option>
+                          <option value="SATA SSD">SATA SSD</option>
+                          <option value="HDD">HDD</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Screen Size</label>
+                        <select value={specScreenSize} onChange={(e) => setSpecScreenSize(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                          <option value="13.3 inch">13.3 inch</option>
+                          <option value="14 inch">14 inch</option>
+                          <option value="15.6 inch">15.6 inch</option>
+                          <option value="16 inch">16 inch</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Graphics GPU</label>
+                        <input type="text" value={specGraphics} onChange={(e) => setSpecGraphics(e.target.value)} placeholder="Intel Iris Xe / RTX 4070" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Operating System</label>
+                        <input type="text" value={specOs} onChange={(e) => setSpecOs(e.target.value)} placeholder="Windows 11 Pro" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-white/70 block mb-0.5">Weight</label>
+                        <input type="text" value={specWeight} onChange={(e) => setSpecWeight(e.target.value)} placeholder="1.4 kg" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                      </div>
+                      <div className="flex items-center gap-3 pt-4">
+                        <label className="flex items-center gap-1.5 text-xs text-white cursor-pointer">
+                          <input type="checkbox" checked={specTouchScreen} onChange={(e) => setSpecTouchScreen(e.target.checked)} className="rounded text-nex-blue" />
+                          <span>Touchscreen</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ) : category === "storage" ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Capacity</label>
+                      <select value={specSsdCap} onChange={(e) => setSpecSsdCap(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                        <option value="128 GB">128 GB</option>
+                        <option value="256 GB">256 GB</option>
+                        <option value="512 GB">512 GB</option>
+                        <option value="1 TB">1 TB</option>
+                        <option value="2 TB">2 TB</option>
+                        <option value="4 TB">4 TB</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Interface</label>
+                      <input type="text" value={specSsdInterface} onChange={(e) => setSpecSsdInterface(e.target.value)} placeholder="PCIe Gen 4.0 x4" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Form Factor</label>
+                      <input type="text" value={specSsdFormFactor} onChange={(e) => setSpecSsdFormFactor(e.target.value)} placeholder="M.2 2280" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Read Speed</label>
+                      <input type="text" value={specSsdReadSpeed} onChange={(e) => setSpecSsdReadSpeed(e.target.value)} placeholder="7000 MB/s" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                  </div>
+                ) : category === "ram" ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Capacity</label>
+                      <select value={specRamCap} onChange={(e) => setSpecRamCap(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                        <option value="4 GB">4 GB</option>
+                        <option value="8 GB">8 GB</option>
+                        <option value="16 GB">16 GB</option>
+                        <option value="32 GB">32 GB</option>
+                        <option value="64 GB">64 GB</option>
+                        <option value="128 GB">128 GB</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">DDR Generation</label>
+                      <select value={specRamType} onChange={(e) => setSpecRamType(e.target.value)} className="w-full rounded-lg bg-nex-ink border border-white/10 px-2 py-1 text-white text-[11px]">
+                        <option value="DDR4">DDR4</option>
+                        <option value="DDR5">DDR5</option>
+                        <option value="LPDDR5">LPDDR5</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Speed</label>
+                      <input type="text" value={specRamSpeed} onChange={(e) => setSpecRamSpeed(e.target.value)} placeholder="3200MHz" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Form Factor</label>
+                      <input type="text" value={specRamFormFactor} onChange={(e) => setSpecRamFormFactor(e.target.value)} placeholder="SO-DIMM" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                  </div>
+                ) : (category === "cctv" || category === "cctv_security") ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Camera Type</label>
+                      <input type="text" value={specCctvCameraType} onChange={(e) => setSpecCctvCameraType(e.target.value)} placeholder="Dome / Bullet" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Resolution</label>
+                      <input type="text" value={specCctvResolution} onChange={(e) => setSpecCctvResolution(e.target.value)} placeholder="4MP" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Night Vision</label>
+                      <input type="text" value={specCctvNightVision} onChange={(e) => setSpecCctvNightVision(e.target.value)} placeholder="Color Night Vision" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-white/70 block mb-0.5">Connectivity</label>
+                      <input type="text" value={specCctvConnectivity} onChange={(e) => setSpecCctvConnectivity(e.target.value)} placeholder="PoE / BNC" className="w-full rounded-lg bg-white/[0.03] border border-white/10 px-2 py-1 text-white text-[11px]" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-nex-mist italic">
+                    General product item — Basic specs will be automatically derived from description and brand.
+                  </div>
+                )}
               </div>
 
               {/* PRODUCT IMAGES MULTI-UPLOADER SECTION */}

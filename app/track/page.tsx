@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Search, Loader2, Calendar, ClipboardCheck, Laptop, CheckCircle2, Send, ShoppingBag, GraduationCap, Award, Upload } from "lucide-react";
@@ -500,12 +501,12 @@ export default function TrackPage() {
                                   <div className="text-[11px] text-cyan-400 font-semibold mt-0.5">Rs. {(prod.price ?? 0).toLocaleString("en-IN")}</div>
                                 </div>
                               </div>
-                              <a
+                              <Link
                                 href="/products"
                                 className="btn-primary !py-1.5 !px-3 text-[10px] shrink-0 flex items-center gap-1"
                               >
                                 <ShoppingBag className="h-3 w-3" /> Book
-                              </a>
+                              </Link>
                             </div>
                           ))}
                         </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,11 +33,30 @@ export async function PATCH(request: NextRequest) {
 
     const updated = await dbHelper.resellers.update(id, { status });
 
-    await dbHelper.notifications.create({
-      title: `Reseller Application ${status.toUpperCase()}`,
-      message: `Reseller account (${updated?.business_name || updated?.owner_name || id}) status set to ${status}`,
-      type: "reseller_status",
-      status: "unread",
+    // PIPELINE EVENT (ADMIN → RESELLER ONBOARDING STATUS)
+    let eventType: any = "RESELLER_APPROVED";
+    let title = "Reseller Account Approved 🎉";
+    let msg = `Your NexByte reseller application for ${updated?.business_name || "your business"} has been approved!`;
+
+    if (status === "suspended") {
+      eventType = "RESELLER_SUSPENDED";
+      title = "Reseller Account Suspended ⚠️";
+      msg = `Your reseller partner account has been suspended. Please contact NexByte Admin.`;
+    } else if (status === "rejected") {
+      eventType = "RESELLER_REJECTED";
+      title = "Reseller Application Status";
+      msg = `Your reseller partner application was not approved at this time.`;
+    }
+
+    await dispatchPipelineEvent({
+      eventType,
+      title,
+      message: msg,
+      recipientRole: "reseller",
+      recipientUserId: id,
+      referenceType: "reseller",
+      referenceId: id,
+      actorRole: "admin",
     });
 
     return NextResponse.json({ success: true, reseller: updated });

@@ -1,4 +1,4 @@
-import { calculateInvoiceTotals, validateMobile, validateGSTIN } from "./lib/billingUtils";
+import { calculateInvoiceTotals, sanitizeInvoiceItems, validateMobile, validateGSTIN } from "./lib/billingUtils";
 import { dbHelper } from "./lib/dbHelper";
 
 async function runBillingSuite() {
@@ -7,7 +7,7 @@ async function runBillingSuite() {
   console.log("==================================================\n");
 
   let passCount = 0;
-  let totalTests = 15;
+  let totalTests = 19;
 
   // TEST 1: GST OFF
   try {
@@ -113,37 +113,51 @@ async function runBillingSuite() {
     console.error("FAIL - TEST 5 Error:", e.message);
   }
 
-  // TEST 6: Invoice Number Generation Sequence
+  // TEST 6: Invoice Number Format & Sequential Generation (NEX-2026-0003, NEX-2026-0004)
   try {
-    const next1 = await dbHelper.invoices.generateNextNumber();
-    console.log("Generated Sequence Invoice Number:", next1);
-    if (next1.startsWith("NEX-") && next1.length === 13) {
-      console.log("PASS - TEST 6: Invoice Number Format NEX-YEAR-0001");
+    const inv3 = await dbHelper.invoices.create({ customerName: "Test Customer 3", mobile: "9876543210" });
+    const inv4 = await dbHelper.invoices.create({ customerName: "Test Customer 4", mobile: "9876543210" });
+    const inv5 = await dbHelper.invoices.create({ customerName: "Test Customer 5", mobile: "9876543210" });
+
+    const num3 = inv3.invoiceNumber || inv3.invoice_number;
+    const num4 = inv4.invoiceNumber || inv4.invoice_number;
+    const num5 = inv5.invoiceNumber || inv5.invoice_number;
+
+    const regex = /^NEX-[0-9]{4}-[0-9]{4}$/;
+    const validFormat = regex.test(num3) && regex.test(num4) && regex.test(num5);
+    const isSequential = num3 === "NEX-2026-0003" && num4 === "NEX-2026-0004" && num5 === "NEX-2026-0005";
+
+    if (validFormat && isSequential) {
+      console.log(`PASS - TEST 6: Sequential Numbering (${num3} -> ${num4} -> ${num5})`);
       passCount++;
     } else {
-      console.error("FAIL - TEST 6:", next1);
+      console.error("FAIL - TEST 6: Sequential check failed:", { num3, num4, num5 });
     }
   } catch (e: any) {
     console.error("FAIL - TEST 6 Error:", e.message);
   }
 
-  // TEST 7: Persistent Saved Invoices
+  // TEST 7: Sequence Persistence After Deletion/Cancellation (Never Reuse Test)
   try {
-    const list = await dbHelper.invoices.list();
-    if (Array.isArray(list) && list.length >= 2) {
-      console.log("PASS - TEST 7: Persistent Invoice Storage Verified");
+    // Cancel inv5 (NEX-2026-0005)
+    await dbHelper.invoices.cancel("inv-5");
+    const inv6 = await dbHelper.invoices.create({ customerName: "Test Customer 6", mobile: "9876543210" });
+    const num6 = inv6.invoiceNumber || inv6.invoice_number;
+
+    if (num6 === "NEX-2026-0006") {
+      console.log(`PASS - TEST 7: Never Reuse Sequence After Cancellation/Deletion (${num6})`);
       passCount++;
     } else {
-      console.error("FAIL - TEST 7: Expected at least 2 saved invoices, found", list.length);
+      console.error("FAIL - TEST 7: Reused sequence integer! Expected NEX-2026-0006, got:", num6);
     }
   } catch (e: any) {
     console.error("FAIL - TEST 7 Error:", e.message);
   }
 
-  // TEST 8: Historical Price Immutability
+  // TEST 8: Historical Price & Invoice Number Immutability
   try {
     const inv1 = await dbHelper.invoices.getById("inv-1");
-    if (inv1 && inv1.grandTotal === 38940) {
+    if (inv1 && inv1.grandTotal === 38940 && inv1.invoiceNumber === "NEX-2026-0001") {
       console.log("PASS - TEST 8: Saved Invoice Snapshot Immutability");
       passCount++;
     } else {
@@ -209,7 +223,7 @@ async function runBillingSuite() {
   // TEST 15: Share Token Verification
   try {
     const invTok = await dbHelper.invoices.getByShareToken("tok-nex-2026-0001-sec");
-    if (invTok && invTok.invoiceNumber === "NEX-2026-0001") {
+    if (invTok && (invTok.invoiceNumber === "NEX-2026-0001" || invTok.invoice_number === "NEX-2026-0001")) {
       console.log("PASS - TEST 15: Non-guessable Secure Share Token Access");
       passCount++;
     } else {
@@ -217,6 +231,82 @@ async function runBillingSuite() {
     }
   } catch (e: any) {
     console.error("FAIL - TEST 15 Error:", e.message);
+  }
+
+  // TEST 16: Two-Item Screenshot Scenario Sanitization (EVM SSD + Lenovo T490 + 5 empty placeholders -> EXACTLY 2 items)
+  try {
+    const inputItems = [
+      { name: "EVM ssd NVME", description: "512 gb gen 2", quantity: 1, unitPrice: 46000, discount: 0 },
+      { name: "Lenovo ThinkPad T490 (Certified Refurbished)", description: "second_hand_laptops", quantity: 1, unitPrice: 285000, discount: 1000 },
+      { name: "", description: "", quantity: 1, unitPrice: 0, discount: 0 },
+      { name: "Item", description: "", quantity: 1, unitPrice: 0, discount: 0 },
+      { name: "", description: "", quantity: 1, unitPrice: 0, discount: 0 },
+    ];
+    const sanitized = sanitizeInvoiceItems(inputItems);
+    const totals = calculateInvoiceTotals({ items: inputItems, gstEnabled: false, paymentStatus: "partially_paid", amountPaid: 0 });
+
+    if (sanitized.length === 2 && totals.items.length === 2 && totals.subtotal === 330000 && totals.grandTotal === 330000) {
+      console.log("PASS - TEST 16: Two-Item Screenshot Scenario Sanitized to EXACTLY 2 Rows (Subtotal: ₹3,30,000, Grand Total: ₹3,30,000)");
+      passCount++;
+    } else {
+      console.error("FAIL - TEST 16:", { sanitizedLen: sanitized.length, calcLen: totals.items.length, grandTotal: totals.grandTotal });
+    }
+  } catch (e: any) {
+    console.error("FAIL - TEST 16 Error:", e.message);
+  }
+
+  // TEST 17: One-Item Sanitization
+  try {
+    const singleInput = [
+      { name: "EVM ssd NVME", description: "512 gb gen 2", quantity: 1, unitPrice: 46000, discount: 0 },
+      { name: "", description: "", quantity: 1, unitPrice: 0, discount: 0 },
+      { name: "Item", description: "", quantity: 1, unitPrice: 0, discount: 0 }
+    ];
+    const sanitized = sanitizeInvoiceItems(singleInput);
+    if (sanitized.length === 1 && sanitized[0].name === "EVM ssd NVME") {
+      console.log("PASS - TEST 17: Single Item Invoice Sanitized to EXACTLY 1 Row");
+      passCount++;
+    } else {
+      console.error("FAIL - TEST 17:", sanitized);
+    }
+  } catch (e: any) {
+    console.error("FAIL - TEST 17 Error:", e.message);
+  }
+
+  // TEST 18: Three-Item Sanitization
+  try {
+    const threeInput = [
+      { name: "Item A", quantity: 1, unitPrice: 1000 },
+      { name: "Item B", quantity: 2, unitPrice: 2000 },
+      { name: "Item C", quantity: 1, unitPrice: 3000 },
+    ];
+    const sanitized = sanitizeInvoiceItems(threeInput);
+    if (sanitized.length === 3) {
+      console.log("PASS - TEST 18: Three Item Invoice Sanitized to EXACTLY 3 Rows");
+      passCount++;
+    } else {
+      console.error("FAIL - TEST 18:", sanitized);
+    }
+  } catch (e: any) {
+    console.error("FAIL - TEST 18 Error:", e.message);
+  }
+
+  // TEST 19: Ten-Item Sanitization
+  try {
+    const tenItems = Array.from({ length: 10 }).map((_, idx) => ({
+      name: `Product ${idx + 1}`,
+      quantity: 1,
+      unitPrice: 1000 * (idx + 1)
+    }));
+    const sanitized = sanitizeInvoiceItems(tenItems);
+    if (sanitized.length === 10) {
+      console.log("PASS - TEST 19: Ten Item Invoice Sanitized to EXACTLY 10 Rows");
+      passCount++;
+    } else {
+      console.error("FAIL - TEST 19:", sanitized);
+    }
+  } catch (e: any) {
+    console.error("FAIL - TEST 19 Error:", e.message);
   }
 
   console.log("\n==================================================");

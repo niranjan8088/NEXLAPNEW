@@ -15,14 +15,14 @@ export default function CustomerFavoritesPage() {
       name: "NexByte ROG Slayer R15 Gaming PC",
       category: "Gaming PC",
       price: 98500,
-      image: "/images/hero-pc-transparent.png",
+      image: "/images/product-gaming-desktops.png",
     },
     {
       id: "fav-2",
       name: "MacBook Pro 16\" M1 Pro (Pre-Owned)",
       category: "Laptops",
       price: 115000,
-      image: "/images/service-repair-transparent.png",
+      image: "/images/product-second-hand-laptops.png",
     },
   ]);
 

@@ -97,7 +97,7 @@ export default function CustomerServicesPage() {
         <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Professional Computer &amp; IT Services
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
           Book certified computer technicians for hardware repair, upgrades, CCTV installations, and doorstep IT support across Bengaluru and surrounding regions.
         </p>
       </div>
@@ -124,7 +124,7 @@ export default function CustomerServicesPage() {
                 <h3 className="font-display text-base font-bold text-slate-900 dark:text-white">
                   {svc.title}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
                   {svc.description}
                 </p>
               </div>

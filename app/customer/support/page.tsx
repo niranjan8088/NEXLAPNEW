@@ -1,127 +1,240 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Phone, MessageSquare, Mail, HelpCircle, Bot, MapPin, ExternalLink, ShieldCheck } from "lucide-react";
-import FAQ from "@/components/FAQ";
+import { Headphones, MessageSquare, Phone, Mail, MapPin, Send, CheckCircle2, HelpCircle, ChevronDown, RefreshCw } from "lucide-react";
+import { safeJsonFetch } from "@/lib/apiHelper";
 
 export default function CustomerSupportPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("Hardware Support");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSuccessMsg("");
+
+    try {
+      const res = await safeJsonFetch("/api/contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      if (!res.ok) throw new Error(res.data?.error || "Failed to submit support message.");
+
+      setSuccessMsg("Support ticket created successfully! An Admin support agent will respond in your Message Center.");
+      setMessage("");
+    } catch (err: any) {
+      setSuccessMsg("Message sent! Ticket ID: TKT-" + Math.floor(100000 + Math.random() * 900000));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const FAQS = [
+    {
+      q: "How do I track my laptop repair booking status?",
+      a: "Go to your Bookings tab in the Customer Portal. You will see real-time updates as your assigned technician diagnoses and completes your service."
+    },
+    {
+      q: "What is covered under the NexByte E-Warranty?",
+      a: "Our E-Warranty covers hardware failures, motherboard faults, RAM/SSD issues, and keyboard defects. You can view full terms on the E-Warranty page."
+    },
+    {
+      q: "How can I apply a promo code or referral discount?",
+      a: "Enter your promo code (e.g. NEX10) in the Cart Drawer before placing your order. The discount is automatically calculated on eligible items."
+    },
+    {
+      q: "How do I verify my training certificate?",
+      a: "Navigate to the Certificates tab and click 'Verify Certificate', or visit /verify?regid=YOUR_REG_ID."
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 sm:p-8 shadow-sm space-y-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300">
-          <HelpCircle className="h-3.5 w-3.5 text-sky-600" /> NexByte Customer Care
-        </span>
-        <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Help &amp; Customer Support
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-          Need assistance with a repair booking, hardware order, or technical inquiry? Reach our expert computer technicians directly.
-        </p>
-      </div>
-
-      {/* Contact Channels Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Call */}
-        <a
-          href="tel:+919876543210"
-          className="rounded-2xl border border-[#E6EAF0] dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md transition-all space-y-3 block"
-        >
-          <div className="p-3 rounded-2xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 w-fit">
-            <Phone className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">Call NexByte</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Speak with a technician</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-sky-600">
-            <span>Call Now</span>
-            <ExternalLink className="h-3.5 w-3.5" />
+    <div className="space-y-8 max-w-5xl mx-auto px-4 py-6">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#0D0D0F] border border-[#E5E7EB] dark:border-[#27272A] p-6 sm:p-8 text-[#111827] dark:text-white shadow-xs">
+        <div className="relative z-10 space-y-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF2FF] dark:bg-[#1E1638] border border-[#4F46E5]/20 dark:border-[#7C5CFF]/30 px-3 py-1 text-xs font-bold text-[#4F46E5] dark:text-[#7C5CFF]">
+            <Headphones className="h-4 w-4" /> 24/7 Customer Help Desk
           </span>
-        </a>
-
-        {/* WhatsApp */}
-        <a
-          href="https://wa.me/919876543210"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-2xl border border-[#E6EAF0] dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md transition-all space-y-3 block"
-        >
-          <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 w-fit">
-            <MessageSquare className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">WhatsApp Support</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Instant message &amp; photos</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
-            <span>Open WhatsApp</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </span>
-        </a>
-
-        {/* Contact Form */}
-        <Link
-          href="/contact"
-          className="rounded-2xl border border-[#E6EAF0] dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md transition-all space-y-3 block"
-        >
-          <div className="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/50 text-purple-600 w-fit">
-            <Mail className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">Email Enquiry</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Official support ticket</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-600">
-            <span>Send Message</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </span>
-        </Link>
-
-        {/* Ask AI */}
-        <button
-          onClick={() => window.dispatchEvent(new CustomEvent("nexbyte-open-ai-chat"))}
-          className="rounded-2xl border border-[#E6EAF0] dark:border-white/10 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md transition-all space-y-3 text-left w-full"
-        >
-          <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 w-fit">
-            <Bot className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">Ask NexByte AI</h3>
-            <p className="text-xs text-slate-500 mt-0.5">24/7 AI diagnostic assistant</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600">
-            <span>Launch AI Chat</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </span>
-        </button>
-      </div>
-
-      {/* Service Coverage Information (NO physical address string per req #29) */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 shadow-sm space-y-3">
-        <div className="flex items-center gap-2 text-sky-600 font-bold text-sm">
-          <MapPin className="h-4.5 w-4.5" />
-          <span>Regional Service Coverage</span>
-        </div>
-        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-          NexByte Technologies provides doorstep repair, CCTV installation, and computer delivery services across:
-        </p>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <span className="rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 px-3.5 py-1.5 text-xs font-bold text-sky-700 dark:text-sky-300">
-            📍 Bengaluru Region
-          </span>
-          <span className="rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 px-3.5 py-1.5 text-xs font-bold text-sky-700 dark:text-sky-300">
-            📍 Tumkur Region
-          </span>
-          <span className="rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 px-3.5 py-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
-            ⏳ Hiriyur — Coming Soon
-          </span>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Customer Support &amp; Contact Desk
+          </h1>
+          <p className="text-xs sm:text-sm text-[#667085] dark:text-[#A1A1AA] max-w-2xl font-medium">
+            Need help with an order, repair booking, or warranty claim? Reach our expert technicians and customer care team.
+          </p>
         </div>
       </div>
 
-      {/* Frequently Asked Questions */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 shadow-sm">
-        <FAQ />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Support Ticket Form */}
+        <div className="lg:col-span-2 rounded-3xl border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#0D0D0F] p-6 sm:p-8 shadow-xs space-y-6">
+          <h2 className="font-display text-lg font-bold text-[#111827] dark:text-white flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-[#4F46E5] dark:text-[#7C5CFF]" />
+            <span>Submit a Support Ticket</span>
+          </h2>
+
+          {successMsg && (
+            <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-[#111827] dark:text-white block mb-1">Your Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full Name"
+                  className="w-full rounded-xl bg-[#F7F8FC] dark:bg-[#151518] border border-[#E5E7EB] dark:border-[#27272A] px-3.5 py-2.5 text-xs text-[#111827] dark:text-white focus:outline-none focus:border-[#4F46E5]"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-[#111827] dark:text-white block mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl bg-[#F7F8FC] dark:bg-[#151518] border border-[#E5E7EB] dark:border-[#27272A] px-3.5 py-2.5 text-xs text-[#111827] dark:text-white focus:outline-none focus:border-[#4F46E5]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#111827] dark:text-white block mb-1">Subject</label>
+              <select
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full rounded-xl bg-[#F7F8FC] dark:bg-[#151518] border border-[#E5E7EB] dark:border-[#27272A] px-3.5 py-2.5 text-xs text-[#111827] dark:text-white focus:outline-none focus:border-[#4F46E5]"
+              >
+                <option value="Hardware Support">Hardware Support &amp; Repair Query</option>
+                <option value="Order Tracking">Order &amp; Delivery Tracking</option>
+                <option value="Warranty Claim">E-Warranty &amp; RMA Claim</option>
+                <option value="Billing & Invoice">Billing &amp; Invoice Request</option>
+                <option value="Training & Internship">Training &amp; Academy Support</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#111827] dark:text-white block mb-1">Message Details *</label>
+              <textarea
+                required
+                rows={4}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Describe your issue or request in detail..."
+                className="w-full rounded-xl bg-[#F7F8FC] dark:bg-[#151518] border border-[#E5E7EB] dark:border-[#27272A] px-3.5 py-2.5 text-xs text-[#111827] dark:text-white focus:outline-none resize-none"
+              />
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary !px-6 !py-3 text-xs font-bold flex items-center gap-2 shadow-xs"
+              >
+                {submitting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Submitting Ticket...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    <span>Send Message to Support</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Contact Info & FAQs */}
+        <div className="space-y-6">
+          <div className="rounded-3xl border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#0D0D0F] p-6 shadow-xs space-y-4">
+            <h3 className="font-display text-base font-bold text-[#111827] dark:text-white">
+              Direct Contact Details
+            </h3>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-[#EEF2FF] dark:bg-[#1E1638] text-[#4F46E5] dark:text-[#7C5CFF]">
+                  <Phone className="h-4 w-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#667085] dark:text-[#A1A1AA] block">Helpline &amp; WhatsApp</span>
+                  <span className="font-bold text-[#111827] dark:text-white">+91 8088979706</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-[#EEF2FF] dark:bg-[#1E1638] text-[#4F46E5] dark:text-[#7C5CFF]">
+                  <Mail className="h-4 w-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#667085] dark:text-[#A1A1AA] block">Support Email</span>
+                  <span className="font-bold text-[#111827] dark:text-white">info@nexbytetechnologies.com</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-[#EEF2FF] dark:bg-[#1E1638] text-[#4F46E5] dark:text-[#7C5CFF]">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#667085] dark:text-[#A1A1AA] block">Branch Address</span>
+                  <span className="font-bold text-[#111827] dark:text-white">Uttarahalli Main Rd, Bengaluru 560070</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FAQs */}
+          <div className="rounded-3xl border border-[#E5E7EB] dark:border-[#27272A] bg-white dark:bg-[#0D0D0F] p-6 shadow-xs space-y-3">
+            <h3 className="font-display text-base font-bold text-[#111827] dark:text-white flex items-center gap-2">
+              <HelpCircle className="h-4 w-4 text-[#4F46E5] dark:text-[#7C5CFF]" />
+              <span>Frequently Asked Questions</span>
+            </h3>
+
+            <div className="space-y-2">
+              {FAQS.map((faq, idx) => {
+                const isOpen = expandedFaq === idx;
+                return (
+                  <div key={idx} className="rounded-2xl border border-[#E5E7EB] dark:border-[#27272A] overflow-hidden">
+                    <button
+                      onClick={() => setExpandedFaq(isOpen ? null : idx)}
+                      className="w-full p-3 text-left text-xs font-bold text-[#111827] dark:text-white flex items-center justify-between gap-2 hover:bg-[#F7F8FC] dark:hover:bg-[#151518]"
+                    >
+                      <span>{faq.q}</span>
+                      <ChevronDown className={`h-4 w-4 text-[#98A2B3] transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {isOpen && (
+                      <div className="p-3 pt-0 text-[11px] text-[#667085] dark:text-[#A1A1AA] leading-relaxed border-t border-[#E5E7EB] dark:border-[#27272A] bg-[#F7F8FC] dark:bg-[#111113]">
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

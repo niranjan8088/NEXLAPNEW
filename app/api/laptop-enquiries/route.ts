@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -54,6 +55,17 @@ export async function POST(req: Request) {
       requirements: body.requirements || body.additionalRequirements || body.message || "",
       message: body.requirements || body.additionalRequirements || body.message || "",
       preferred_contact: body.preferred_contact || body.preferredContact || "WhatsApp",
+    });
+
+    // Dispatch real-time Admin notification with deep link reference
+    await dispatchPipelineEvent({
+      eventType: "LAPTOP_ENQUIRY_CREATED",
+      title: "💻 New Laptop Enquiry",
+      message: `${name} submitted a laptop requirement (${saved.laptop_type}). Budget: ${saved.budget || "Unspecified"}. Reference: ${saved.reference_id || saved.id}`,
+      recipientRole: "admin",
+      referenceType: "laptop_enquiry",
+      referenceId: saved.reference_id || saved.id,
+      metadata: { enquiryId: saved.id, referenceId: saved.reference_id, customerName: name, phone }
     });
 
     return NextResponse.json(
@@ -114,6 +126,19 @@ export async function PUT(req: Request) {
     }
 
     const updated = await dbHelper.laptopEnquiries.update(id, updates);
+
+    // If updated, notify customer
+    if (updated && (updated.user_id || updated.customer_id)) {
+      await dispatchPipelineEvent({
+        eventType: "LAPTOP_ENQUIRY_UPDATED",
+        title: "💻 Laptop Enquiry Update",
+        message: `Your laptop enquiry ${updated.reference_id || updated.id} status is now: ${updated.status}.`,
+        recipientUserId: updated.user_id || updated.customer_id,
+        referenceType: "laptop_enquiry",
+        referenceId: updated.reference_id || updated.id,
+        metadata: { enquiryId: updated.id, status: updated.status }
+      });
+    }
 
     return NextResponse.json(
       { success: true, enquiry: updated, message: "Enquiry updated successfully." },

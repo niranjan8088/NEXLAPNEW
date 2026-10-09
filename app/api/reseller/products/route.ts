@@ -38,6 +38,17 @@ export async function POST(request: NextRequest) {
 
     const { title, category, description, price, discount, stock, warranty, condition, images, specs } = body;
 
+    // Check seller account approval status
+    if (user.role === "reseller") {
+      const seller = await dbHelper.resellers.getById(user.resellerId || user.id);
+      if (seller && (seller.status === "pending" || seller.status === "rejected" || seller.status === "suspended")) {
+        return NextResponse.json(
+          { error: `Seller account status is '${seller.status}'. Only approved resellers can list products.` },
+          { status: 403 }
+        );
+      }
+    }
+
     // Server-side validation — never trust price/stock from browser
     if (!title?.trim() || !category?.trim()) {
       return NextResponse.json({ error: "Title and category are required." }, { status: 400 });

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Settings as SettingsIcon, Shield, Bell, Palette, Database, Save, Check, AlertTriangle, RefreshCw } from "lucide-react";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
-  const [activeTab, setActiveTab] = useState<"profile" | "notifications" | "system">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "appearance" | "notifications" | "system">("appearance");
 
   // Profile
   const [adminName, setAdminName] = useState("NexByte Admin");
@@ -54,6 +55,7 @@ export default function AdminSettingsPage() {
 
   const tabs = [
     { key: "profile" as const, label: "Admin Profile", icon: <Shield className="h-4 w-4" /> },
+    { key: "appearance" as const, label: "Appearance & Global Policy", icon: <Palette className="h-4 w-4" /> },
     { key: "notifications" as const, label: "Notification Preferences", icon: <Bell className="h-4 w-4" /> },
     { key: "system" as const, label: "System & Database", icon: <Database className="h-4 w-4" /> },
   ];
@@ -62,23 +64,23 @@ export default function AdminSettingsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold text-white flex items-center gap-2">
-            <SettingsIcon className="h-6 w-6 text-nex-blueLight" /> Settings
+          <h1 className="font-display text-2xl font-extrabold text-black dark:text-white flex items-center gap-2">
+            <SettingsIcon className="h-6 w-6 text-black dark:text-white" /> Settings
           </h1>
-          <p className="text-xs text-nex-mist mt-0.5">Admin profile, notification preferences, and system configuration.</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Admin profile, notification preferences, and system configuration.</p>
         </div>
-        <button onClick={handleSave} className={`btn-primary !py-2.5 !px-5 text-xs flex items-center gap-1.5 transition-all ${saved ? "bg-green-500" : ""}`}>
+        <button onClick={handleSave} className={`btn-primary !py-2.5 !px-5 text-xs flex items-center gap-1.5 transition-all ${saved ? "bg-green-600 text-white" : ""}`}>
           {saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
           {saved ? "Saved!" : "Save Changes"}
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 flex-wrap border-b border-white/[0.06] pb-2">
+      <div className="flex gap-2 flex-wrap border-b border-neutral-200 dark:border-neutral-800 pb-2">
         {tabs.map((tab) => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 rounded-t-lg px-4 py-2 text-xs font-semibold transition-all ${
-              activeTab === tab.key ? "bg-nex-blue/20 border border-nex-blue/30 text-nex-blueLight" : "text-nex-mist hover:text-white"
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+              activeTab === tab.key ? "bg-black text-white dark:bg-white dark:text-black shadow-sm" : "text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900"
             }`}>
             {tab.icon} {tab.label}
           </button>
@@ -120,6 +122,11 @@ export default function AdminSettingsPage() {
             <strong>Note:</strong> Password changes require Supabase Auth to be configured. In local dev mode, use the default credentials.
           </div>
         </div>
+      )}
+
+      {/* Appearance Tab */}
+      {activeTab === "appearance" && (
+        <ThemeSelector isAdmin={true} />
       )}
 
       {/* Notifications Tab */}

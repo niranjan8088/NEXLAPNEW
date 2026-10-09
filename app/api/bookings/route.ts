@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -27,9 +28,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("[BOOKING API RECEIVED]", "/api/bookings POST", body);
-
-    // 1. Validate required fields (Task 3 & 4: Customer Name, Phone, Request Type)
     const customerName = body.customerName || body.customer_name || body.name;
     const phone = body.phone;
     const requestType = body.requestType || body.request_type || "product";
@@ -46,7 +44,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Map incoming form fields to DB fields (Task 5: Complete Booking Entity Pipeline)
     const newBooking = {
       customerName,
       phone,
@@ -69,10 +66,29 @@ export async function POST(req: Request) {
       message: body.description || body.remarks || body.message || "",
     };
 
-    // 3. Save to database using dbHelper (Generates Booking ID, Customer ID, Notification, Activity Log, Timeline)
-    console.log("[BOOKING DB INSERT]", newBooking);
     const saved = await dbHelper.bookings.create(newBooking);
-    console.log("[BOOKING DB INSERT SUCCESS]", saved.bookingId);
+
+    // PIPELINE EVENT DISPATCH (CUSTOMER → ADMIN & ADMIN → CUSTOMER)
+    await dispatchPipelineEvent({
+      eventType: "BOOKING_CREATED",
+      title: "New Service Booking Received 🔧",
+      message: `${customerName} submitted booking ${saved.bookingId} for ${newBooking.productName}`,
+      recipientRole: "admin",
+      referenceType: "booking",
+      referenceId: saved.bookingId,
+      actorRole: "user",
+    });
+
+    await dispatchPipelineEvent({
+      eventType: "BOOKING_CREATED",
+      title: "Service Request Received ✓",
+      message: `Your service booking ${saved.bookingId} for ${newBooking.productName} has been received.`,
+      recipientRole: "user",
+      recipientUserId: saved.user_id || undefined,
+      referenceType: "booking",
+      referenceId: saved.bookingId,
+      actorRole: "system",
+    });
 
     return NextResponse.json(
       {
@@ -104,7 +120,6 @@ export async function GET(req: Request) {
     const bookingId = searchParams.get("bookingId");
     const id = searchParams.get("id");
 
-    // Single booking lookup by internal id
     if (id) {
       const list = await dbHelper.bookings.list();
       const match = list.find((b: any) => b.id === id || b.bookingId === id);
@@ -117,7 +132,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // Customer tracking lookup by phone + bookingId
     if (phone && bookingId) {
       const match = await dbHelper.bookings.getByPhoneAndId(phone, bookingId);
       if (match) {
@@ -130,8 +144,6 @@ export async function GET(req: Request) {
       }
     }
 
-    // List all bookings (admin fetch)
-    console.log("[ADMIN BOOKINGS FETCH]");
     const allBookings = await dbHelper.bookings.list();
     return NextResponse.json({ success: true, bookings: allBookings }, { status: 200, headers: JSON_HEADERS });
   } catch (error: any) {
@@ -163,7 +175,6 @@ export async function PUT(req: Request) {
       );
     }
 
-    // If chatMessage is present, this is a customer chat message
     if (body.chatMessage) {
       const list = await dbHelper.bookings.list();
       const existing = list.find((b: any) => b.id === id);
@@ -175,9 +186,10 @@ export async function PUT(req: Request) {
       }
 
       const now = new Date().toISOString();
+      const sender = body.sender || "customer";
       const chatItem = {
         type: "chat",
-        sender: body.sender || "customer",
+        sender,
         message: body.chatMessage.trim(),
         timestamp: now
       };
@@ -191,10 +203,33 @@ export async function PUT(req: Request) {
         ...(body.status ? { status: body.status } : {}),
       });
 
+      // PIPELINE EVENT DISPATCH FOR CHAT MESSAGE
+      if (sender === "customer") {
+        await dispatchPipelineEvent({
+          eventType: "MESSAGE_RECEIVED",
+          title: "New Customer Message 💬",
+          message: `${existing.customerName || "Customer"} sent a message on ${existing.bookingId}`,
+          recipientRole: "admin",
+          referenceType: "booking",
+          referenceId: existing.bookingId,
+          actorRole: "user",
+        });
+      } else {
+        await dispatchPipelineEvent({
+          eventType: "MESSAGE_RECEIVED",
+          title: "New Support Message 💬",
+          message: `Technician replied to your booking ${existing.bookingId}`,
+          recipientRole: "user",
+          recipientUserId: existing.user_id || undefined,
+          referenceType: "booking",
+          referenceId: existing.bookingId,
+          actorRole: "admin",
+        });
+      }
+
       return NextResponse.json({ success: true, booking: updated }, { status: 200, headers: JSON_HEADERS });
     }
 
-    // Otherwise, this is a general admin update (status, technician, notes, etc.)
     const updates: any = {};
     if (body.status !== undefined) updates.status = body.status;
     if (body.assignedTo !== undefined) { updates.assignedTo = body.assignedTo; updates.technician = body.assignedTo; }
@@ -216,6 +251,38 @@ export async function PUT(req: Request) {
     }
 
     const updated = await dbHelper.bookings.update(id, updates);
+
+    // PIPELINE EVENT DISPATCH (ADMIN → CUSTOMER STATUS UPDATES)
+    if (updates.status) {
+      const reqId = updated.bookingId || updated.id;
+      let title = "Service Status Updated 🔧";
+      let msg = `Your service request ${reqId} is now ${updates.status}.`;
+
+      if (updates.status === "confirmed") {
+        title = "Service Booking Confirmed ✓";
+        msg = `Your repair request ${reqId} has been confirmed. A technician is assigned.`;
+      } else if (updates.status === "in_progress" || updates.status === "processing") {
+        title = "Service In Progress ⚙️";
+        msg = `Your repair request ${reqId} is now in progress.`;
+      } else if (updates.status === "completed" || updates.status === "delivered") {
+        title = "Service Completed 🎉";
+        msg = `Your repair request ${reqId} has been completed!`;
+      } else if (updates.status === "cancelled") {
+        title = "Service Request Cancelled ❌";
+        msg = `Your service request ${reqId} was cancelled.`;
+      }
+
+      await dispatchPipelineEvent({
+        eventType: updates.status === "confirmed" ? "BOOKING_CONFIRMED" : updates.status === "completed" ? "BOOKING_COMPLETED" : "BOOKING_IN_PROGRESS",
+        title,
+        message: msg,
+        recipientRole: "user",
+        recipientUserId: updated.user_id || undefined,
+        referenceType: "booking",
+        referenceId: reqId,
+        actorRole: "admin",
+      });
+    }
 
     return NextResponse.json({ success: true, booking: updated }, { status: 200, headers: JSON_HEADERS });
   } catch (error: any) {

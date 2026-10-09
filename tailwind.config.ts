@@ -9,15 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Core brand palette — extracted from the NexByte logo, preserved exactly.
+        // Unified NexByte Theme Tokens
         nex: {
-          black: "#05070C",       // near-black base, deeper than pure #000 for OLED depth
-          ink: "#0A0E17",         // panel background
-          blue: "#1E5EFF",        // primary brand blue (logo "BYTE")
-          blueLight: "#4A8CFF",   // lighter accent / hover
-          blueDeep: "#0B2A8C",    // deep blue for gradients
-          white: "#F7F9FC",       // brand white / off-white text
-          mist: "#8B93A7",        // muted secondary text
+          primary: "var(--color-primary, #0EA5E9)",
+          primaryHover: "var(--color-primary-hover, #0284C7)",
+          primarySoft: "var(--color-primary-soft, #E0F2FE)",
+          accent: "var(--color-accent, #F472B6)",
+          accentHover: "var(--color-accent-hover, #EC4899)",
+          accentSoft: "var(--color-accent-soft, #FCE7F3)",
+          bg: "var(--color-background, #F8FAFC)",
+          surface: "var(--color-surface, #FFFFFF)",
+          surface2: "var(--color-surface-secondary, #F1F5F9)",
+          border: "var(--color-border, #E2E8F0)",
+          text: "var(--color-text, #0F172A)",
+          textMuted: "var(--color-text-secondary, #64748B)",
+          textSoft: "var(--color-text-soft, #94A3B8)",
+          // Backward compatibility mappings
+          blue: "var(--color-primary, #0EA5E9)",
+          blueLight: "var(--color-primary-soft, #E0F2FE)",
+          blueDeep: "var(--color-primary-hover, #0284C7)",
+          white: "var(--color-surface, #FFFFFF)",
+          mist: "var(--color-text-secondary, #64748B)",
         },
       },
       fontFamily: {
@@ -25,15 +37,18 @@ const config: Config = {
         body: ["var(--font-body)", "sans-serif"],
       },
       boxShadow: {
-        "glow-blue": "0 0 20px rgba(30,94,255,0.35), 0 0 60px rgba(30,94,255,0.15)",
-        "glow-blue-lg": "0 0 40px rgba(30,94,255,0.45), 0 0 100px rgba(30,94,255,0.2)",
-        "glass": "0 8px 32px rgba(0,0,0,0.45)",
+        "glow-blue": "0 0 20px var(--color-primary-glow, rgba(14,165,233,0.25)), 0 0 60px var(--color-primary-soft, rgba(14,165,233,0.15))",
+        "glow-pink": "0 0 20px var(--color-accent-glow, rgba(244,114,182,0.22)), 0 0 60px var(--color-accent-soft, rgba(244,114,182,0.15))",
+        "glow-blue-lg": "0 0 40px var(--color-primary-glow, rgba(14,165,233,0.35)), 0 0 100px var(--color-primary-soft, rgba(14,165,233,0.2))",
+        "glass": "0 8px 32px rgba(0,0,0,0.06)",
       },
       backgroundImage: {
         "grid-glow":
-          "radial-gradient(circle at 50% 0%, rgba(30,94,255,0.18), transparent 60%)",
+          "radial-gradient(circle at 50% 0%, var(--color-primary-soft, rgba(14,165,233,0.15)), transparent 60%)",
         "hero-radial":
-          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(30,94,255,0.35), transparent 70%)",
+          "radial-gradient(ellipse 80% 60% at 50% -10%, var(--color-primary-glow, rgba(14,165,233,0.25)), transparent 70%)",
+        "hero-ambient":
+          "radial-gradient(circle at 20% 20%, rgba(14,165,233,0.12), transparent 40%), radial-gradient(circle at 80% 80%, rgba(244,114,182,0.10), transparent 40%)",
       },
       keyframes: {
         float: {

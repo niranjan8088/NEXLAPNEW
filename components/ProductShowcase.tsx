@@ -36,7 +36,7 @@ export default function ProductShowcase() {
                   alt={product.title || "Product"}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover object-center opacity-95 transition-transform duration-700 group-hover:scale-110"
+                  className="object-contain p-3 opacity-95 transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-nex-ink via-transparent to-transparent" />

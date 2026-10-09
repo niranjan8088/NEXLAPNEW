@@ -30,6 +30,41 @@ export const business = {
   ],
 } as const;
 
+export const HARDWARE_CATEGORIES = [
+  { id: "storage", name: "Storage (SSD / HDD / Enclosures)", icon: "HardDrive" },
+  { id: "ram", name: "RAM / Memory (DDR3 / DDR4 / DDR5)", icon: "Cpu" },
+  { id: "laptop_components", name: "Laptop Components & Parts", icon: "Laptop" },
+  { id: "desktop_components", name: "Desktop Components & PC Parts", icon: "Monitor" },
+  { id: "peripherals", name: "Keyboard / Mouse / Peripherals", icon: "Keyboard" },
+  { id: "usb_typec", name: "USB & Type-C Accessories", icon: "Usb" },
+  { id: "display_video", name: "Display & Video Adapters/Cables", icon: "Tv" },
+  { id: "networking", name: "Networking & WiFi Devices", icon: "Wifi" },
+  { id: "repair_tools", name: "Laptop / PC Repair Tools", icon: "Wrench" },
+  { id: "thermal_cooling", name: "Thermal Paste & Cooling Solutions", icon: "Thermometer" },
+  { id: "laptop_cleaning", name: "Laptop Cleaning & Maintenance", icon: "Sparkles" },
+  { id: "power", name: "Power Adapters & SMPS Supplies", icon: "Zap" },
+  { id: "memory_cards", name: "Memory Cards & Readers", icon: "SdCard" },
+  { id: "audio", name: "Audio Accessories & Microphones", icon: "Headphones" },
+  { id: "cctv_security", name: "CCTV & Security Accessories", icon: "ShieldCheck" },
+  { id: "small_components", name: "Small Repair Components & Connectors", icon: "Layers" },
+
+  // System Categories
+  { id: "gaming_pcs", name: "Gaming PCs & Workstations", icon: "Gamepad2" },
+  { id: "business_laptops", name: "Business Laptops", icon: "Laptop" },
+  { id: "premium_used_laptops", name: "Premium Used Laptops", icon: "Laptop" },
+  { id: "second_hand_laptops", name: "Refurbished Laptops", icon: "Laptop" },
+  { id: "servers", name: "Servers & Enterprise Rack Systems", icon: "Server" },
+  { id: "desktop_systems", name: "Desktop Workstation Systems", icon: "Monitor" },
+  { id: "monitors", name: "Monitors & Displays", icon: "Tv" },
+  { id: "cctv", name: "Complete CCTV Systems", icon: "ShieldCheck" }
+] as const;
+
+export const POPULAR_BRANDS = [
+  "Kingston", "Crucial", "Samsung", "ADATA", "TeamGroup", "Corsair", "G.Skill",
+  "Logitech", "Dell", "Lenovo", "HP", "Acer", "ASUS", "MSI", "Gigabyte",
+  "TP-Link", "D-Link", "Western Digital", "Seagate", "Thermal Grizzly", "DeepCool", "Antec"
+] as const;
+
 export type ProductImage = {
   id: string;
   url: string;
@@ -38,28 +73,125 @@ export type ProductImage = {
   alt_text?: string;
 };
 
+export type ProductCompatibility = {
+  brand?: string;
+  series?: string;
+  model?: string;
+  partNumber?: string;
+};
+
+export type ProductVariant = {
+  id: string;
+  sku?: string;
+  name: string; // e.g. "256GB NVMe SSD", "512GB NVMe SSD", "1TB NVMe SSD", "2TB NVMe SSD"
+  price: number;
+  compareAtPrice?: number;
+  costPrice?: number;
+  stock?: number;
+  image?: string;
+};
+
 export type Product = {
   id: string;
+  sku?: string;
+  slug?: string;
   title: string;
   description: string;
+  shortDescription?: string;
   image: string;
   images?: ProductImage[];
+  variants?: ProductVariant[];
   tags: string[];
-  category: "gaming_pcs" | "business_laptops" | "premium_used_laptops" | "second_hand_laptops" | "servers" | "desktop_systems" | "accessories" | "storage" | "networking" | "monitors" | "cctv";
+  category: string;
+  subcategoryId?: string;
+  brand?: string;
+
   price: number;
+  compareAtPrice?: number;
+  costPrice?: number; // ADMIN ONLY — Never exposed to customer API!
+
   stock?: number;
-  discount?: number;
+  lowStockThreshold?: number;
+
   specs: {
     [key: string]: string;
   };
-  status?: string;
+  compatibility?: ProductCompatibility;
+
+  discount?: number;
+
+  warrantyEnabled?: boolean;
+  warrantyDuration?: string;
   warranty?: string;
+  warrantyText?: string;
+
+  returnEnabled?: boolean;
+  returnWindowDays?: number;
+  returnPolicyText?: string;
+
+  deliveryEnabled?: boolean;
+  deliveryEstimate?: string;
+  deliveryMinDays?: number;
+  deliveryMaxDays?: number;
+
+  offersEnabled?: boolean;
+  activeOfferId?: string;
+
+  status?: string; // "show" | "hide" | "deleted" | "pending"
+  approval_status?: string; // "approved" | "pending" | "rejected"
   condition?: string;
   featured?: boolean;
   latest?: boolean;
+
+  rating?: number;
+  reviewCount?: number;
+
+  seller_id?: string;
+  seller_type?: string;
+  created_by?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export const products: Product[] = [
+  {
+    id: "samsung-980-pro-ssd",
+    sku: "SAM-SSD-980P",
+    title: "Samsung 980 PRO PCIe 4.0 NVMe M.2 SSD",
+    description: "Next-gen flagship PCIe 4.0 high-speed NVMe SSD for high-performance computing, workstation, and gaming storage upgrades.",
+    image: "/images/poster-products.png",
+    category: "storage",
+    brand: "Samsung",
+    price: 15000,
+    compareAtPrice: 18500,
+    stock: 25,
+    lowStockThreshold: 5,
+    warrantyEnabled: true,
+    warrantyDuration: "5 Years",
+    warrantyText: "5 Years Samsung Official Brand Warranty",
+    returnEnabled: true,
+    returnWindowDays: 7,
+    returnPolicyText: "7-Day Replacement Guarantee",
+    deliveryEnabled: true,
+    deliveryEstimate: "2–3 business days",
+    deliveryMinDays: 2,
+    deliveryMaxDays: 3,
+    tags: ["Samsung", "NVMe SSD", "PCIe 4.0", "M.2 2280"],
+    variants: [
+      { id: "var-256", sku: "SAM-980P-256G", name: "256GB", price: 10000, compareAtPrice: 12500, stock: 12 },
+      { id: "var-512", sku: "SAM-980P-512G", name: "512GB", price: 15000, compareAtPrice: 18500, stock: 25 },
+      { id: "var-1tb", sku: "SAM-980P-1TB", name: "1TB", price: 20000, compareAtPrice: 24000, stock: 18 },
+      { id: "var-2tb", sku: "SAM-980P-2TB", name: "2TB", price: 35000, compareAtPrice: 42000, stock: 8 }
+    ],
+    specs: {
+      Interface: "PCIe Gen 4.0 x4, NVMe 1.3",
+      FormFactor: "M.2 (2280)",
+      ReadSpeed: "Up to 7,000 MB/s",
+      WriteSpeed: "Up to 5,100 MB/s",
+      Controller: "Samsung In-House Elpis Controller",
+    }
+  },
   {
     id: "gaming-pc-pro",
     title: "NexByte ROG Slayer R15 Gaming PC",

@@ -101,7 +101,7 @@ export default function ResellerProductsPage() {
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-lg overflow-hidden bg-white/5 border border-white/10 shrink-0 flex items-center justify-center p-1">
-                            <Image src={getSafeImageSrc(p.image)} alt={p.title} width={32} height={32} className="object-contain" />
+                            <Image src={getSafeImageSrc(p.image)} alt={p.title || p.name || "Product"} width={32} height={32} className="object-contain" />
                           </div>
                           <div>
                             <div className="font-semibold text-white truncate max-w-[180px]">{p.title}</div>

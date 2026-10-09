@@ -1,25 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { business } from "@/lib/data";
 import FloatingButtons from "@/components/FloatingButtons";
 import NotificationProvider from "@/components/NotificationProvider";
 import ClientModals from "@/components/ClientModals";
 
-const spaceGrotesk = Space_Grotesk({
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-display",
+  weight: ["600", "700", "800"],
   display: "swap",
-  weight: ["500", "600", "700"],
-  preload: false,
 });
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-body",
+  weight: ["400", "500", "600"],
   display: "swap",
-  weight: ["400", "500", "600", "700"],
-  preload: false,
 });
 
 const SITE_URL = "https://nexbytetechnologies.com";
@@ -105,7 +104,7 @@ const jsonLd = {
   priceRange: "₹₹",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "#372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road",
+    streetAddress: "Padmanabhanagar",
     addressLocality: "Bengaluru",
     addressRegion: "Karnataka",
     postalCode: "560070",
@@ -138,11 +137,13 @@ const jsonLd = {
   ],
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`} data-theme="day" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -154,11 +155,16 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'light') {
-                    document.documentElement.classList.add('light');
+                  var saved = localStorage.getItem('nexbyte_theme') || localStorage.getItem('nexbyte-theme') || localStorage.getItem('theme');
+                  var isNight = saved === 'night' || saved === 'dark' || (saved && (saved.indexOf('dark') !== -1 || saved.indexOf('midnight') !== -1 || saved.indexOf('black') !== -1));
+                  var target = isNight ? 'night' : 'day';
+                  document.documentElement.setAttribute('data-theme', target);
+                  if (isNight) {
+                    document.documentElement.classList.add('dark', 'night');
+                    document.documentElement.classList.remove('light', 'day');
                   } else {
-                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('light', 'day');
+                    document.documentElement.classList.remove('dark', 'night');
                   }
                 } catch (e) {}
               })();
@@ -183,12 +189,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-body antialiased bg-nex-black text-nex-white">
-        <NotificationProvider>
-          {children}
-          <FloatingButtons />
-          <ClientModals />
-        </NotificationProvider>
+      <body className="font-body antialiased bg-nex-bg text-nex-text min-h-screen">
+        <ThemeProvider>
+          <NotificationProvider>
+            {children}
+            <FloatingButtons />
+            <ClientModals />
+          </NotificationProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

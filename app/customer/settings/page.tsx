@@ -1,32 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Settings, Sun, Moon, Bell, Lock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Settings, CheckCircle2 } from "lucide-react";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function CustomerSettingsPage() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsAlerts, setSmsAlerts] = useState(true);
   const [savedSuccess, setSavedSuccess] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    if (savedTheme === "dark") {
-      setTheme("dark");
-    } else {
-      setTheme("light");
-    }
-  }, []);
-
-  const handleToggleTheme = (newTheme: "light" | "dark") => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    if (newTheme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-  };
 
   const handleSaveSettings = () => {
     setSavedSuccess(true);
@@ -56,40 +37,9 @@ export default function CustomerSettingsPage() {
       )}
 
       {/* Settings Options Grid */}
-      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 sm:p-8 shadow-sm space-y-6">
-        {/* Appearance Section */}
-        <div className="space-y-4 pb-6 border-b border-slate-100 dark:border-white/5">
-          <div>
-            <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">Portal Appearance Theme</h3>
-            <p className="text-xs text-slate-500">Choose your preferred visual theme mode for the NexByte Customer Application.</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 max-w-md">
-            <button
-              onClick={() => handleToggleTheme("light")}
-              className={`flex items-center justify-center gap-2 p-4 rounded-2xl border text-xs font-bold transition-all ${
-                theme === "light"
-                  ? "bg-sky-50 border-sky-600 text-sky-700 shadow-sm"
-                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <Sun className="h-4 w-4 text-amber-500" />
-              <span>Light Theme (Default)</span>
-            </button>
-
-            <button
-              onClick={() => handleToggleTheme("dark")}
-              className={`flex items-center justify-center gap-2 p-4 rounded-2xl border text-xs font-bold transition-all ${
-                theme === "dark"
-                  ? "bg-sky-950 border-sky-500 text-sky-300 shadow-sm"
-                  : "border-slate-200 text-slate-600 hover:bg-slate-50"
-              }`}
-            >
-              <Moon className="h-4 w-4 text-slate-400" />
-              <span>Dark Theme</span>
-            </button>
-          </div>
-        </div>
+      <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 sm:p-8 shadow-sm space-y-8">
+        {/* Appearance & Themes */}
+        <ThemeSelector isAdmin={false} />
 
         {/* Notifications Section */}
         <div className="space-y-4 pb-6 border-b border-slate-100 dark:border-white/5">

@@ -1,16 +1,49 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "@/lib/auth";
 import { dbHelper } from "@/lib/dbHelper";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
 export async function GET() {
   try {
-    const notifications = await dbHelper.notifications.list();
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized access.", notifications: [] },
+        { status: 401, headers: JSON_HEADERS }
+      );
+    }
+
+    const allNotifications = await dbHelper.notifications.list();
+
+    // Security Filter: Role-based & User-specific notification isolation
+    const userNotifications = allNotifications.filter((n: any) => {
+      // 1. Exact match on recipient user ID
+      if (n.recipient_user_id && n.recipient_user_id === session.id) {
+        return true;
+      }
+      // 2. Exact match on recipient role
+      if (n.recipient_role) {
+        if (session.role === "admin" && n.recipient_role === "admin") return true;
+        if (session.role === "reseller" && n.recipient_role === "reseller") return true;
+        if (session.role === "user" && n.recipient_role === "user") return true;
+        return false;
+      }
+      // 3. Admin legacy fallback notifications (where no recipient specified)
+      if (session.role === "admin" && !n.recipient_user_id && !n.recipient_role) {
+        return true;
+      }
+      return false;
+    });
+
+    const unreadCount = userNotifications.filter((n: any) => n.status === "unread" || !n.is_read).length;
+
     return NextResponse.json(
-      { success: true, notifications },
+      { success: true, notifications: userNotifications, unreadCount },
       { status: 200, headers: JSON_HEADERS }
     );
   } catch (error: any) {
+    console.error("GET Notifications Error:", error);
     return NextResponse.json(
       { success: false, message: error.message || "Internal Error", error: error.message },
       { status: 500, headers: JSON_HEADERS }
@@ -20,6 +53,14 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized access." },
+        { status: 401, headers: JSON_HEADERS }
+      );
+    }
+
     let body: any;
     try {
       body = await req.json();

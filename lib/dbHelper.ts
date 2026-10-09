@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { products as initialProducts, services as initialServices } from "./data";
 import { broadcastServerEvent } from "./realtimeServer";
+import { DEFAULT_FILTER_DEFINITIONS } from "./filterEngine";
 
 function notifyDataChange(table: string, action: string, data?: any) {
   if (typeof window !== "undefined") {
@@ -39,6 +40,10 @@ const supabase =
 const globalRef = globalThis as any;
 if (!globalRef.__nexbyteMockDb) {
   globalRef.__nexbyteMockDb = {
+    systemSettings: {
+      global_theme_policy: "personal", // 'personal' | 'forced'
+      forced_theme: "day",
+    },
     users: [
       { id: "cust-1", email: "customer@nexbyte.com", full_name: "Ramesh Kumar", phone: "9876543210", role: "customer" },
       { id: "admin-1", email: "admin@nexbyte.com", full_name: "Admin Officer", phone: "8088979706", role: "admin" }
@@ -193,7 +198,7 @@ if (!globalRef.__nexbyteMockDb) {
       },
       footer: {
         tagline: "Your trusted partner for premium IT solutions.",
-        address: "#372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road, Bengaluru 560070",
+        address: "Bengaluru, Karnataka",
         copyright: "© 2026 NexByte Technologies. All rights reserved.",
       },
       contact_info: {
@@ -483,7 +488,8 @@ if (!globalRef.__nexbyteMockDb) {
     orders: [],
     cart_items: [],
     conversations: [],
-    messages: []
+    messages: [],
+    filterDefinitions: DEFAULT_FILTER_DEFINITIONS,
   };
 }
 
@@ -2273,6 +2279,245 @@ export const dbHelper = {
     }
   },
 
+  // --- RESELLER LISTINGS & INVENTORY ---
+  resellerListings: {
+    async list() {
+      if (supabase) {
+        const { data } = await supabase.from("reseller_listings").select("*").order("created_at", { ascending: false });
+        if (data) return data;
+      }
+      return getMockData("reseller_listings") || [];
+    },
+
+    async getByReseller(resellerId: string) {
+      const list = await this.list();
+      return list.filter((l: any) => l.reseller_id === resellerId || l.resellerId === resellerId);
+    },
+
+    async getByProduct(productId: string) {
+      const list = await this.list();
+      const sellers = await dbHelper.resellers.list();
+
+      return list.filter((l: any) => {
+        const matchesProduct = (l.product_id === productId || l.productId === productId);
+        const isActive = (l.status === "active" || l.status === "approved");
+        const seller = sellers.find((s: any) => s.id === l.reseller_id || s.id === l.resellerId);
+        const sellerApproved = seller ? (seller.status === "approved" || seller.status === "active") : true;
+        return matchesProduct && isActive && sellerApproved;
+      });
+    },
+
+    async getById(id: string) {
+      const list = await this.list();
+      return list.find((l: any) => l.id === id) || null;
+    },
+
+    async create(listing: any) {
+      const seller = await dbHelper.resellers.getById(listing.reseller_id || listing.resellerId);
+      if (seller && (seller.status === "pending" || seller.status === "rejected" || seller.status === "suspended")) {
+        throw new Error(`Seller account status is '${seller.status}'. Only approved resellers can list products.`);
+      }
+
+      const payload = {
+        id: `lst-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        reseller_id: listing.reseller_id || listing.resellerId,
+        resellerId: listing.reseller_id || listing.resellerId,
+        product_id: listing.product_id || listing.productId,
+        productId: listing.product_id || listing.productId,
+        seller_sku: listing.seller_sku || listing.sellerSku || `SKU-SEL-${Date.now()}`,
+        selling_price: Number(listing.selling_price ?? listing.sellingPrice) || 0,
+        sellingPrice: Number(listing.selling_price ?? listing.sellingPrice) || 0,
+        stock_quantity: Math.max(0, Number(listing.stock_quantity ?? listing.stockQuantity) || 0),
+        stockQuantity: Math.max(0, Number(listing.stock_quantity ?? listing.stockQuantity) || 0),
+        status: listing.status || "active",
+        delivery_method: listing.delivery_method || listing.deliveryMethod || "Standard 3-5 Days",
+        warranty: listing.warranty || "1 Year Seller Warranty",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      if (supabase) {
+        const { data, error } = await supabase.from("reseller_listings").insert([payload]).select().single();
+        if (data && !error) {
+          notifyDataChange("reseller_listings", "insert", data);
+          return data;
+        }
+      }
+
+      const list = getMockData("reseller_listings") || [];
+      const updated = [payload, ...list];
+      saveMockData("reseller_listings", updated);
+      notifyDataChange("reseller_listings", "insert", payload);
+      return payload;
+    },
+
+    async update(id: string, updates: any) {
+      const existing = await this.getById(id);
+      if (!existing) throw new Error("Listing not found.");
+
+      const payload = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
+      if (supabase) {
+        const { data } = await supabase.from("reseller_listings").update(payload).eq("id", id).select().single();
+        if (data) {
+          notifyDataChange("reseller_listings", "update", data);
+          return data;
+        }
+      }
+
+      const list = getMockData("reseller_listings") || [];
+      const updated = list.map((l: any) => l.id === id ? { ...l, ...payload } : l);
+      saveMockData("reseller_listings", updated);
+      const found = updated.find((l: any) => l.id === id);
+      notifyDataChange("reseller_listings", "update", found);
+      return found;
+    },
+
+    async adjustStock(id: string, qtyDelta: number, reason: string = "manual_adjustment") {
+      const listing = await this.getById(id);
+      if (!listing) throw new Error("Listing not found for stock adjustment.");
+
+      const currentStock = Number(listing.stock_quantity ?? listing.stockQuantity) || 0;
+      const newStock = currentStock + qtyDelta;
+
+      if (newStock < 0) {
+        throw new Error(`Insufficient stock. Current stock is ${currentStock}, requested reduction is ${Math.abs(qtyDelta)}.`);
+      }
+
+      const updated = await this.update(id, {
+        stock_quantity: newStock,
+        stockQuantity: newStock
+      });
+
+      // Record transaction
+      await dbHelper.inventoryTransactions.record({
+        reseller_id: listing.reseller_id || listing.resellerId,
+        listing_id: id,
+        type: qtyDelta > 0 ? "restock" : "deduction",
+        quantity: Math.abs(qtyDelta),
+        reason
+      });
+
+      return updated;
+    }
+  },
+
+  // --- COMMISSION ENGINE ---
+  commissionEngine: {
+    calculate(productId: string, category: string, resellerId: string, sellingPrice: number, qty: number = 1) {
+      const lineSubtotal = sellingPrice * qty;
+      let commissionRate = 0.05; // Default 5% global commission
+
+      const catLower = (category || "").toLowerCase();
+      if (catLower.includes("laptop")) {
+        commissionRate = 0.04; // 4% for laptops
+      } else if (catLower.includes("storage") || catLower.includes("ssd") || catLower.includes("ram")) {
+        commissionRate = 0.03; // 3% for components
+      }
+
+      const platformCommission = Math.round(lineSubtotal * commissionRate);
+      const sellerEarning = lineSubtotal - platformCommission;
+
+      return {
+        commissionRate,
+        commissionPercent: commissionRate * 100,
+        lineSubtotal,
+        platformCommission,
+        sellerEarning
+      };
+    }
+  },
+
+  // --- PAYOUTS SECTION ---
+  resellerPayouts: {
+    async list() {
+      if (supabase) {
+        const { data } = await supabase.from("reseller_payouts").select("*").order("created_at", { ascending: false });
+        if (data) return data;
+      }
+      return getMockData("reseller_payouts") || [];
+    },
+
+    async getByReseller(resellerId: string) {
+      const list = await this.list();
+      return list.filter((p: any) => p.reseller_id === resellerId || p.resellerId === resellerId);
+    },
+
+    async create(payout: any) {
+      const payload = {
+        id: `pay-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        reseller_id: payout.reseller_id || payout.resellerId,
+        amount: Number(payout.amount) || 0,
+        commission_amount: Number(payout.commission_amount || payout.commissionAmount) || 0,
+        status: payout.status || "Pending",
+        period_start: payout.period_start || new Date().toISOString().split("T")[0],
+        period_end: payout.period_end || new Date().toISOString().split("T")[0],
+        payment_reference: payout.payment_reference || payout.paymentReference || "",
+        created_at: new Date().toISOString()
+      };
+
+      if (supabase) {
+        const { data } = await supabase.from("reseller_payouts").insert([payload]).select().single();
+        if (data) return data;
+      }
+
+      const list = getMockData("reseller_payouts") || [];
+      const updated = [payload, ...list];
+      saveMockData("reseller_payouts", updated);
+      return payload;
+    },
+
+    async updateStatus(id: string, status: string, paymentReference?: string) {
+      const payload: any = { status, updated_at: new Date().toISOString() };
+      if (status === "Paid") {
+        payload.paid_at = new Date().toISOString();
+        if (paymentReference) payload.payment_reference = paymentReference;
+      }
+
+      if (supabase) {
+        const { data } = await supabase.from("reseller_payouts").update(payload).eq("id", id).select().single();
+        if (data) return data;
+      }
+
+      const list = getMockData("reseller_payouts") || [];
+      const updated = list.map((p: any) => p.id === id ? { ...p, ...payload } : p);
+      saveMockData("reseller_payouts", updated);
+      return updated.find((p: any) => p.id === id);
+    }
+  },
+
+  // --- INVENTORY TRANSACTIONS ---
+  inventoryTransactions: {
+    async record(tx: any) {
+      const payload = {
+        id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        reseller_id: tx.reseller_id || tx.resellerId,
+        listing_id: tx.listing_id || tx.listingId,
+        type: tx.type || "adjustment",
+        quantity: Number(tx.quantity) || 0,
+        reason: tx.reason || "Inventory update",
+        created_at: new Date().toISOString()
+      };
+
+      if (supabase) {
+        await supabase.from("inventory_transactions").insert([payload]);
+      }
+
+      const list = getMockData("inventory_transactions") || [];
+      saveMockData("inventory_transactions", [payload, ...list]);
+      return payload;
+    },
+
+    async listByReseller(resellerId: string) {
+      const list = getMockData("inventory_transactions") || [];
+      return list.filter((t: any) => t.reseller_id === resellerId || t.resellerId === resellerId);
+    }
+  },
+
+
   // --- ORDERS SECTION ---
   orders: {
     async getNextOrderId(): Promise<string> {
@@ -2497,15 +2742,59 @@ export const dbHelper = {
         created_at: new Date().toISOString(),
         ...message
       };
+      let savedData: any = payload;
       if (supabase) {
         const { data } = await supabase.from("messages").insert([payload]).select().single();
         notifyDataChange("messages", "insert", data);
+        savedData = data || payload;
+      } else {
+        const list = getMockData("messages");
+        saveMockData("messages", [...list, payload]);
+        notifyDataChange("messages", "insert", payload);
+      }
+
+      // Fire admin notification with deep link reference to this conversation
+      try {
+        const senderName = message.sender_name || message.customer_name || message.customer_email || "Customer";
+        const preview = (message.message || "").substring(0, 80);
+        await dbHelper.notifications.create({
+          title: "💬 New Customer Message",
+          message: `${senderName}: ${preview}`,
+          type: "message",
+          recipient_role: "admin",
+          reference_type: "message",
+          reference_id: savedData?.id || payload.id,
+          meta: {
+            message_id: savedData?.id || payload.id,
+            sender: senderName,
+            user_id: message.user_id,
+          }
+        });
+      } catch (notifErr) {
+        console.error("Failed to create message notification:", notifErr);
+      }
+
+      return savedData;
+    },
+    async reply(id: string, replyText: string, replyBy: string = "NexByte Support") {
+      const payload = {
+        admin_reply: replyText,
+        reply: replyText,
+        status: "read",
+        replied_at: new Date().toISOString(),
+        replied_by: replyBy,
+      };
+      if (supabase) {
+        const { data } = await supabase.from("messages").update(payload).eq("id", id).select().single();
+        notifyDataChange("messages", "update", data);
         return data;
       }
       const list = getMockData("messages");
-      saveMockData("messages", [...list, payload]);
-      notifyDataChange("messages", "insert", payload);
-      return payload;
+      const updated = list.map((m: any) => m.id === id ? { ...m, ...payload } : m);
+      saveMockData("messages", updated);
+      const found = updated.find((m: any) => m.id === id);
+      notifyDataChange("messages", "update", found);
+      return found;
     }
   },
 
@@ -2538,55 +2827,87 @@ export const dbHelper = {
       return list.find((inv: any) => inv.shareToken === token || inv.share_token === token) || null;
     },
 
-    async generateNextNumber() {
-      const year = new Date().getFullYear();
+    async getNextSequenceInfo(targetYear?: number) {
+      const year = targetYear || new Date().getFullYear();
       const prefix = `NEX-${year}-`;
-      let nextCounter = 1;
+      let maxSequence = 0;
 
+      // 1. Get max sequence from existing DB records
       if (supabase) {
         const { data } = await supabase
           .from("invoices")
-          .select("invoice_number")
-          .like("invoice_number", `${prefix}%`)
-          .order("invoice_number", { ascending: false })
-          .limit(1);
+          .select("invoice_number, invoice_sequence, invoice_year")
+          .eq("invoice_year", year);
 
-        if (data && data.length > 0 && data[0].invoice_number) {
-          const parts = data[0].invoice_number.split("-");
-          const counterNum = parseInt(parts[parts.length - 1], 10);
-          if (!isNaN(counterNum)) {
-            nextCounter = counterNum + 1;
-          }
-        }
-      } else {
-        const list = getMockData("invoices");
-        list.forEach((inv: any) => {
-          const numStr = inv.invoiceNumber || inv.invoice_number || "";
-          if (numStr.startsWith(prefix)) {
-            const parts = numStr.split("-");
-            const counterNum = parseInt(parts[parts.length - 1], 10);
-            if (!isNaN(counterNum) && counterNum >= nextCounter) {
-              nextCounter = counterNum + 1;
+        if (data && data.length > 0) {
+          data.forEach((inv: any) => {
+            if (inv.invoice_sequence && typeof inv.invoice_sequence === "number") {
+              if (inv.invoice_sequence > maxSequence) maxSequence = inv.invoice_sequence;
+            } else if (inv.invoice_number && inv.invoice_number.startsWith(prefix)) {
+              const parts = inv.invoice_number.split("-");
+              const num = parseInt(parts[parts.length - 1], 10);
+              if (!isNaN(num) && num > maxSequence) maxSequence = num;
             }
-          }
-        });
+          });
+        }
       }
 
-      const formattedCounter = String(nextCounter).padStart(4, "0");
-      return `${prefix}${formattedCounter}`;
+      // Always check mock data / local sequence storage to ensure max sequence across deletes
+      const list = getMockData("invoices") || [];
+      list.forEach((inv: any) => {
+        const invYear = inv.invoice_year || inv.invoiceYear;
+        const invSeq = inv.invoice_sequence || inv.invoiceSequence;
+        const numStr = inv.invoiceNumber || inv.invoice_number || "";
+
+        if (invYear === year && typeof invSeq === "number" && invSeq > maxSequence) {
+          maxSequence = invSeq;
+        } else if (numStr.startsWith(prefix)) {
+          const parts = numStr.split("-");
+          const num = parseInt(parts[parts.length - 1], 10);
+          if (!isNaN(num) && num > maxSequence) maxSequence = num;
+        }
+      });
+
+      // Check persistent sequence tracker object (preserves sequence after deletion)
+      const seqTrackerMap = getMockData("invoice_sequences") || {};
+      const highestAssigned = seqTrackerMap[year] || 0;
+      if (highestAssigned > maxSequence) {
+        maxSequence = highestAssigned;
+      }
+
+      const nextSequence = maxSequence + 1;
+      const formattedCounter = String(nextSequence).padStart(4, "0");
+      const invoiceNumber = `${prefix}${formattedCounter}`;
+
+      return {
+        year,
+        sequence: nextSequence,
+        invoiceNumber,
+      };
+    },
+
+    async generateNextNumber(targetYear?: number) {
+      const info = await this.getNextSequenceInfo(targetYear);
+      return info.invoiceNumber;
     },
 
     async create(invoiceData: any) {
       const year = new Date().getFullYear();
-      const invoiceNumber = await this.generateNextNumber();
+      const seqInfo = await this.getNextSequenceInfo(year);
+      const invoiceNumber = seqInfo.invoiceNumber;
+      const invoiceSequence = seqInfo.sequence;
+
+      // Update persistent max sequence tracker for this year
+      const seqTrackerMap = getMockData("invoice_sequences") || {};
+      seqTrackerMap[year] = Math.max(seqTrackerMap[year] || 0, invoiceSequence);
+      saveMockData("invoice_sequences", seqTrackerMap);
+
       const now = new Date();
       const invoiceDate = now.toISOString().split("T")[0];
       const invoiceTime = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
 
       const payload = {
         id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        invoiceNumber,
-        invoice_number: invoiceNumber,
         invoiceDate,
         invoice_date: invoiceDate,
         invoiceTime,
@@ -2599,6 +2920,13 @@ export const dbHelper = {
         share_token: `tok-${invoiceNumber.toLowerCase()}-${Date.now().toString(36)}`,
         status: "active",
         ...invoiceData,
+        // Enforce immutable invoice number & sequence
+        invoiceNumber,
+        invoice_number: invoiceNumber,
+        invoiceYear: year,
+        invoice_year: year,
+        invoiceSequence: invoiceSequence,
+        invoice_sequence: invoiceSequence,
       };
 
       if (supabase) {
@@ -2609,7 +2937,7 @@ export const dbHelper = {
         }
       }
 
-      const list = getMockData("invoices");
+      const list = getMockData("invoices") || [];
       const updated = [payload, ...list];
       saveMockData("invoices", updated);
       notifyDataChange("invoices", "insert", payload);
@@ -2901,5 +3229,93 @@ export const dbHelper = {
 
       return this.update(offer.id, updates);
     }
-  }
+  },
+
+  systemSettings: {
+    async get() {
+      if (supabase) {
+        try {
+          const { data } = await supabase.from("system_settings").select("*").single();
+          if (data) {
+            return {
+              policy: data.global_theme_policy || "personal",
+              forcedTheme: data.forced_theme || "white-sky-pink",
+            };
+          }
+        } catch (e) {}
+      }
+      const mock = globalRef.__nexbyteMockDb.systemSettings || {
+        global_theme_policy: "personal",
+        forced_theme: "white-sky-pink",
+      };
+      return {
+        policy: mock.global_theme_policy || "personal",
+        forcedTheme: mock.forced_theme || "white-sky-pink",
+      };
+    },
+
+    async update(policy: string, forcedTheme?: string) {
+      if (!globalRef.__nexbyteMockDb.systemSettings) {
+        globalRef.__nexbyteMockDb.systemSettings = {
+          global_theme_policy: "personal",
+          forced_theme: "white-sky-pink",
+        };
+      }
+      globalRef.__nexbyteMockDb.systemSettings.global_theme_policy = policy;
+      if (forcedTheme) {
+        globalRef.__nexbyteMockDb.systemSettings.forced_theme = forcedTheme;
+      }
+
+      if (supabase) {
+        try {
+          await supabase.from("system_settings").upsert({
+            id: "global",
+            global_theme_policy: policy,
+            forced_theme: forcedTheme || "white-sky-pink",
+            updated_at: new Date().toISOString(),
+          });
+        } catch (e) {}
+      }
+
+      notifyDataChange("system_settings", "UPDATE", {
+        policy,
+        forcedTheme: forcedTheme || "white-sky-pink",
+      });
+
+      return {
+        policy,
+        forcedTheme: forcedTheme || "white-sky-pink",
+      };
+    },
+  },
+
+  // --- FILTER DEFINITIONS SECTION ---
+  filterDefinitions: {
+    async list(categoryId: string = "all") {
+      if (supabase) {
+        try {
+          const { data } = await supabase
+            .from("filter_definitions")
+            .select("*")
+            .eq("enabled", true)
+            .order("sort_order", { ascending: true });
+          if (data && data.length > 0) return data;
+        } catch (e) {}
+      }
+      const list = getMockData("filterDefinitions") || DEFAULT_FILTER_DEFINITIONS;
+      return list;
+    },
+    async save(definitions: any[]) {
+      if (supabase) {
+        try {
+          await supabase.from("filter_definitions").upsert(definitions);
+        } catch (e) {}
+      }
+      saveMockData("filterDefinitions", definitions);
+      notifyDataChange("filter_definitions", "UPDATE", definitions);
+      return definitions;
+    },
+  },
 };
+
+export const db = dbHelper;

@@ -8,27 +8,33 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Home,
   ShoppingBag,
-  Wrench,
-  Package,
-  Boxes,
   Tag,
   Heart,
+  ShoppingCart,
+  Package,
+  Calendar,
+  Wrench,
+  Laptop,
   MessageSquare,
   Bell,
-  HelpCircle,
-  Bot,
+  GraduationCap,
+  Briefcase,
+  Award,
+  ShieldCheck,
+  Sparkles,
+  Headphones,
   User,
   Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Menu,
   X,
-  ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { useCartStore } from "@/lib/cartStore";
+import { useNotificationStore } from "@/lib/notificationStore";
 
 interface CustomerSidebarProps {
   mobileOpen: boolean;
@@ -36,66 +42,98 @@ interface CustomerSidebarProps {
   onOpenAiChat?: () => void;
 }
 
-const MAIN_NAV = [
-  { href: "/customer", label: "Home", icon: Home },
-  { href: "/customer/shop", label: "Shop", icon: ShoppingBag },
-  { href: "/customer/services", label: "Services", icon: Wrench },
-  { href: "/customer/requests", label: "My Requests", icon: Package },
-  { href: "/customer/orders", label: "My Orders", icon: Boxes },
-  { href: "/customer/offers", label: "Offers", icon: Tag },
-  { href: "/customer/favorites", label: "Favorites", icon: Heart },
+const NAV_CATEGORIES = [
+  {
+    title: "",
+    items: [
+      { href: "/customer", label: "Home", icon: Home, exact: true },
+    ],
+  },
+  {
+    title: "SHOP",
+    items: [
+      { href: "/customer/shop", label: "Products", icon: ShoppingBag },
+      { href: "/customer/offers", label: "Offers", icon: Tag },
+      { href: "/customer/favorites", label: "Wishlist", icon: Heart },
+      { href: "/customer/cart", label: "Cart", icon: ShoppingCart, isCart: true },
+    ],
+  },
+  {
+    title: "MY ACTIVITY",
+    items: [
+      { href: "/customer/orders", label: "Orders", icon: Package },
+      { href: "/customer/bookings", label: "Bookings", icon: Calendar },
+      { href: "/customer/services", label: "Services", icon: Wrench },
+      { href: "/customer/laptop-enquiry", label: "Laptop Enquiries", icon: Laptop },
+    ],
+  },
+  {
+    title: "COMMUNICATION",
+    items: [
+      { href: "/customer/messages", label: "Messages", icon: MessageSquare },
+      { href: "/customer/notifications", label: "Notifications", icon: Bell, isNotifications: true },
+    ],
+  },
+  {
+    title: "LEARNING",
+    items: [
+      { href: "/customer/training", label: "Training", icon: GraduationCap },
+      { href: "/customer/internship", label: "Internship", icon: Briefcase },
+      { href: "/customer/certificates", label: "Certificates", icon: Award },
+    ],
+  },
+  {
+    title: "SUPPORT",
+    items: [
+      { href: "/customer/ewarranty", label: "E-Warranty", icon: ShieldCheck },
+      { href: "/customer/ai", label: "AI Assistant", icon: Sparkles },
+      { href: "/customer/support", label: "Contact Support", icon: Headphones },
+    ],
+  },
+  {
+    title: "ACCOUNT",
+    items: [
+      { href: "/customer/profile", label: "My Profile", icon: User },
+      { href: "/customer/settings", label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
-const COMM_NAV = [
-  { href: "/customer/messages", label: "Messages", icon: MessageSquare },
-  { href: "/customer/notifications", label: "Notifications", icon: Bell },
-];
-
-const SUPPORT_NAV = [
-  { href: "/customer/support", label: "Help & Support", icon: HelpCircle },
-];
-
-export default function CustomerSidebar({ mobileOpen, setMobileOpen, onOpenAiChat }: CustomerSidebarProps) {
+export default function CustomerSidebar({ mobileOpen, setMobileOpen }: CustomerSidebarProps) {
   const pathname = usePathname() || "/customer";
   const [collapsed, setCollapsed] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
-  // Hydrate collapsed state from localStorage
+  const cartOpen = useCartStore((s) => s.openCart);
+  const cartItemCount = useCartStore((s) => s.getItemCount());
+  const unreadNotifications = useNotificationStore((s) => s.unreadCount);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("nexbyte_sidebar_collapsed");
-      if (saved === "true") {
-        setCollapsed(true);
-      }
-    } catch (e) {
-      // ignore
-    }
+      if (saved === "true") setCollapsed(true);
+    } catch {}
   }, []);
 
   const toggleCollapsed = () => {
-    const nextState = !collapsed;
-    setCollapsed(nextState);
+    const next = !collapsed;
+    setCollapsed(next);
     try {
-      localStorage.setItem("nexbyte_sidebar_collapsed", String(nextState));
-    } catch (e) {
-      // ignore
-    }
+      localStorage.setItem("nexbyte_sidebar_collapsed", String(next));
+      window.dispatchEvent(new CustomEvent("nexbyte-sidebar-toggle", { detail: { collapsed: next } }));
+    } catch {}
   };
 
-  const isActive = (href: string) => {
-    if (href === "/customer") {
-      return pathname === "/customer";
-    }
+  const isActive = (href: string, exact = false) => {
+    if (exact || href === "/customer") return pathname === href;
     return pathname.startsWith(href);
   };
 
   const handleSignOutConfirm = async () => {
     setSigningOut(true);
     try {
-      if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        await supabase.auth.signOut();
-      }
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL) await supabase.auth.signOut();
       await fetch("/api/customer/logout", { method: "POST" });
     } catch (e) {
       console.error("Logout error", e);
@@ -107,37 +145,84 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen, onOpenAiCha
     }
   };
 
-  const renderNavItem = (item: { href: string; label: string; icon: any }, isMobile = false) => {
-    const active = isActive(item.href);
+  const renderNavItem = (
+    item: { href: string; label: string; icon: any; exact?: boolean; isCart?: boolean; isNotifications?: boolean },
+    isMobile = false
+  ) => {
+    const active = isActive(item.href, item.exact);
     const IconComp = item.icon;
+
+    // Cart item — opens drawer instead of navigating
+    if (item.isCart) {
+      return (
+        <button
+          key="cart"
+          onClick={() => {
+            if (isMobile) setMobileOpen(false);
+            cartOpen();
+          }}
+          className={cn(
+            "group relative w-full flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200",
+            "text-[#667085] dark:text-[#A1A1AA] hover:bg-[#F0F4FF] dark:hover:bg-[#1E1638]/50 hover:text-[#2563EB] dark:hover:text-[#60A5FA]"
+          )}
+        >
+          <div className="relative">
+            <IconComp className="h-4 w-4 shrink-0 text-[#98A2B3] dark:text-[#71717A] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] transition-colors" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#2563EB] text-[8px] font-bold text-white">
+                {cartItemCount > 9 ? "9+" : cartItemCount}
+              </span>
+            )}
+          </div>
+          {(!collapsed || isMobile) && <span className="truncate tracking-tight">Cart</span>}
+          {(!collapsed || isMobile) && cartItemCount > 0 && (
+            <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-[#2563EB] text-[9px] font-bold text-white px-1">
+              {cartItemCount}
+            </span>
+          )}
+        </button>
+      );
+    }
 
     return (
       <Link
         key={item.href}
         href={item.href}
-        onClick={() => {
-          if (isMobile) setMobileOpen(false);
-        }}
+        onClick={() => { if (isMobile) setMobileOpen(false); }}
         className={cn(
-          "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200",
+          "group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all duration-200",
           active
-            ? "bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-l-4 border-sky-600 shadow-sm"
-            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+            ? "bg-[#DBEAFE] dark:bg-[#1a2744] text-[#2563EB] dark:text-[#60A5FA] font-bold shadow-sm border-l-4 border-[#2563EB] dark:border-[#60A5FA]"
+            : "text-[#475569] dark:text-[#A1A1AA] hover:bg-[#F1F5F9] dark:hover:bg-[#1E1638]/50 hover:text-[#2563EB] dark:hover:text-[#60A5FA]"
         )}
       >
-        <IconComp
-          className={cn(
-            "h-4.5 w-4.5 shrink-0 transition-colors",
-            active ? "text-sky-600 dark:text-sky-400" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white"
+        <div className="relative">
+          <IconComp
+            className={cn(
+              "h-4 w-4 shrink-0 transition-colors",
+              active
+                ? "text-[#2563EB] dark:text-[#60A5FA]"
+                : "text-[#98A2B3] dark:text-[#71717A] group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA]"
+            )}
+          />
+          {item.isNotifications && unreadNotifications > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">
+              {unreadNotifications > 9 ? "9+" : unreadNotifications}
+            </span>
           )}
-        />
+        </div>
         {(!collapsed || isMobile) && (
           <span className="truncate tracking-tight">{item.label}</span>
         )}
+        {item.isNotifications && unreadNotifications > 0 && (!collapsed || isMobile) && (
+          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white px-1">
+            {unreadNotifications > 99 ? "99+" : unreadNotifications}
+          </span>
+        )}
 
-        {/* Floating Tooltip when Desktop Sidebar Collapsed */}
+        {/* Tooltip for collapsed state */}
         {collapsed && !isMobile && (
-          <div className="absolute left-full ml-2.5 hidden rounded-lg bg-slate-900 dark:bg-slate-800 px-2.5 py-1 text-[11px] font-medium text-white shadow-md group-hover:block z-50 whitespace-nowrap">
+          <div className="absolute left-full ml-2.5 hidden rounded-lg bg-[#111827] dark:bg-[#1B1B20] px-2.5 py-1 text-[11px] font-medium text-white shadow-md group-hover:block z-50 whitespace-nowrap">
             {item.label}
           </div>
         )}
@@ -147,123 +232,77 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen, onOpenAiCha
 
   return (
     <>
-      {/* DESKTOP FIXED LEFT SIDEBAR */}
+      {/* ─── DESKTOP FIXED LEFT SIDEBAR ────────────────────────────────── */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col fixed top-0 left-0 bottom-0 z-40 bg-white dark:bg-slate-900 border-r border-[#E6EAF0] dark:border-white/10 transition-all duration-300 ease-in-out shadow-sm",
-          collapsed ? "w-18" : "w-64"
+          "hidden lg:flex flex-col fixed top-0 left-0 bottom-0 z-40 bg-white dark:bg-[#101B2B] border-r border-[#DCEAF2] dark:border-[#2A3B50] transition-all duration-300 ease-in-out shadow-sm",
+          collapsed ? "w-[72px]" : "w-64"
         )}
       >
-        {/* Top Branding Section */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-[#E6EAF0] dark:border-white/10 shrink-0">
+        {/* Branding */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-[#DCEAF2] dark:border-[#2A3B50] shrink-0">
           <Link href="/customer" className="flex items-center gap-3 group overflow-hidden">
-            <div className="relative h-9 w-9 shrink-0">
+            <div className="relative h-9 w-9 shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#7C3AED] flex items-center justify-center shadow-md">
               <Image
                 src="/images/logo-icon-transparent.png"
                 alt="NexByte Logo"
                 fill
                 sizes="36px"
-                className="object-contain"
+                className="object-contain p-1"
                 priority
+                onError={() => {}}
               />
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-display text-base font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
-                  NEX<span className="text-sky-600">BYTE</span>
+                <span className="font-display text-sm font-extrabold tracking-tight text-[#111827] dark:text-[#F8FAFC] leading-none">
+                  NEXBYTE
                 </span>
-                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 tracking-wide mt-0.5">
-                  Customer Portal
+                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#94A3B8] tracking-wide mt-0.5">
+                  Technology Store
                 </span>
               </div>
             )}
           </Link>
-
-          {/* Collapse Toggle Button */}
           <button
             onClick={toggleCollapsed}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-800 transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#E2E8F0] dark:border-[#263247] text-[#64748B] dark:text-[#94A3B8] hover:bg-[#F0F4FF] dark:hover:bg-[#1a2744] hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         </div>
 
-        {/* Scrollable Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5 no-scrollbar">
-          {/* Main Navigation */}
-          <div className="space-y-1">
-            {!collapsed && (
-              <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Main
-              </span>
-            )}
-            {MAIN_NAV.map((item) => renderNavItem(item))}
-          </div>
-
-          <div className="h-px bg-[#E6EAF0] dark:bg-white/10 mx-2" />
-
-          {/* Communication Section */}
-          <div className="space-y-1">
-            {!collapsed && (
-              <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Communication
-              </span>
-            )}
-            {COMM_NAV.map((item) => renderNavItem(item))}
-          </div>
-
-          <div className="h-px bg-[#E6EAF0] dark:bg-white/10 mx-2" />
-
-          {/* Support & AI Section */}
-          <div className="space-y-1">
-            {!collapsed && (
-              <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Support
-              </span>
-            )}
-            {SUPPORT_NAV.map((item) => renderNavItem(item))}
-
-            {/* Ask NexByte AI trigger button */}
-            <button
-              onClick={() => {
-                if (onOpenAiChat) onOpenAiChat();
-                else window.dispatchEvent(new CustomEvent("nexbyte-open-ai-chat"));
-              }}
-              className={cn(
-                "group relative w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all duration-200 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40",
-                collapsed ? "justify-center" : ""
+        {/* Nav */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3 no-scrollbar">
+          {NAV_CATEGORIES.map((cat, idx) => (
+            <div key={cat.title || idx} className="space-y-0.5">
+              {!collapsed && cat.title && (
+                <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] dark:text-[#64748B] block mb-1.5">
+                  {cat.title}
+                </span>
               )}
-            >
-              <Bot className="h-4.5 w-4.5 shrink-0 text-sky-600" />
-              {!collapsed && <span>Ask NexByte AI</span>}
-
-              {collapsed && (
-                <div className="absolute left-full ml-2.5 hidden rounded-lg bg-slate-900 dark:bg-slate-800 px-2.5 py-1 text-[11px] font-medium text-white shadow-md group-hover:block z-50 whitespace-nowrap">
-                  Ask NexByte AI
-                </div>
+              {cat.items.map((item) => renderNavItem(item as any))}
+              {idx < NAV_CATEGORIES.length - 1 && (
+                <div className="h-px bg-[#E2E8F0] dark:bg-[#263247] my-2 mx-2" />
               )}
-            </button>
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom Profile & Logout Controls */}
-        <div className="p-3 border-t border-[#E6EAF0] dark:border-white/10 space-y-1 shrink-0 bg-white dark:bg-slate-900">
-          {renderNavItem({ href: "/customer/profile", label: "My Profile", icon: User })}
-          {renderNavItem({ href: "/customer/settings", label: "Settings", icon: Settings })}
-
+        {/* Sign Out */}
+        <div className="p-3 border-t border-[#E2E8F0] dark:border-[#263247] shrink-0 bg-white dark:bg-[#080B12]">
           <button
             onClick={() => setShowSignOutModal(true)}
             className={cn(
-              "group relative w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all duration-200",
+              "group relative w-full flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all duration-200",
               collapsed ? "justify-center" : ""
             )}
           >
-            <LogOut className="h-4.5 w-4.5 shrink-0 text-rose-600" />
+            <LogOut className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
             {!collapsed && <span>Sign Out</span>}
-
             {collapsed && (
-              <div className="absolute left-full ml-2.5 hidden rounded-lg bg-slate-900 dark:bg-slate-800 px-2.5 py-1 text-[11px] font-medium text-white shadow-md group-hover:block z-50 whitespace-nowrap">
+              <div className="absolute left-full ml-2.5 hidden rounded-lg bg-[#111827] dark:bg-[#1B1B20] px-2.5 py-1 text-[11px] font-medium text-white shadow-md group-hover:block z-50 whitespace-nowrap">
                 Sign Out
               </div>
             )}
@@ -271,95 +310,74 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen, onOpenAiCha
         </div>
       </aside>
 
-      {/* MOBILE SLIDE-IN DRAWER */}
+      {/* ─── MOBILE SLIDE-IN DRAWER ────────────────────────────────────── */}
       <AnimatePresence>
         {mobileOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="lg:hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm"
+              className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
             />
 
-            {/* Slide Drawer */}
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
-              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-[#E6EAF0] dark:border-white/10 flex flex-col shadow-2xl"
+              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white dark:bg-[#080B12] border-r border-[#E2E8F0] dark:border-[#263247] flex flex-col shadow-2xl"
             >
-              <div className="flex items-center justify-between p-4 border-b border-[#E6EAF0] dark:border-white/10">
+              <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] dark:border-[#263247]">
                 <div className="flex items-center gap-3">
-                  <Image
-                    src="/images/logo-icon-transparent.png"
-                    alt="NexByte Logo"
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
+                  <div className="relative h-9 w-9 rounded-xl overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#7C3AED] flex items-center justify-center shadow-md">
+                    <Image
+                      src="/images/logo-icon-transparent.png"
+                      alt="NexByte Logo"
+                      fill
+                      sizes="36px"
+                      className="object-contain p-1"
+                      onError={() => {}}
+                    />
+                  </div>
                   <div>
-                    <h3 className="font-display font-extrabold text-slate-900 dark:text-white text-base">
-                      NEX<span className="text-sky-600">BYTE</span>
+                    <h3 className="font-display font-extrabold text-[#111827] dark:text-[#F8FAFC] text-sm">
+                      NEXBYTE
                     </h3>
-                    <p className="text-[10px] text-slate-500 font-medium">Customer Portal</p>
+                    <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] font-medium">Technology Store</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5"
+                  className="p-2 rounded-lg text-[#64748B] hover:bg-[#F0F4FF] dark:hover:bg-[#1a2744]"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Navigation</span>
-                  {MAIN_NAV.map((item) => renderNavItem(item, true))}
-                </div>
-
-                <div className="h-px bg-[#E6EAF0] dark:bg-white/10" />
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Messages &amp; Alerts</span>
-                  {COMM_NAV.map((item) => renderNavItem(item, true))}
-                </div>
-
-                <div className="h-px bg-[#E6EAF0] dark:bg-white/10" />
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Support &amp; AI</span>
-                  {SUPPORT_NAV.map((item) => renderNavItem(item, true))}
-                  <button
-                    onClick={() => {
-                      setMobileOpen(false);
-                      if (onOpenAiChat) onOpenAiChat();
-                      else window.dispatchEvent(new CustomEvent("nexbyte-open-ai-chat"));
-                    }}
-                    className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/40"
-                  >
-                    <Bot className="h-4.5 w-4.5 text-sky-600" />
-                    <span>Ask NexByte AI</span>
-                  </button>
-                </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {NAV_CATEGORIES.map((cat, idx) => (
+                  <div key={cat.title || idx} className="space-y-0.5">
+                    {cat.title && (
+                      <span className="text-[10px] font-bold uppercase text-[#94A3B8] dark:text-[#64748B] block mb-1.5">
+                        {cat.title}
+                      </span>
+                    )}
+                    {cat.items.map((item) => renderNavItem(item as any, true))}
+                    {idx < NAV_CATEGORIES.length - 1 && (
+                      <div className="h-px bg-[#E2E8F0] dark:bg-[#263247] my-2" />
+                    )}
+                  </div>
+                ))}
               </div>
 
-              <div className="p-4 border-t border-[#E6EAF0] dark:border-white/10 space-y-1">
-                {renderNavItem({ href: "/customer/profile", label: "My Profile", icon: User }, true)}
-                {renderNavItem({ href: "/customer/settings", label: "Settings", icon: Settings }, true)}
-
+              <div className="p-4 border-t border-[#E2E8F0] dark:border-[#263247]">
                 <button
-                  onClick={() => {
-                    setMobileOpen(false);
-                    setShowSignOutModal(true);
-                  }}
+                  onClick={() => { setMobileOpen(false); setShowSignOutModal(true); }}
                   className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30"
                 >
-                  <LogOut className="h-4.5 w-4.5 text-rose-600" />
+                  <LogOut className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                   <span>Sign Out</span>
                 </button>
               </div>
@@ -368,33 +386,33 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen, onOpenAiCha
         )}
       </AnimatePresence>
 
-      {/* CONFIRMATION SIGN OUT MODAL */}
+      {/* ─── SIGN OUT CONFIRMATION MODAL ───────────────────────────────── */}
       <AnimatePresence>
         {showSignOutModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 shadow-2xl space-y-4"
+              className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#0D0D0F] border border-[#E2E8F0] dark:border-[#263247] p-6 shadow-2xl space-y-4"
             >
               <div className="flex items-center gap-3 text-amber-500">
                 <div className="p-2.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
                   <AlertTriangle className="h-5 w-5" />
                 </div>
-                <h3 className="font-display font-bold text-slate-900 dark:text-white text-base">
-                  Sign Out Confirmation
+                <h3 className="font-display font-bold text-[#111827] dark:text-white text-base">
+                  Sign Out?
                 </h3>
               </div>
 
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
                 Sign out of your NexByte account? You will need to sign in again to access your orders, bookings, and profile.
               </p>
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowSignOutModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-[#64748B] dark:text-[#94A3B8] hover:bg-[#F0F4FF] dark:hover:bg-[#1a2744] rounded-xl border border-[#E2E8F0] dark:border-[#263247] transition-colors"
                 >
                   Cancel
                 </button>

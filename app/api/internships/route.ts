@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
+import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -68,6 +69,28 @@ export async function POST(req: Request) {
       status: "pending",
     });
 
+    // PIPELINE EVENT (CUSTOMER → ADMIN & ADMIN → CUSTOMER)
+    await dispatchPipelineEvent({
+      eventType: "INTERNSHIP_SUBMITTED",
+      title: "New Internship Application 🎓",
+      message: `${name} (${college}) applied for ${saved.domain}`,
+      recipientRole: "admin",
+      referenceType: "internship",
+      referenceId: saved.application_id || saved.id,
+      actorRole: "user",
+    });
+
+    await dispatchPipelineEvent({
+      eventType: "INTERNSHIP_SUBMITTED",
+      title: "Internship Application Received 🎓",
+      message: `Your application ${saved.application_id || saved.id} for ${saved.domain} has been submitted for review.`,
+      recipientRole: "user",
+      recipientUserId: saved.user_id || undefined,
+      referenceType: "internship",
+      referenceId: saved.application_id || saved.id,
+      actorRole: "system",
+    });
+
     return NextResponse.json(
       {
         success: true,
@@ -128,7 +151,38 @@ export async function PUT(req: Request) {
       );
     }
 
-    const updated = await dbHelper.internships.update(id, updates);
+    // Strip internal admin-only notes before sending notifications to customer
+    const { admin_notes, internal_comments, ...publicUpdates } = updates;
+
+    const updated = await dbHelper.internships.update(id, publicUpdates);
+
+    // PIPELINE EVENT (ADMIN → CUSTOMER INTERNSHIP STATUS UPDATES)
+    if (updates.status) {
+      let eventType: any = "INTERNSHIP_APPROVED";
+      let title = "Internship Application Approved 🎉";
+      let msg = `Your internship application ${updated.application_id || updated.id} has been approved!`;
+
+      if (updates.status === "rejected") {
+        eventType = "INTERNSHIP_REJECTED";
+        title = "Internship Application Update";
+        msg = `Your internship application ${updated.application_id || updated.id} status was updated.`;
+      } else if (updates.status === "info_required") {
+        eventType = "INTERNSHIP_INFO_REQUIRED";
+        title = "Action Required: Internship Application ⚠️";
+        msg = `We need additional information for your internship application ${updated.application_id || updated.id}.`;
+      }
+
+      await dispatchPipelineEvent({
+        eventType,
+        title,
+        message: msg,
+        recipientRole: "user",
+        recipientUserId: updated.user_id || undefined,
+        referenceType: "internship",
+        referenceId: updated.application_id || updated.id,
+        actorRole: "admin",
+      });
+    }
 
     return NextResponse.json(
       { success: true, application: updated, message: "Application updated successfully." },

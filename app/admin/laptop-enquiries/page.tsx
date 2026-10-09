@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Laptop,
   Search,
@@ -32,7 +33,10 @@ const STATUS_OPTIONS = [
   { value: "cancelled", label: "Cancelled", color: "text-red-400 bg-red-500/10 border-red-500/20" },
 ];
 
-export default function AdminLaptopEnquiriesPage() {
+function LaptopEnquiriesContent() {
+  const searchParams = useSearchParams();
+  const targetId = searchParams ? searchParams.get("id") : null;
+
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [productsCatalog, setProductsCatalog] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -53,6 +57,21 @@ export default function AdminLaptopEnquiriesPage() {
     ]);
     setEnquiries(enqList);
     setProductsCatalog(prodList);
+
+    // Deep link auto-highlighting (Req #10)
+    if (targetId) {
+      const match = enqList.find(
+        (e: any) =>
+          e.id === targetId ||
+          e.reference_id?.toLowerCase() === targetId.toLowerCase()
+      );
+      if (match) {
+        setSelectedEnquiry(match);
+        setAdminNotesText(match.admin_notes || "");
+        setCustomerReplyText(match.customer_reply || "");
+        setRecommendedProductsList(match.recommended_products || []);
+      }
+    }
   };
 
   useEffect(() => {
@@ -60,7 +79,7 @@ export default function AdminLaptopEnquiriesPage() {
     const handler = () => loadData();
     window.addEventListener("nexbyte-realtime", handler);
     return () => window.removeEventListener("nexbyte-realtime", handler);
-  }, []);
+  }, [targetId]);
 
   const handleOpenDetail = (e: any) => {
     setSelectedEnquiry(e);
@@ -560,5 +579,13 @@ export default function AdminLaptopEnquiriesPage() {
       )}
 
     </div>
+  );
+}
+
+export default function AdminLaptopEnquiriesPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-white text-xs font-semibold">Loading Laptop Enquiries...</div>}>
+      <LaptopEnquiriesContent />
+    </Suspense>
   );
 }

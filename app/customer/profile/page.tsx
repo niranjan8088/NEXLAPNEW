@@ -248,6 +248,29 @@ export default function CustomerProfilePage() {
         </div>
       </div>
 
+      {/* Account Overview Quick Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm text-center">
+          <span className="text-2xl font-extrabold text-slate-900 dark:text-white font-display">2</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Hardware Orders</span>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm text-center">
+          <span className="text-2xl font-extrabold text-emerald-600 font-display">3</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Active E-Warranties</span>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm text-center">
+          <span className="text-2xl font-extrabold text-purple-600 font-display">1</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Service Request</span>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 p-4 shadow-sm text-center">
+          <span className="text-2xl font-extrabold text-sky-600 font-display">100%</span>
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Genuine Parts</span>
+        </div>
+      </div>
+
       {/* Change Password Modal */}
       {showPasswordSection && (
         <form onSubmit={handleChangePassword} className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 space-y-4">

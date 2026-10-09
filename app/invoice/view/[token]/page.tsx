@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Printer, Download, Share2, AlertCircle, CheckCircle, Receipt } from "lucide-react";
-import { formatRupees } from "@/lib/billingUtils";
+import { formatRupees, sanitizeInvoiceItems } from "@/lib/billingUtils";
 
 export default function PublicInvoiceViewPage({
   params
@@ -37,10 +37,10 @@ export default function PublicInvoiceViewPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-nex-black text-white flex items-center justify-center p-6">
+      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex items-center justify-center p-6">
         <div className="text-center space-y-3">
-          <div className="h-10 w-10 border-2 border-nex-blue border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-nex-mist">Loading Tax Invoice...</p>
+          <div className="h-10 w-10 border-2 border-black dark:border-white border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-neutral-500">Loading Tax Invoice...</p>
         </div>
       </div>
     );
@@ -48,12 +48,12 @@ export default function PublicInvoiceViewPage({
 
   if (errorMsg || !invoice) {
     return (
-      <div className="min-h-screen bg-nex-black text-white flex items-center justify-center p-6">
-        <div className="glass-panel p-8 rounded-2xl bg-nex-ink border border-red-500/30 text-center max-w-md space-y-4">
-          <AlertCircle className="h-12 w-12 text-red-400 mx-auto" />
-          <h2 className="font-display text-lg font-bold text-white">Invoice Not Found</h2>
-          <p className="text-xs text-nex-mist">{errorMsg || "The invoice link is invalid or expired."}</p>
-          <Link href="/" className="btn-primary inline-block text-xs !py-2 !px-6">
+      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex items-center justify-center p-6">
+        <div className="p-8 rounded-2xl bg-neutral-100 dark:bg-neutral-900 border border-red-500/30 text-center max-w-md space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+          <h2 className="font-display text-lg font-bold text-black dark:text-white">Invoice Not Found</h2>
+          <p className="text-xs text-neutral-500">{errorMsg || "The invoice link is invalid or expired."}</p>
+          <Link href="/" className="bg-black text-white dark:bg-white dark:text-black font-bold inline-block text-xs py-2 px-6 rounded-xl">
             Return to NexByte Home
           </Link>
         </div>
@@ -86,18 +86,18 @@ export default function PublicInvoiceViewPage({
   const balanceDue = Number(invoice.balanceDue || invoice.balance_due) || 0;
 
   return (
-    <div className="min-h-screen bg-nex-black text-white p-4 sm:p-8 flex justify-center items-start">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white p-4 sm:p-8 flex justify-center items-start">
       <div className="max-w-2xl w-full space-y-4 my-4">
         
         {/* Top Header Controls */}
-        <div className="flex items-center justify-between bg-nex-ink p-4 rounded-2xl border border-white/10">
+        <div className="flex items-center justify-between bg-neutral-100 dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 print:hidden">
           <div className="flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-nex-blueLight" />
-            <span className="text-xs font-bold text-white">NexByte Tax Invoice: {numStr}</span>
+            <Receipt className="h-5 w-5 text-black dark:text-white" />
+            <span className="text-xs font-bold text-black dark:text-white">NexByte Tax Invoice: {numStr}</span>
           </div>
           <button
             onClick={() => window.print()}
-            className="btn-primary !py-1.5 !px-4 text-xs flex items-center gap-1.5 shadow-glow-blue"
+            className="bg-black text-white dark:bg-white dark:text-black font-bold py-1.5 px-4 text-xs flex items-center gap-1.5 rounded-xl shadow-sm hover:opacity-90"
           >
             <Printer className="h-3.5 w-3.5" /> Print / Save PDF
           </button>
@@ -124,9 +124,10 @@ export default function PublicInvoiceViewPage({
               <p className="text-xs text-slate-500 font-semibold">
                 Connecting Customers with Trusted Tech Experts
               </p>
-              <p className="text-[9px] text-slate-400">
-                #372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road, Bengaluru 560070 | Ph: +91 8088979706
-              </p>
+              <div className="text-[9px] text-slate-500 space-y-0.5 pt-0.5">
+                <p>Contact: +91 8088979706 | +91 8904760125</p>
+                <p>Email: nexbytetechnologies@gmail.com</p>
+              </div>
             </div>
 
             <div className="text-right space-y-1">
@@ -175,8 +176,8 @@ export default function PublicInvoiceViewPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {items.map((item: any, idx: number) => (
-                <tr key={idx} className="text-slate-700">
+              {sanitizeInvoiceItems(items).map((item: any, idx: number) => (
+                <tr key={item.id || idx} className="text-slate-700">
                   <td className="py-2 px-2 text-slate-400">{idx + 1}</td>
                   <td className="py-2 px-2">
                     <div className="font-semibold text-slate-900">{item.name}</div>
@@ -188,7 +189,7 @@ export default function PublicInvoiceViewPage({
                     {item.discount > 0 ? formatRupees(item.discount) : "-"}
                   </td>
                   <td className="py-2 px-2 text-right font-bold text-slate-900">
-                    {formatRupees(item.lineTotal)}
+                    {formatRupees(item.lineTotal || (item.quantity * item.unitPrice - (item.discount || 0)))}
                   </td>
                 </tr>
               ))}
