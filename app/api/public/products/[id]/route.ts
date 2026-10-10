@@ -27,6 +27,12 @@ export async function GET(
 
     const stockQty = Number(customerSafeProduct.stock ?? 10);
     const lowThreshold = Number(customerSafeProduct.lowStockThreshold ?? 5);
+    const customerSafeVariants = Array.isArray(customerSafeProduct.variants)
+      ? customerSafeProduct.variants.map((variant: any) => {
+          const { costPrice: _variantCostPrice, ...safeVariant } = variant;
+          return safeVariant;
+        })
+      : customerSafeProduct.variants;
     let stockStatus = "In Stock";
     if (stockQty <= 0) {
       stockStatus = "Out of Stock";
@@ -38,6 +44,7 @@ export async function GET(
       success: true,
       product: {
         ...customerSafeProduct,
+        variants: customerSafeVariants,
         stockStatus,
         inStock: stockQty > 0,
       }

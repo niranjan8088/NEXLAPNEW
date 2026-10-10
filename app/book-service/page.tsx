@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { services, business } from "@/lib/data";
 import { Calendar, User, Phone, Mail, Clock, MessageSquare, CheckCircle, Star } from "lucide-react";
-import { dbHelper } from "@/lib/dbHelper";
 import StarRating from "@/components/ui/StarRating";
 
 export default function BookServicePage() {
@@ -34,27 +33,39 @@ export default function BookServicePage() {
     setLoading(true);
 
     try {
-      // Save to database
-      const saved = await dbHelper.bookings.create({
-        customerName: name,
-        phone,
-        email,
-        productName: serviceName,
-        bookingType: "service",
-        notes,
-        status: "new",
-        city,
-        state: "Karnataka",
-        timeline: [
-          { status: "new", timestamp: new Date().toISOString(), message: `Doorstep service scheduled: ${serviceName}` }
-        ]
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: name,
+          phone,
+          email,
+          service_name: serviceName,
+          requestType: "service",
+          preferredDate: date,
+          preferredTime: timeSlot,
+          description: notes,
+          city,
+          state: "Karnataka",
+        }),
       });
 
-      setCreatedBookingId(saved.bookingId);
+      if (res.status === 401) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/customer/signin?next=${encodeURIComponent(next)}`);
+        return;
+      }
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to submit service booking.");
+      }
+
+      setCreatedBookingId(data.bookingId);
       setBookingSuccess(true);
     } catch (err) {
-      console.error(err);
-      alert("Failed to submit service booking. Please try again.");
+      console.error("Service booking submission failed.", err);
+      alert(err instanceof Error ? err.message : "Failed to submit service booking. Please try again.");
     } finally {
       setLoading(false);
     }

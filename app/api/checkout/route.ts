@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
-import { cookies } from "next/headers";
+import { getServerSession } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
+      return NextResponse.json(
+        { success: false, error: "Sign in with a customer account to place an order.", code: "AUTH_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const {
       items,
@@ -31,37 +39,69 @@ export async function POST(request: NextRequest) {
     const dbProducts = await dbHelper.products.list();
 
     let serverSubtotal = 0;
-    const verifiedItems = items.map((item: any) => {
-      const prod = dbProducts.find((p: any) => p.id === item.productId || p.id === item.id);
-      let unitPrice = Number(item.price) || 0;
-
-      if (prod) {
-        // If variant price exists
-        if (prod.variants && prod.variants.length > 0) {
-          const v = prod.variants.find((varObj: any) => varObj.name === item.variant || varObj.id === item.variantId);
-          if (v && v.price) unitPrice = Number(v.price);
-          else unitPrice = Number(prod.price);
-        } else {
-          unitPrice = Number(prod.price);
-        }
+    const reservedQuantities = new Map<string, number>();
+    const verifiedItems = [];
+    for (const [index, item] of items.entries()) {
+      if (!item || typeof item !== "object") {
+        return NextResponse.json({ error: `Cart item ${index + 1} is invalid.` }, { status: 400 });
       }
 
-      const qty = Math.max(1, Number(item.quantity) || 1);
-      const lineTotal = unitPrice * qty;
-      serverSubtotal += lineTotal;
+      const productId = String(item.productId || item.id || "");
+      const prod = dbProducts.find((product: any) => product.id === productId);
+      if (!prod) {
+        return NextResponse.json({ error: `Product for cart item ${index + 1} is no longer available.` }, { status: 400 });
+      }
 
-      return {
-        id: item.id || `item-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-        productId: item.productId || item.id,
-        title: item.title || prod?.title || "Hardware Item",
-        variant: item.variant || "",
-        quantity: qty,
+      const quantity = Number(item.quantity);
+      if (!Number.isInteger(quantity) || quantity < 1) {
+        return NextResponse.json({ error: `Quantity for "${prod.title}" must be a positive whole number.` }, { status: 400 });
+      }
+
+      const variants = Array.isArray(prod.variants) ? prod.variants : [];
+      let variant: any = null;
+      if (variants.length > 0) {
+        if (!item.variantId) {
+          return NextResponse.json({ error: `Choose a valid configuration for "${prod.title}" before ordering.` }, { status: 400 });
+        }
+        variant = variants.find((entry: any) => entry.id === item.variantId);
+        if (!variant) {
+          return NextResponse.json({ error: `The selected configuration for "${prod.title}" is no longer available.` }, { status: 400 });
+        }
+      } else if (item.variantId) {
+        return NextResponse.json({ error: `The selected configuration for "${prod.title}" is invalid.` }, { status: 400 });
+      }
+
+      const unitPrice = Number(variant ? variant.price : prod.price);
+      if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+        return NextResponse.json({ error: `The price for "${prod.title}" is currently invalid.` }, { status: 400 });
+      }
+
+      const availableStock = variant?.stock ?? prod.stock;
+      const stockKey = `${prod.id}:${variant?.id || ""}`;
+      const requestedStock = (reservedQuantities.get(stockKey) || 0) + quantity;
+      if (availableStock !== undefined && availableStock !== null && requestedStock > Number(availableStock)) {
+        return NextResponse.json({
+          error: `${variant?.name ? `${variant.name} of ` : ""}${prod.title} has only ${Number(availableStock)} in stock.`,
+        }, { status: 400 });
+      }
+      reservedQuantities.set(stockKey, requestedStock);
+
+      const lineTotal = unitPrice * quantity;
+      serverSubtotal += lineTotal;
+      verifiedItems.push({
+        id: `item-${Date.now()}-${index}`,
+        productId: prod.id,
+        variantId: variant?.id || "",
+        variantSku: variant?.sku || "",
+        variant: variant?.name || "",
+        title: `${prod.title}${variant?.name ? ` (${variant.name})` : ""}`,
+        quantity,
         unitPrice,
         price: unitPrice,
         total: lineTotal,
-        image: item.image || prod?.image || "/images/poster-products.png",
-      };
-    });
+        image: variant?.image || prod.image || "/images/poster-products.png",
+      });
+    }
 
     // 2. Validate Offer Discount Server-side
     let discountAmount = 0;
@@ -98,13 +138,7 @@ export async function POST(request: NextRequest) {
     const grandTotal = netTaxable + gstAmount + shippingFee;
 
     // 5. Auth User linking
-    const cookieStore = await cookies();
-    const customerSession = cookieStore.get("nexbyte_customer_session")?.value;
-    let userId = "guest-user";
-    if (customerSession) {
-      const parts = customerSession.split(":");
-      userId = parts[1] || parts[0];
-    }
+    const userId = authUser.id;
 
     // 6. Generate Order record
     const nextOrderId = await dbHelper.orders.getNextOrderId();
@@ -130,7 +164,7 @@ export async function POST(request: NextRequest) {
       shipping_fee: shippingFee,
       total_amount: grandTotal,
       gst_details: gstDetails?.isGstInvoice ? gstDetails : null,
-      courier: deliveryOption === "express" ? "NexByte Priority Express" : "NexByte Standard Logistics",
+      courier: deliveryOption === "express" ? "Nex LapTech Priority Express" : "Nex LapTech Standard Logistics",
       tracking_number: `NEX-TRK-${Math.floor(100000 + Math.random() * 900000)}`,
       created_at: new Date().toISOString(),
     };

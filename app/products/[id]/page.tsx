@@ -31,7 +31,7 @@ import {
 
 interface Variant {
   id: string;
-  sku: string;
+  sku?: string;
   name: string;
   price: number;
   compareAtPrice?: number;
@@ -102,6 +102,8 @@ export default function ProductDetailPage({
   // Purchase state
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isCustomerAuthenticated, setIsCustomerAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState<string | null>(null);
 
@@ -135,6 +137,40 @@ export default function ProductDetailPage({
 
   const addItemToCart = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
+
+  const redirectToSignIn = () => {
+    const next = `${pathname}${window.location.search}`;
+    router.push(`/customer/signin?next=${encodeURIComponent(next)}`);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCustomerFavorites() {
+      try {
+        const res = await fetch("/api/customer/favorites");
+        if (cancelled) return;
+        setIsCustomerAuthenticated(res.ok);
+        if (res.ok) {
+          const data = await res.json();
+          setIsWishlisted(
+            Array.isArray(data.favorites) &&
+              data.favorites.some((favorite: Product) => favorite.id === productId)
+          );
+        }
+      } catch (err) {
+        console.error("Failed to check customer sign-in status.", err);
+        if (!cancelled) setIsCustomerAuthenticated(false);
+      } finally {
+        if (!cancelled) setAuthChecked(true);
+      }
+    }
+
+    loadCustomerFavorites();
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
 
   // 1. Load Product Data
   useEffect(() => {
@@ -197,10 +233,6 @@ export default function ProductDetailPage({
           // Graceful fallback
         }
 
-        // Check Wishlist
-        const localWishlist: string[] = JSON.parse(localStorage.getItem("nexbyte_wishlist") || "[]");
-        setIsWishlisted(localWishlist.includes(prod.id));
-
       } catch (err: any) {
         setError("Failed to load product details.");
       } finally {
@@ -214,25 +246,30 @@ export default function ProductDetailPage({
   // Wishlist Toggle
   const toggleWishlist = async () => {
     if (!product) return;
-    const nextState = !isWishlisted;
-    setIsWishlisted(nextState);
-
-    let localWishlist: string[] = JSON.parse(localStorage.getItem("nexbyte_wishlist") || "[]");
-    if (nextState) {
-      if (!localWishlist.includes(product.id)) localWishlist.push(product.id);
-    } else {
-      localWishlist = localWishlist.filter((id) => id !== product.id);
+    if (!authChecked) return;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return;
     }
-    localStorage.setItem("nexbyte_wishlist", JSON.stringify(localWishlist));
+
+    const nextState = !isWishlisted;
 
     try {
-      await fetch("/api/customer/favorites", {
+      const res = await fetch("/api/customer/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: product.id }),
       });
+      if (res.status === 401) {
+        redirectToSignIn();
+        return;
+      }
+      if (!res.ok) {
+        throw new Error("Failed to update your wishlist.");
+      }
+      setIsWishlisted(nextState);
     } catch (err) {
-      // Local fallback already saved
+      console.error("Wishlist update failed.", err);
     }
   };
 
@@ -291,6 +328,11 @@ export default function ProductDetailPage({
   const handleAskSellerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sellerMessage.trim()) return;
+    if (!authChecked) return;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return;
+    }
 
     try {
       setSellerMsgError("");
@@ -312,8 +354,12 @@ export default function ProductDetailPage({
           setSellerMessage("");
         }, 2000);
       } else {
+        if (res.status === 401) {
+          redirectToSignIn();
+          return;
+        }
         const d = await res.json();
-        setSellerMsgError(d.error || "Failed to send seller enquiry. Please log in.");
+        setSellerMsgError(d.error || "Failed to send seller enquiry.");
       }
     } catch (err) {
       setSellerMsgError("Network error. Please try again.");
@@ -355,7 +401,21 @@ export default function ProductDetailPage({
 
   // Add to Cart Action
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!authChecked) return false;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return false;
+    }
+    if (!product) return false;
+    if (product.variants?.length && !selectedVariant) {
+      alert("Choose a product configuration before adding it to your cart.");
+      return false;
+    }
+    const availableStock = selectedVariant?.stock ?? product.stock ?? 10;
+    if (availableStock < 1 || quantity > availableStock) {
+      alert("The selected configuration does not have enough stock for this quantity.");
+      return false;
+    }
     const finalPrice = selectedVariant ? selectedVariant.price : product.price;
     const variantTitle = selectedVariant ? ` (${selectedVariant.name})` : "";
 
@@ -365,14 +425,26 @@ export default function ProductDetailPage({
       price: finalPrice,
       image: selectedImage || product.image || "/images/poster-products.png",
       category: product.category,
+      variantId: selectedVariant?.id,
+      variantSku: selectedVariant?.sku,
+      variantName: selectedVariant?.name,
     });
     openCart();
+    return true;
   };
 
   // Buy Now Action
   const handleBuyNow = () => {
-    handleAddToCart();
-    router.push("/checkout");
+    if (handleAddToCart()) router.push("/checkout");
+  };
+
+  const handleAskSellerClick = () => {
+    if (!authChecked) return;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return;
+    }
+    setIsAskSellerOpen(true);
   };
 
   if (loading) {
@@ -429,6 +501,7 @@ export default function ProductDetailPage({
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
   const displayMrp = selectedVariant?.compareAtPrice || product.compareAtPrice || product.mrp || Math.round(displayPrice * 1.35);
   const discountPercent = product.discount || Math.round(((displayMrp - displayPrice) / displayMrp) * 100);
+  const displayStock = selectedVariant?.stock ?? product.stock ?? 10;
 
   // Gallery list
   const galleryImages = Array.isArray(product.images) && product.images.length > 0
@@ -534,19 +607,19 @@ export default function ProductDetailPage({
               {/* Brand & Stock Pill */}
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 bg-blue-50 text-[#2563EB] text-xs font-bold uppercase tracking-wider rounded-md">
-                  {product.brand || "NexByte Original"}
+                  {product.brand || "Nex LapTech Original"}
                 </span>
                 <span
                   className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center space-x-1 ${
-                    (product.stock ?? 10) > 0
+                    displayStock > 0
                       ? "bg-emerald-50 text-emerald-700"
                       : "bg-red-50 text-red-600"
                   }`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${
-                    (product.stock ?? 10) > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-500"
+                    displayStock > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-500"
                   }`}></span>
-                  <span>{product.stockStatus || ((product.stock ?? 10) > 0 ? "In Stock" : "Out of Stock")}</span>
+                  <span>{displayStock > 0 ? `${displayStock} In Stock` : "Out of Stock"}</span>
                 </span>
               </div>
 
@@ -567,7 +640,7 @@ export default function ProductDetailPage({
                 <span className="text-slate-300">•</span>
                 <span className="text-emerald-600 text-xs font-semibold flex items-center">
                   <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-                  NexByte Assured
+                  Nex LapTech Assured
                 </span>
               </div>
 
@@ -598,7 +671,7 @@ export default function ProductDetailPage({
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {product.variants.map((variant) => {
                       const isSelected = selectedVariant?.id === variant.id;
-                      const isAvailable = (variant.stock ?? 1) > 0;
+                      const isAvailable = (variant.stock ?? product.stock ?? 10) > 0;
 
                       return (
                         <button
@@ -606,7 +679,8 @@ export default function ProductDetailPage({
                           onClick={() => {
                             if (isAvailable) {
                               setSelectedVariant(variant);
-                              if (variant.image) setSelectedImage(variant.image);
+                              setQuantity(1);
+                              setSelectedImage(variant.image || product.image || "/images/poster-products.png");
                             }
                           }}
                           disabled={!isAvailable}
@@ -653,8 +727,8 @@ export default function ProductDetailPage({
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity((q) => Math.min(product.stock ?? 10, q + 1))}
-                    disabled={quantity >= (product.stock ?? 10)}
+                    onClick={() => setQuantity((q) => Math.min(displayStock, q + 1))}
+                    disabled={quantity >= displayStock}
                     className="p-1.5 rounded-lg bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-40 shadow-sm"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -754,11 +828,11 @@ export default function ProductDetailPage({
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                 <div>
                   <span className="text-slate-500">Sold by: </span>
-                  <span className="font-bold text-slate-900">{product.sellerName || "NexByte Official Store"}</span>
+                  <span className="font-bold text-slate-900">{product.sellerName || "Nex LapTech Official Store"}</span>
                   <span className="ml-2 text-emerald-600 font-semibold">(4.8 ★ Verified Seller)</span>
                 </div>
                 <button
-                  onClick={() => setIsAskSellerOpen(true)}
+                  onClick={handleAskSellerClick}
                   className="px-3 py-1.5 bg-blue-50 text-[#2563EB] font-bold rounded-lg hover:bg-blue-100 transition flex items-center space-x-1"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
@@ -835,7 +909,7 @@ export default function ProductDetailPage({
               <>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
                   <span className="text-slate-400 block font-semibold">Brand</span>
-                  <span className="font-bold text-slate-900">{product.brand || "NexByte"}</span>
+                  <span className="font-bold text-slate-900">{product.brand || "Nex LapTech"}</span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
                   <span className="text-slate-400 block font-semibold">Category</span>
@@ -883,7 +957,7 @@ export default function ProductDetailPage({
               ))
             ) : (
               <div className="p-4 text-xs text-slate-500 italic text-center">
-                Standard NexByte Hardware Specifications Apply.
+                Standard Nex LapTech Hardware Specifications Apply.
               </div>
             )}
           </div>
@@ -893,7 +967,7 @@ export default function ProductDetailPage({
         <div className="mt-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
             <ShieldCheck className="w-5 h-5 text-[#7C3AED]" />
-            <span>NexByte Care & Protection Plans</span>
+            <span>Nex LapTech Care & Protection Plans</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 border border-purple-100 bg-purple-50/40 rounded-xl flex items-start justify-between">
@@ -950,7 +1024,7 @@ export default function ProductDetailPage({
                 <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                 <span>Customer Ratings & Reviews</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Empirical reviews from verified NexByte customers</p>
+              <p className="text-xs text-slate-500 mt-0.5">Empirical reviews from verified Nex LapTech customers</p>
             </div>
             <button
               onClick={() => setShowReviewForm(!showReviewForm)}
@@ -1041,7 +1115,7 @@ export default function ProductDetailPage({
                     </div>
                   </div>
                   <p className="text-slate-700 leading-relaxed pt-1">
-                    {rev.review_message || rev.quote || rev.overall_experience || "Great product from NexByte!"}
+                    {rev.review_message || rev.quote || rev.overall_experience || "Great product from Nex LapTech!"}
                   </p>
                 </div>
               ))

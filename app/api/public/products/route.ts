@@ -87,6 +87,12 @@ export async function GET(request: NextRequest) {
 
       return {
         ...customerSafeProduct,
+        variants: Array.isArray(customerSafeProduct.variants)
+          ? customerSafeProduct.variants.map((variant: any) => {
+              const { costPrice: _variantCostPrice, ...customerSafeVariant } = variant;
+              return customerSafeVariant;
+            })
+          : customerSafeProduct.variants,
         stockStatus,
         inStock: stockQty > 0,
       };

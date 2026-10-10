@@ -180,6 +180,11 @@ export default function UnifiedBookingModal() {
         }),
       });
 
+      if (res.status === 401) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/customer/signin?next=${encodeURIComponent(next)}`);
+        return;
+      }
       if (!res.ok || !res.data?.success) {
         throw new Error(res.error || "Failed to submit booking.");
       }
@@ -239,6 +244,11 @@ export default function UnifiedBookingModal() {
         }),
       });
 
+      if (res.status === 401) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/customer/signin?next=${encodeURIComponent(next)}`);
+        return;
+      }
       if (!res.ok || !res.data?.success) throw new Error(res.error || "Failed to send message.");
 
       setTrackedBooking(res.data.booking);
@@ -711,7 +721,7 @@ export default function UnifiedBookingModal() {
                                     {msg.message}
                                   </div>
                                   <span className="text-[8px] text-white/30 mt-1">
-                                    {isAdmin ? "NexByte Support" : "You"} •{" "}
+                                    {isAdmin ? "Nex LapTech Support" : "You"} •{" "}
                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                   </span>
                                 </div>
@@ -728,7 +738,7 @@ export default function UnifiedBookingModal() {
                             required
                             value={chatMessage}
                             onChange={(e) => setChatMessage(e.target.value)}
-                            placeholder="Type a reply to NexByte Support..."
+                            placeholder="Type a reply to Nex LapTech Support..."
                             className="flex-1 rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2 text-xs text-white focus:outline-none focus:border-nex-blue/50"
                           />
                           <button

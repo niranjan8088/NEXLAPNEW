@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
 import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
+import { getServerSession } from "@/lib/auth";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -18,6 +19,14 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
+      return NextResponse.json(
+        { success: false, message: "Sign in with a customer account to submit an enquiry.", code: "AUTH_REQUIRED" },
+        { status: 401, headers: JSON_HEADERS }
+      );
+    }
+
     let body: any;
     try {
       body = await req.json();
@@ -64,6 +73,7 @@ export async function POST(req: Request) {
       status: "new",
       productId: body.selectedItem || body.productId || "",
       message: body.description || body.remarks || body.message || "",
+      user_id: authUser.id,
     };
 
     const saved = await dbHelper.bookings.create(newBooking);
@@ -176,6 +186,14 @@ export async function PUT(req: Request) {
     }
 
     if (body.chatMessage) {
+      const authUser = await getServerSession();
+      if (!authUser || authUser.role !== "user") {
+        return NextResponse.json(
+          { success: false, message: "Sign in with a customer account to send a message.", code: "AUTH_REQUIRED" },
+          { status: 401, headers: JSON_HEADERS }
+        );
+      }
+
       const list = await dbHelper.bookings.list();
       const existing = list.find((b: any) => b.id === id);
       if (!existing) {
@@ -184,12 +202,17 @@ export async function PUT(req: Request) {
           { status: 404, headers: JSON_HEADERS }
         );
       }
+      if (existing.user_id !== authUser.id) {
+        return NextResponse.json(
+          { success: false, message: "You can only message about your own booking.", code: "FORBIDDEN" },
+          { status: 403, headers: JSON_HEADERS }
+        );
+      }
 
       const now = new Date().toISOString();
-      const sender = body.sender || "customer";
       const chatItem = {
         type: "chat",
-        sender,
+        sender: "customer",
         message: body.chatMessage.trim(),
         timestamp: now
       };
@@ -204,28 +227,15 @@ export async function PUT(req: Request) {
       });
 
       // PIPELINE EVENT DISPATCH FOR CHAT MESSAGE
-      if (sender === "customer") {
-        await dispatchPipelineEvent({
-          eventType: "MESSAGE_RECEIVED",
-          title: "New Customer Message 💬",
-          message: `${existing.customerName || "Customer"} sent a message on ${existing.bookingId}`,
-          recipientRole: "admin",
-          referenceType: "booking",
-          referenceId: existing.bookingId,
-          actorRole: "user",
-        });
-      } else {
-        await dispatchPipelineEvent({
-          eventType: "MESSAGE_RECEIVED",
-          title: "New Support Message 💬",
-          message: `Technician replied to your booking ${existing.bookingId}`,
-          recipientRole: "user",
-          recipientUserId: existing.user_id || undefined,
-          referenceType: "booking",
-          referenceId: existing.bookingId,
-          actorRole: "admin",
-        });
-      }
+      await dispatchPipelineEvent({
+        eventType: "MESSAGE_RECEIVED",
+        title: "New Customer Message 💬",
+        message: `${existing.customerName || "Customer"} sent a message on ${existing.bookingId}`,
+        recipientRole: "admin",
+        referenceType: "booking",
+        referenceId: existing.bookingId,
+        actorRole: "user",
+      });
 
       return NextResponse.json({ success: true, booking: updated }, { status: 200, headers: JSON_HEADERS });
     }

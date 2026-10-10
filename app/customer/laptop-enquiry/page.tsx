@@ -10,6 +10,7 @@ export default function CustomerLaptopEnquiryPage() {
   const [submitting, setSubmitting] = useState(false);
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   // Form State
   const [customerName, setCustomerName] = useState("");
@@ -49,21 +50,8 @@ export default function CustomerLaptopEnquiryPage() {
       if (res.ok && res.data?.enquiries) {
         setEnquiries(res.data.enquiries);
       } else {
-        // Fallback sample data
-        setEnquiries([
-          {
-            id: "lp-101",
-            customer_name: "Ramesh Kumar",
-            phone: "9876543210",
-            email: "customer@nexbyte.com",
-            budget: "₹30,000 – ₹40,000",
-            laptop_type: "Business Laptop",
-            message: "Looking for a reliable pre-owned ThinkPad with 16GB RAM and good battery life.",
-            status: "Under Review",
-            created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            admin_notes: "Recommended Lenovo ThinkPad T490 (Intel i5, 16GB RAM, 512GB SSD) @ ₹28,500."
-          }
-        ]);
+        setEnquiries([]);
+        console.error("Failed to load customer enquiries.", res.error);
       }
     } catch (e) {
       console.error(e);
@@ -81,6 +69,7 @@ export default function CustomerLaptopEnquiryPage() {
     e.preventDefault();
     setSubmitting(true);
     setSuccessMsg("");
+    setErrorMsg("");
 
     try {
       const payload = {
@@ -103,13 +92,21 @@ export default function CustomerLaptopEnquiryPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error(res.data?.error || "Failed to submit enquiry.");
+      if (res.status === 401) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        window.location.assign(`/customer/signin?next=${encodeURIComponent(next)}`);
+        return;
+      }
+      if (!res.ok || !res.data?.success) {
+        throw new Error(res.data?.message || res.error || "Failed to submit enquiry.");
+      }
 
       setSuccessMsg("Your laptop requirement enquiry has been received! Our tech experts will contact you with matched options shortly.");
       setMessage("");
-      fetchEnquiries();
+      await fetchEnquiries();
     } catch (err: any) {
-      setSuccessMsg(`Submission received! Ref ID: LP-${Math.floor(100000 + Math.random() * 900000)}.`);
+      console.error("Laptop enquiry submission failed.", err);
+      setErrorMsg(err.message || "Failed to submit enquiry. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -127,7 +124,7 @@ export default function CustomerLaptopEnquiryPage() {
             Laptop &amp; Device Requirement Enquiry
           </h1>
           <p className="text-xs sm:text-sm text-[#667085] dark:text-[#A1A1AA] max-w-2xl font-medium">
-            Tell us your specs, budget, and preference. NexByte engineers will handpick the best refurbished or new laptop matching your exact workload.
+            Tell us your specs, budget, and preference. Nex LapTech engineers will handpick the best refurbished or new laptop matching your exact workload.
           </p>
         </div>
       </div>
@@ -144,6 +141,11 @@ export default function CustomerLaptopEnquiryPage() {
             <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
               <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               <span>{successMsg}</span>
+            </div>
+          )}
+          {errorMsg && (
+            <div className="rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 p-4 text-xs font-semibold text-rose-700 dark:text-rose-300">
+              {errorMsg}
             </div>
           )}
 

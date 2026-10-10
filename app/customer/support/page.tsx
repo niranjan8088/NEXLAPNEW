@@ -12,12 +12,14 @@ export default function CustomerSupportPage() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setSuccessMsg("");
+    setErrorMsg("");
 
     try {
       const res = await safeJsonFetch("/api/contacts", {
@@ -31,7 +33,7 @@ export default function CustomerSupportPage() {
       setSuccessMsg("Support ticket created successfully! An Admin support agent will respond in your Message Center.");
       setMessage("");
     } catch (err: any) {
-      setSuccessMsg("Message sent! Ticket ID: TKT-" + Math.floor(100000 + Math.random() * 900000));
+      setErrorMsg(err.message || "Failed to submit support message. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -43,7 +45,7 @@ export default function CustomerSupportPage() {
       a: "Go to your Bookings tab in the Customer Portal. You will see real-time updates as your assigned technician diagnoses and completes your service."
     },
     {
-      q: "What is covered under the NexByte E-Warranty?",
+      q: "What is covered under the Nex LapTech E-Warranty?",
       a: "Our E-Warranty covers hardware failures, motherboard faults, RAM/SSD issues, and keyboard defects. You can view full terms on the E-Warranty page."
     },
     {
@@ -85,6 +87,11 @@ export default function CustomerSupportPage() {
             <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 p-4 text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
               <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
               <span>{successMsg}</span>
+            </div>
+          )}
+          {errorMsg && (
+            <div className="rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 p-4 text-xs font-semibold text-rose-700 dark:text-rose-300">
+              {errorMsg}
             </div>
           )}
 

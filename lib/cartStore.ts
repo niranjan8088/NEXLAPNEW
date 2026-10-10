@@ -9,6 +9,9 @@ export interface CartItem {
   image: string;
   category: string;
   quantity: number;
+  variantId?: string;
+  variantSku?: string;
+  variantName?: string;
 }
 
 interface CartStore {
@@ -17,7 +20,16 @@ interface CartStore {
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
-  addItem: (product: { id: string; title: string; price: number; image: string; category?: string }) => void;
+  addItem: (product: {
+    id: string;
+    title: string;
+    price: number;
+    image: string;
+    category?: string;
+    variantId?: string;
+    variantSku?: string;
+    variantName?: string;
+  }) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -37,7 +49,9 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (product) => {
         set((state) => {
-          const existingIndex = state.items.findIndex((i) => i.productId === product.id);
+          const existingIndex = state.items.findIndex(
+            (item) => item.productId === product.id && item.variantId === product.variantId
+          );
           if (existingIndex > -1) {
             const updated = [...state.items];
             updated[existingIndex].quantity += 1;
@@ -51,6 +65,9 @@ export const useCartStore = create<CartStore>()(
               image: product.image || "/images/poster-products.png",
               category: product.category || "Hardware",
               quantity: 1,
+              variantId: product.variantId,
+              variantSku: product.variantSku,
+              variantName: product.variantName,
             };
             return { items: [...state.items, newItem], isOpen: true };
           }

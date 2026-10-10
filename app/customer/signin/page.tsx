@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import {
   Mail,
   Phone,
@@ -54,7 +54,15 @@ export default function CustomerSignInPage() {
         throw new Error("The email/phone or password is incorrect.");
       }
 
-      const redirectUrl = res.data.redirectUrl || "/customer";
+      const requestedNext = new URLSearchParams(window.location.search).get("next");
+      const safeNext =
+        res.data.role === "user" &&
+        requestedNext?.startsWith("/") &&
+        !requestedNext.startsWith("//") &&
+        !requestedNext.startsWith("/customer/signin")
+          ? requestedNext
+          : null;
+      const redirectUrl = safeNext || res.data.redirectUrl || "/customer";
       router.replace(redirectUrl);
     } catch (err: any) {
       setErrorMsg(err.message || "The email/phone or password is incorrect.");
@@ -69,22 +77,15 @@ export default function CustomerSignInPage() {
       <header className="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-slate-200/60 dark:border-white/5">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="relative h-9 w-9">
-            <Image
-              src="/images/logo-icon-transparent.png"
-              alt="NexByte Technologies"
-              fill
-              sizes="36px"
-              className="object-contain"
-              priority
-            />
+            <BrandLogo width={72} height={72} sizes="36px" priority className="h-full w-full" />
           </div>
           <span className="font-display text-lg font-bold">
-            NEX<span className="text-nex-blue">BYTE</span>
+            NEX LAPTECH
           </span>
         </Link>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="hidden sm:inline text-slate-500 dark:text-slate-400">New to NexByte?</span>
+          <span className="hidden sm:inline text-slate-500 dark:text-slate-400">New to Nex LapTech?</span>
           <Link
             href="/customer/signup"
             className="rounded-full bg-nex-blue/10 hover:bg-nex-blue/20 text-nex-blue dark:text-nex-blueLight border border-nex-blue/20 px-4 py-1.5 font-bold transition-all"
@@ -102,7 +103,7 @@ export default function CustomerSignInPage() {
           <div className="hidden md:flex md:col-span-5 flex-col justify-center space-y-6 pr-4">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-nex-blue/10 border border-nex-blue/20 px-3 py-1 text-[11px] font-bold text-nex-blue dark:text-nex-blueLight mb-3">
-                <ShieldCheck className="h-3.5 w-3.5" /> NexByte Account Portal
+                <ShieldCheck className="h-3.5 w-3.5" /> Nex LapTech Account Portal
               </span>
               <h1 className="font-display text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 Technology made simple.
@@ -136,7 +137,7 @@ export default function CustomerSignInPage() {
                   Welcome back
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Sign in to continue to your NexByte customer account.
+                  Sign in to continue to your Nex LapTech customer account.
                 </p>
               </div>
 
@@ -253,7 +254,7 @@ export default function CustomerSignInPage() {
 
       {/* Minimal Auth Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 border-t border-slate-200/60 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-        <p>© 2026 NexByte Technologies. All rights reserved.</p>
+        <p>© 2026 Nex LapTech. All rights reserved.</p>
         <div className="flex gap-4">
           <Link href="/contact" className="hover:text-nex-blue">Contact</Link>
           <Link href="/contact" className="hover:text-nex-blue">Privacy</Link>

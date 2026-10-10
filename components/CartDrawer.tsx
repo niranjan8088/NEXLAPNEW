@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useCartStore } from "@/lib/cartStore";
 import { ShoppingBag, X, Trash2, Plus, Minus, ArrowRight, CheckCircle2, Loader2, Sparkles, Tag } from "lucide-react";
 import { getSafeImageSrc } from "@/lib/utils";
-import { dbHelper } from "@/lib/dbHelper";
 import { safeJsonFetch } from "@/lib/apiHelper";
 
 export default function CartDrawer() {
@@ -45,7 +44,10 @@ export default function CartDrawer() {
     }
   }
 
-  const grandTotal = Math.max(0, subtotal - discountAmount);
+  const taxableSubtotal = Math.max(0, subtotal - discountAmount);
+  const gstAmount = Math.round(taxableSubtotal * 0.18);
+  const shippingFee = subtotal < 1000 ? 99 : 0;
+  const grandTotal = taxableSubtotal + gstAmount + shippingFee;
 
   const handleApplyPromoCode = async () => {
     if (!promoCodeInput.trim()) {
@@ -97,41 +99,95 @@ export default function CartDrawer() {
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return;
-    if (!customerName || !customerPhone || !shippingAddress) {
-      alert("Please enter Name, Phone, and Delivery Address.");
+    if (!customerName || !customerEmail || !customerPhone || !shippingAddress) {
+      alert("Please enter Name, Email, Phone, and Delivery Address.");
+      return;
+    }
+
+    const pincode = shippingAddress.match(/\b\d{6}\b/)?.[0];
+    if (!pincode) {
+      alert("Please include a valid 6-digit pincode in your delivery address.");
       return;
     }
 
     setSubmitting(true);
     try {
-      const orderPayload = {
-        customer_name: customerName,
-        customer_email: customerEmail,
-        customer_phone: customerPhone,
-        shipping_address: shippingAddress,
-        payment_method: paymentMethod,
-        applied_offer_code: appliedOffer ? appliedOffer.code : null,
-        subtotal: subtotal,
-        discount_amount: discountAmount,
-        total: grandTotal,
-        items: items.map((i) => ({
-          product_id: i.productId,
-          title: i.title,
-          price: i.price,
-          quantity: i.quantity,
-          image: i.image,
-        })),
-        status: "pending",
-      };
+      const addressParts = shippingAddress
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+      const addressWithoutPincode = addressParts.filter(
+        (part) => !/\b\d{6}\b/.test(part)
+      );
+      let city = addressWithoutPincode.at(-1) || "Tumkur";
+      if (city.toLowerCase() === "karnataka") {
+        city = addressWithoutPincode.at(-2) || "Tumkur";
+      }
 
-      const newOrder = await dbHelper.orders.create(orderPayload);
-      setCompletedOrder(newOrder);
+      const res = await safeJsonFetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone,
+          },
+          shippingAddress: {
+            addressLine1: shippingAddress,
+            addressLine2: "",
+            city,
+            state: "Karnataka",
+            pincode,
+          },
+          deliveryOption: "standard",
+          paymentMethod,
+          offerCode: appliedOffer?.code || "",
+          items: items.map((i) => ({
+            id: i.id,
+            productId: i.productId,
+            title: i.title,
+            variantId: i.variantId,
+            variantSku: i.variantSku,
+            variant: i.variantName,
+            price: i.price,
+            quantity: i.quantity,
+            image: i.image,
+          })),
+        }),
+      });
+
+      if (res.status === 401) {
+        window.location.assign(`/customer/signin?next=${encodeURIComponent("/checkout")}`);
+        return;
+      }
+      if (!res.ok || !res.data?.success) {
+        throw new Error(res.data?.error || res.error || "Failed to place order.");
+      }
+
+      setCompletedOrder(res.data.order);
       clearCart();
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Failed to place order. Please try again.");
+      console.error("Cart checkout failed.", err);
+      alert(err instanceof Error ? err.message : "Failed to place order. Please try again.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleBeginCheckout = async () => {
+    try {
+      const res = await fetch("/api/customer/favorites");
+      if (res.status === 401) {
+        window.location.assign(`/customer/signin?next=${encodeURIComponent("/checkout")}`);
+        return;
+      }
+      if (!res.ok) {
+        throw new Error("Unable to verify your customer sign-in. Please try again.");
+      }
+      setIsCheckingOut(true);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Unable to verify your customer sign-in.");
     }
   };
 
@@ -175,15 +231,17 @@ export default function CartDrawer() {
               <div>
                 <h4 className="font-display text-lg font-bold">Order Confirmed!</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  Thank you for ordering with NexByte Technologies.
+                  Thank you for ordering with Nex LapTech.
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 text-left space-y-1.5 text-xs">
                 <div className="text-[10px] text-slate-500 font-bold uppercase">Order Reference Number</div>
-                <div className="font-mono text-base font-bold text-nex-blue dark:text-nex-blueLight">{completedOrder.id}</div>
+                <div className="font-mono text-base font-bold text-nex-blue dark:text-nex-blueLight">
+                  {completedOrder.order_number || completedOrder.order_id || completedOrder.id}
+                </div>
                 <div className="text-slate-600 dark:text-slate-400 text-[11px]">
-                  Total Amount Paid: <span className="font-bold text-slate-900 dark:text-white">₹{(completedOrder.total || 0).toLocaleString("en-IN")}</span>
+                  Total Amount Due: <span className="font-bold text-slate-900 dark:text-white">₹{(completedOrder.total_amount || 0).toLocaleString("en-IN")}</span>
                 </div>
               </div>
 
@@ -238,9 +296,10 @@ export default function CartDrawer() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">Email Address *</label>
                   <input
                     type="email"
+                    required
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
                     placeholder="rahul@gmail.com"
@@ -326,7 +385,15 @@ export default function CartDrawer() {
 
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Doorstep Delivery</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">FREE</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {shippingFee ? `₹${shippingFee}` : "FREE"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                  <span>GST (18%)</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    ₹{gstAmount.toLocaleString("en-IN")}
+                  </span>
                 </div>
 
                 <div className="flex justify-between text-slate-900 dark:text-white font-bold pt-1.5 border-t border-slate-200 dark:border-white/10 text-sm">
@@ -379,6 +446,7 @@ export default function CartDrawer() {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-xs truncate">{item.title}</div>
+                    {item.variantSku && <div className="text-[10px] text-slate-500 mt-0.5">SKU: {item.variantSku}</div>}
                     <div className="text-xs font-bold text-nex-blue dark:text-nex-blueLight mt-0.5">
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </div>
@@ -425,7 +493,7 @@ export default function CartDrawer() {
             </div>
 
             <button
-              onClick={() => setIsCheckingOut(true)}
+              onClick={handleBeginCheckout}
               className="w-full rounded-xl bg-nex-blue hover:bg-blue-600 text-white font-bold py-3 text-xs shadow-md flex items-center justify-center gap-2"
             >
               Proceed to Checkout <ArrowRight className="h-4 w-4" />

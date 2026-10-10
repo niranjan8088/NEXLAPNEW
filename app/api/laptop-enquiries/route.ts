@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbHelper } from "@/lib/dbHelper";
 import { dispatchPipelineEvent } from "@/lib/pipelineEvents";
+import { getServerSession } from "@/lib/auth";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
 
@@ -18,6 +19,14 @@ export async function OPTIONS() {
 
 export async function POST(req: Request) {
   try {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
+      return NextResponse.json(
+        { success: false, message: "Sign in with a customer account to submit an enquiry.", code: "AUTH_REQUIRED" },
+        { status: 401, headers: JSON_HEADERS }
+      );
+    }
+
     let body: any;
     try {
       body = await req.json();
@@ -55,6 +64,7 @@ export async function POST(req: Request) {
       requirements: body.requirements || body.additionalRequirements || body.message || "",
       message: body.requirements || body.additionalRequirements || body.message || "",
       preferred_contact: body.preferred_contact || body.preferredContact || "WhatsApp",
+      user_id: authUser.id,
     });
 
     // Dispatch real-time Admin notification with deep link reference
@@ -88,10 +98,23 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
+      return NextResponse.json(
+        { success: false, message: "Sign in with a customer account to view enquiries.", code: "AUTH_REQUIRED" },
+        { status: 401, headers: JSON_HEADERS }
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    const list = await dbHelper.laptopEnquiries.list();
+    const allEnquiries = await dbHelper.laptopEnquiries.list();
+    const list = allEnquiries.filter((enquiry: any) =>
+      enquiry.user_id === authUser.id ||
+      enquiry.customer_id === authUser.id ||
+      enquiry.email?.toLowerCase() === authUser.email.toLowerCase()
+    );
 
     if (id) {
       const match = list.find((e: any) => e.id === id || e.reference_id?.toLowerCase() === id.toLowerCase());

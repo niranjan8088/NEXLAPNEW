@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { business } from "@/lib/data";
@@ -20,6 +21,7 @@ import {
 import { safeJsonFetch } from "@/lib/apiHelper";
 
 export default function ContactPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -31,7 +33,7 @@ export default function ContactPage() {
 
   const handleDownloadProfile = () => {
     // Generate a simple company profile blob and trigger download
-    const docText = `NEXBYTE TECHNOLOGIES COMPANY PROFILE
+    const docText = `NEX LAPTECH COMPANY PROFILE
 =======================================
 Premium Technology Platform, Computer Sales & Services
 
@@ -67,7 +69,7 @@ Trusted · Reliable · Affordable`;
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "NexByte_Technologies_Company_Profile.txt";
+    link.download = "NexLapTech_Company_Profile.txt";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -97,6 +99,12 @@ Trusted · Reliable · Affordable`;
           status: "unread",
         }),
       });
+
+      if (res.status === 401) {
+        const next = `${window.location.pathname}${window.location.search}`;
+        router.push(`/customer/signin?next=${encodeURIComponent(next)}`);
+        return;
+      }
       
       if (!res.ok || !res.data?.success) throw new Error(res.error || "Failed to send message.");
       
@@ -145,7 +153,7 @@ Trusted · Reliable · Affordable`;
               {/* Core contacts card */}
               <div className="glass-card p-6 bg-nex-ink border border-white/5 rounded-2xl">
                 <h3 className="font-display text-sm font-bold text-white mb-5 flex items-center gap-2">
-                  <Building className="h-4.5 w-4.5 text-nex-blueLight" /> NexByte Support Desk
+                  <Building className="h-4.5 w-4.5 text-nex-blueLight" /> Nex LapTech Support Desk
                 </h3>
                 
                 <div className="space-y-4 text-xs">

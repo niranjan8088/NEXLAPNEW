@@ -60,7 +60,7 @@ function ProductsCatalogContent() {
   const pathname = usePathname();
   const isCustomerPortal = pathname ? pathname.startsWith("/customer") : false;
 
-  const addToCart = useCartStore((s) => s.addItem);
+  const addCartItem = useCartStore((s) => s.addItem);
 
   // Raw Products & Filter Definitions from Source of Truth
   const [products, setProducts] = useState<Product[]>([]);
@@ -69,6 +69,9 @@ function ProductsCatalogContent() {
 
   // Favorites & Compare State
   const [wishlist, setWishlist] = useState<string[]>([]);
+  const [isCustomerAuthenticated, setIsCustomerAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [actionError, setActionError] = useState("");
   const [compareIds, setCompareIds] = useState<string[]>([]);
 
   // UI Modals
@@ -143,18 +146,84 @@ function ProductsCatalogContent() {
     return () => window.removeEventListener("nexbyte-realtime", loadCatalogData);
   }, [categoryParam]);
 
+  const redirectToSignIn = () => {
+    const next = `${pathname || "/products"}${window.location.search}`;
+    router.push(`/customer/signin?next=${encodeURIComponent(next)}`);
+  };
+
   useEffect(() => {
-    const stored = localStorage.getItem("nexbyte_wishlist");
-    if (stored) {
-      try { setWishlist(JSON.parse(stored)); } catch {}
+    let cancelled = false;
+
+    async function loadCustomerFavorites() {
+      try {
+        const res = await fetch("/api/customer/favorites");
+        if (cancelled) return;
+        setIsCustomerAuthenticated(res.ok);
+        if (res.ok) {
+          const data = await res.json();
+          setWishlist(
+            Array.isArray(data.favorites)
+              ? data.favorites.map((favorite: Product) => favorite.id)
+              : []
+          );
+        } else if (res.status !== 401) {
+          console.error("Failed to load customer wishlist.", await res.text());
+        }
+      } catch (err) {
+        console.error("Failed to check customer sign-in status.", err);
+        if (!cancelled) setIsCustomerAuthenticated(false);
+      } finally {
+        if (!cancelled) setAuthChecked(true);
+      }
     }
+
+    loadCustomerFavorites();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const toggleWishlist = (id: string) => {
-    const isFav = wishlist.includes(id);
-    const updated = isFav ? wishlist.filter((item) => item !== id) : [...wishlist, id];
-    setWishlist(updated);
-    localStorage.setItem("nexbyte_wishlist", JSON.stringify(updated));
+  const toggleWishlist = async (id: string) => {
+    if (!authChecked) return;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return;
+    }
+
+    setActionError("");
+    try {
+      const res = await fetch("/api/customer/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: id }),
+      });
+      if (res.status === 401) {
+        redirectToSignIn();
+        return;
+      }
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update wishlist.");
+      }
+
+      setWishlist((current) =>
+        current.includes(id)
+          ? current.filter((item) => item !== id)
+          : [...current, id]
+      );
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to update wishlist.");
+    }
+  };
+
+  const addToCart = (product: Product) => {
+    if (!authChecked) return false;
+    if (!isCustomerAuthenticated) {
+      redirectToSignIn();
+      return false;
+    }
+    addCartItem(product);
+    return true;
   };
 
   // Helper function to update URL Search Params cleanly
@@ -381,10 +450,10 @@ function ProductsCatalogContent() {
         </div>
 
         {/* Action Bar (Search, Active Chips, Sort Dropdown & Mobile Filter Button) */}
-        <div className="rounded-2xl border border-[#DCEAF2] dark:border-[#2A3B50] bg-white dark:bg-[#101B2B] p-3 sm:p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-3 items-center justify-between">
+        <div className="w-full min-w-0 rounded-2xl border border-[#DCEAF2] dark:border-[#2A3B50] bg-white dark:bg-[#101B2B] p-3 sm:p-4 shadow-sm mb-6 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           
           {/* Search Input */}
-          <div className="relative w-full md:max-w-md">
+          <div className="relative flex w-full min-w-0 items-center md:max-w-md">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0891B2]" />
             <input
               type="text"
@@ -396,7 +465,7 @@ function ProductsCatalogContent() {
                   updateUrl({ search: searchInput.trim() });
                 }
               }}
-              className="w-full rounded-xl bg-[#F7FBFF] dark:bg-[#162438] border border-[#DCEAF2] dark:border-[#2A3B50] pl-10 pr-10 py-2 text-xs font-medium text-[#0F172A] dark:text-white focus:outline-none focus:border-[#2563EB]"
+              className="w-full min-w-0 rounded-xl bg-[#F7FBFF] dark:bg-[#162438] border border-[#DCEAF2] dark:border-[#2A3B50] pl-10 pr-24 py-2 text-xs font-medium text-[#0F172A] dark:text-white focus:outline-none focus:border-[#2563EB]"
             />
             {searchInput && (
               <button
@@ -404,23 +473,29 @@ function ProductsCatalogContent() {
                   setSearchInput("");
                   updateUrl({ search: null });
                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] dark:hover:text-white"
+                className="absolute right-[5.5rem] top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] dark:hover:text-white"
+                aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => setShowMobileFilterDrawer(true)}
+              aria-label={`Open catalog filters${activeChipsCount ? `, ${activeChipsCount} active` : ""}`}
+              className="absolute right-1.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-1.5 rounded-lg border border-[#DCEAF2] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#334155] shadow-sm transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5 text-blue-700" />
+              <span>Filter</span>
+              {activeChipsCount > 0 && (
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-700 px-1 text-[9px] font-bold text-white">
+                  {activeChipsCount}
+                </span>
+              )}
+            </button>
           </div>
 
-          <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-            {/* Mobile Filter Drawer Trigger */}
-            <button
-              onClick={() => setShowMobileFilterDrawer(true)}
-              className="md:hidden flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] text-white px-4 py-2 text-xs font-bold shadow-sm"
-            >
-              <Filter className="h-3.5 w-3.5" />
-              <span>Filters {activeChipsCount > 0 && `(${activeChipsCount})`}</span>
-            </button>
-
+          <div className="flex min-w-0 items-center gap-2 w-full md:w-auto justify-between md:justify-end">
             {/* Sort Dropdown */}
             <div className="flex items-center gap-1.5 text-xs font-semibold text-[#475569] dark:text-[#CBD5E1]">
               <span className="hidden sm:inline text-[#64748B]">Sort:</span>
@@ -520,26 +595,45 @@ function ProductsCatalogContent() {
         )}
 
         {/* MAIN LAYOUT: DESKTOP STICKY FILTER SIDEBAR + PRODUCT RESULTS */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+        <div className="grid grid-cols-1 gap-6 items-start">
           
-          {/* DESKTOP FILTER SIDEBAR */}
-          <aside className="hidden md:block md:col-span-1 space-y-4 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-1 scrollbar-thin">
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-[#26364D] bg-white dark:bg-[#0F1B2D] p-4 shadow-sm space-y-4">
+          {/* SHARED RIGHT-SIDE FILTER DRAWER */}
+          {showMobileFilterDrawer && (
+            <>
+              <button
+                type="button"
+                aria-label="Close catalog filters"
+                onClick={() => setShowMobileFilterDrawer(false)}
+                className="fixed inset-0 z-[70] bg-slate-950/35 backdrop-blur-[2px]"
+              />
+              <aside className="fixed inset-y-0 right-0 z-[71] w-full max-w-sm overflow-y-auto bg-white p-4 shadow-2xl sm:p-5">
+                <div className="flex min-h-full flex-col rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#26364D]">
                 <h3 className="font-display text-sm font-extrabold text-[#111827] dark:text-white flex items-center gap-1.5">
                   <Sliders className="h-4 w-4 text-[#2563EB]" /> Filter Catalog
                 </h3>
-                {activeChipsCount > 0 && (
+                <div className="flex items-center gap-3">
+                  {activeChipsCount > 0 && (
+                    <button
+                      onClick={handleClearAllFilters}
+                      className="text-[11px] font-bold text-rose-600 hover:underline"
+                    >
+                      Clear All
+                    </button>
+                  )}
                   <button
-                    onClick={handleClearAllFilters}
-                    className="text-[11px] font-bold text-rose-600 hover:underline"
+                    type="button"
+                    aria-label="Close catalog filters"
+                    onClick={() => setShowMobileFilterDrawer(false)}
+                    className="rounded-lg p-1 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
                   >
-                    Clear All
+                    <X className="h-4 w-4" />
                   </button>
-                )}
+                </div>
               </div>
 
               {/* DYNAMIC FILTER GROUPS GENERATED FROM ADMIN FILTER DEFINITIONS */}
+              <div className="flex-1 space-y-1 overflow-y-auto py-3">
               {dynamicFilterGroups.map((group) => {
                 const def = group.definition;
                 const isCollapsed = collapsedFilters[def.id] || false;
@@ -637,13 +731,39 @@ function ProductsCatalogContent() {
                   </div>
                 );
               })}
-
-            </div>
-          </aside>
+              </div>
+              <div className="sticky bottom-0 flex gap-2 border-t border-slate-100 bg-white pt-3">
+                <button
+                  type="button"
+                  onClick={handleClearAllFilters}
+                  className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  Clear all
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileFilterDrawer(false)}
+                  className="flex-1 rounded-lg bg-blue-700 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-blue-800"
+                >
+                  Show {totalResults} products
+                </button>
+              </div>
+                </div>
+              </aside>
+            </>
+          )}
 
           {/* RIGHT PRODUCT RESULTS GRID */}
-          <section className="md:col-span-3 space-y-6">
-            
+          <section className="min-w-0 space-y-6">
+            {actionError && (
+              <div
+                role="alert"
+                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300"
+              >
+                {actionError}
+              </div>
+            )}
+
             {loading ? (
               /* SKELETON LOADING GRID */
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -715,6 +835,7 @@ function ProductsCatalogContent() {
                           {/* Favorite Button */}
                           <button
                             onClick={() => toggleWishlist(prod.id)}
+                            aria-label={isFav ? `Remove ${prod.title} from wishlist` : `Add ${prod.title} to wishlist`}
                             className="absolute top-2.5 right-2.5 h-8 w-8 rounded-full bg-white dark:bg-[#101B2B] border border-[#E2E8F0] dark:border-[#263247] flex items-center justify-center text-[#0F172A] dark:text-white shadow-sm hover:scale-110 transition-all cursor-pointer"
                           >
                             <Heart className={cn("h-4 w-4", isFav && "fill-rose-500 text-rose-500")} />
@@ -841,76 +962,6 @@ function ProductsCatalogContent() {
         </div>
       </main>
 
-      {/* MOBILE SLIDE-OVER FILTER DRAWER */}
-      {showMobileFilterDrawer && (
-        <div className="fixed inset-0 z-50 flex justify-end md:hidden">
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowMobileFilterDrawer(false)} />
-          <div className="relative w-full max-w-xs bg-white h-full p-6 overflow-y-auto shadow-2xl flex flex-col justify-between z-10">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-                <h3 className="font-display text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Sliders className="h-4 w-4 text-nex-blue" /> Filter Catalog
-                </h3>
-                <button onClick={() => setShowMobileFilterDrawer(false)} className="p-1 text-slate-400">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Mobile Filter Accordions */}
-              <div className="space-y-4">
-                {dynamicFilterGroups.map((group) => {
-                  const def = group.definition;
-                  let paramKey = def.key;
-                  if (def.key === "ramCapacity") paramKey = "ram";
-                  if (def.key === "ssdCapacity") paramKey = "ssd";
-
-                  const currentSelected = getMultiParam(paramKey);
-
-                  return (
-                    <div key={def.id} className="border-b border-slate-100 pb-3">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">
-                        {def.name}
-                      </h4>
-                      <div className="space-y-1.5">
-                        {group.availableOptions.map((opt) => (
-                          <label key={opt.value} className="flex items-center justify-between text-xs text-slate-700">
-                            <span className="flex items-center gap-2">
-                              <input
-                                type="checkbox"
-                                checked={currentSelected.includes(opt.value)}
-                                onChange={() => handleToggleMultiParam(paramKey, opt.value)}
-                                className="rounded text-nex-blue"
-                              />
-                              <span>{opt.label}</span>
-                            </span>
-                            <span className="text-[10px] font-mono text-slate-400">({opt.count})</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 flex gap-2">
-              <button
-                onClick={handleClearAllFilters}
-                className="flex-1 rounded-xl border border-slate-200 bg-slate-50 py-2.5 text-xs font-bold text-slate-700"
-              >
-                Clear All
-              </button>
-              <button
-                onClick={() => setShowMobileFilterDrawer(false)}
-                className="flex-1 rounded-xl bg-nex-blue text-white py-2.5 text-xs font-bold"
-              >
-                Apply Filters
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* PRODUCT DETAILS MODAL */}
       {productDetailModal && (() => {
         const prod = productDetailModal;
@@ -951,8 +1002,7 @@ function ProductsCatalogContent() {
 
                   <button
                     onClick={() => {
-                      addToCart(prod);
-                      setProductDetailModal(null);
+                      if (addToCart(prod)) setProductDetailModal(null);
                     }}
                     className="w-full rounded-xl bg-nex-blue text-white font-bold text-xs py-3 shadow-md flex items-center justify-center gap-1.5"
                   >

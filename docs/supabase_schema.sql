@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   image TEXT,
   images TEXT[],
   specs JSONB,
+  variants JSONB NOT NULL DEFAULT '[]'::jsonb,
   description TEXT,
   warranty TEXT DEFAULT '1 Year NexByte Warranty',
   created_at TIMESTAMPTZ DEFAULT NOW(),

@@ -89,6 +89,7 @@ export type ProductVariant = {
   costPrice?: number;
   stock?: number;
   image?: string;
+  attributes?: Record<string, string>;
 };
 
 export type Product = {

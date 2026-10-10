@@ -1,20 +1,11 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { dbHelper } from "@/lib/dbHelper";
-
-function getAuthUser(cookieStore: any) {
-  const userSession = cookieStore.get("nexbyte_customer_session")?.value;
-  if (!userSession) return null;
-  const parts = userSession.split(":");
-  return { id: parts[1] || parts[0], email: parts[2] || parts[0] };
-}
+import { getServerSession } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const authUser = getAuthUser(cookieStore);
-
-    if (!authUser) {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
       return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     }
 
@@ -34,10 +25,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const authUser = getAuthUser(cookieStore);
-
-    if (!authUser) {
+    const authUser = await getServerSession();
+    if (!authUser || authUser.role !== "user") {
       return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     }
 

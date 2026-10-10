@@ -25,6 +25,7 @@ import {
 import { dbHelper } from "@/lib/dbHelper";
 import Image from "next/image";
 import { getSafeImageSrc } from "@/lib/utils";
+import ProductCatalogImport from "@/components/ProductCatalogImport";
 
 const CATEGORIES = [
   { val: "storage", label: "1. Storage (SSD / HDD / Enclosures)" },
@@ -655,6 +656,7 @@ export default function AdminProductsManager() {
           <p className="text-xs text-nex-mist mt-0.5">Manage systems supply chains, pricing points, reseller submissions, and galleries.</p>
         </div>
         <div className="flex gap-2">
+          <ProductCatalogImport onImported={loadProducts} />
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}

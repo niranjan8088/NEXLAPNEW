@@ -8,6 +8,18 @@ export async function middleware(request: NextRequest) {
   const resellerSession = request.cookies.get("nexbyte_reseller_session")?.value;
   const userSession = request.cookies.get("nexbyte_customer_session")?.value;
 
+  // ── CUSTOMER ACTION PAGES ──────────────────────────────────────────────────
+  const requiresCustomerSession =
+    pathname === "/checkout" ||
+    pathname === "/book-laptop" ||
+    pathname === "/book-service";
+  if (requiresCustomerSession && !userSession) {
+    const next = `${pathname}${request.nextUrl.search}`;
+    return NextResponse.redirect(
+      new URL(`/customer/signin?next=${encodeURIComponent(next)}`, request.url)
+    );
+  }
+
   // ── ROOT "/" — Authentication Gateway ─────────────────────────────────────
   if (pathname === "/") {
     return NextResponse.next();
@@ -135,6 +147,10 @@ export const config = {
     "/",
     "/login",
     "/signup",
+    "/checkout",
+    "/book-laptop",
+    "/book-service",
+    "/contact",
     "/admin/:path*",
     "/reseller/:path*",
     "/customer/:path*",
