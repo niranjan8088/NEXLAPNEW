@@ -40,8 +40,10 @@ components/
 lib/
   data.ts    — all business content (products, services, contact info, FAQs, etc.)
   utils.ts   — small class-name helper
-public/images/
-  logo-horizontal.png, logo-icon.png (+ transparent cutouts)
+public/
+  assets/nexlaptech-logo.png, assets/nexlaptech-logo.svg
+  favicon-32x32.png, android-chrome-192x192.png, android-chrome-512x512.png
+  images/            — product photos and marketing images
   product-*.png        — individual product photos cropped from the product poster
   poster-products.png, poster-services.png — full posters (used in Gallery)
   qr-whatsapp.png, qr-booking.png
@@ -75,3 +77,8 @@ No paid services, databases, or third-party APIs are required to run this site.
 - Fonts load via `next/font/google` (self-hosted, zero layout shift, `display: swap`).
 - Animations respect `prefers-reduced-motion`.
 - No client-side state libraries; motion and counters are scoped to the components that need them, keeping most of the tree as Server Components.
+
+## Brand and loading experience
+
+- The Nex LapTech logo source is `public/assets/nexlaptech-logo.png`; favicon and app icons are generated at 32, 192, and 512 pixels.
+- The entry and route loader colors and assembly pacing are controlled by `--loader-bg`, `--brand-blue`, `--brand-cyan`, and `--loader-duration` in `app/globals.css`. The entry loader exits after load and has a 2.5-second safety limit.

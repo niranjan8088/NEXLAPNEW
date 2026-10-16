@@ -17,13 +17,13 @@ type HardwareKind =
   | "headset";
 
 const HARDWARE: { label: string; kind: HardwareKind }[] = [
-  { label: "Laptop", kind: "laptop" },
-  { label: "Desktop", kind: "desktop" },
-  { label: "SSD", kind: "ssd" },
-  { label: "RAM", kind: "ram" },
-  { label: "Graphics", kind: "gpu" },
-  { label: "CPU", kind: "cpu" },
   { label: "Motherboard", kind: "board" },
+  { label: "CPU", kind: "cpu" },
+  { label: "RAM", kind: "ram" },
+  { label: "Graphics Card", kind: "gpu" },
+  { label: "SSD", kind: "ssd" },
+  { label: "Desktop PC", kind: "desktop" },
+  { label: "Laptop", kind: "laptop" },
   { label: "Keyboard", kind: "keyboard" },
   { label: "Mouse", kind: "mouse" },
   { label: "Headset", kind: "headset" },
@@ -173,7 +173,11 @@ export default function AppExperience({ children }: { children: React.ReactNode 
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest("a[href]");
-      if (!(anchor instanceof HTMLAnchorElement) || anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+      if (
+        !(anchor instanceof HTMLAnchorElement) ||
+        (anchor.target && anchor.target.toLowerCase() !== "_self") ||
+        anchor.hasAttribute("download")
+      ) return;
 
       const destination = new URL(anchor.href, window.location.href);
       if (destination.origin !== window.location.origin) return;

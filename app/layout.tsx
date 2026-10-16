@@ -57,11 +57,11 @@ export const metadata: Metadata = {
     description: business.description,
     images: [
       {
-        url: "/assets/nexlaptech-logo.svg",
-        width: 768,
-        height: 768,
+        url: "/assets/nexlaptech-logo.png",
+        width: 512,
+        height: 512,
         alt: "Nex LapTech",
-        type: "image/svg+xml",
+        type: "image/png",
       },
     ],
   },
@@ -69,16 +69,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Nex LapTech | Laptops, PC Components & Accessories",
     description: business.description,
-    images: ["/assets/nexlaptech-logo.svg"],
+    images: ["/assets/nexlaptech-logo.png"],
   },
   icons: {
     icon: [
-      { url: "/assets/nexlaptech-logo.svg", sizes: "32x32", type: "image/svg+xml" },
-      { url: "/assets/nexlaptech-logo.svg", sizes: "192x192", type: "image/svg+xml" },
-      { url: "/assets/nexlaptech-logo.svg", sizes: "512x512", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/assets/nexlaptech-logo.svg",
-    apple: "/assets/nexlaptech-logo.svg",
+    shortcut: "/favicon-32x32.png",
+    apple: "/android-chrome-192x192.png",
   },
   robots: {
     index: true,
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F8FAFC",
+  themeColor: "#020b1f",
   width: "device-width",
   initialScale: 1,
 };
@@ -102,7 +102,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ElectronicsStore",
   name: business.name,
-  image: `${SITE_URL}/assets/nexlaptech-logo.svg`,
+  image: `${SITE_URL}/assets/nexlaptech-logo.png`,
   "@id": SITE_URL,
   url: SITE_URL,
   telephone: business.phones[0],
@@ -152,11 +152,19 @@ export default function RootLayout({
     <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`} data-theme="day" suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: `
-          :root { --loader-bg: #f8fafc; --brand-blue: #2563eb; --brand-cyan: #0891b2; --loader-duration: 1.6s; }
-          #nexlap-entry-loader { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, rgba(14,165,233,.12), transparent 58%), var(--loader-bg); color: #0f172a; }
+          :root { --loader-bg: #020b1f; --brand-blue: #1e6bff; --brand-cyan: #19d3ff; --loader-duration: 1.6s; }
+          #nexlap-entry-loader { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; overflow: hidden; padding: 20px 16px; background: radial-gradient(ellipse at 50% 36%, rgba(30,107,255,.2), transparent 58%), var(--loader-bg); color: #fff; }
           html.nexlap-entry-active #nexlap-entry-loader { display: flex; }
           html.nexlap-entry-active, html.nexlap-entry-active body { overflow: hidden; }
-          @media (prefers-reduced-motion: reduce) { html.nexlap-entry-active #nexlap-entry-loader { background: var(--loader-bg); } }
+          .nexlap-loader-content { display: flex; width: min(880px,100%); flex-direction: column; align-items: center; gap: clamp(12px,2.4vh,22px); }
+          .nexlap-logo-wrap { display: flex; width: 124px; height: 124px; align-items: center; justify-content: center; border-radius: 50%; filter: drop-shadow(0 0 22px rgba(25,211,255,.24)); }
+          .nexlap-hardware { display: grid; width: min(760px,100%); grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px 8px; }
+          .nexlap-progress-row { display: flex; width: min(360px,88vw); align-items: center; gap: 10px; }
+          .nexlap-progress-track { height: 4px; flex: 1; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.18); }
+          .nexlap-progress-value { width: 100%; height: 100%; transform: scaleX(0); transform-origin: left center; background: linear-gradient(90deg,var(--brand-cyan),var(--brand-blue)); }
+          @media (min-width: 640px) { .nexlap-logo-wrap { width: 160px; height: 160px; } .nexlap-hardware { grid-template-columns: repeat(10,minmax(0,1fr)); } }
+          @media (prefers-reduced-motion: reduce) { html.nexlap-entry-active #nexlap-entry-loader { background: var(--loader-bg); } html.nexlap-entry-active .nexlap-hardware { display: none; } }
+          .nexlap-logo-wrap > span, .nexlap-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
         ` }} />
         <script
           dangerouslySetInnerHTML={{

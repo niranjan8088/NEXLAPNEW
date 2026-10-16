@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-const SVG_LOGO_PATH = "/assets/nexlaptech-logo.svg";
+const LOGO_PATH = "/assets/nexlaptech-logo.png";
 
 interface BrandLogoProps {
   width?: number;
@@ -31,7 +31,7 @@ export default function BrandLogo({
     >
       {!failed ? (
         <Image
-          src={SVG_LOGO_PATH}
+          src={LOGO_PATH}
           alt="Nex LapTech"
           width={width}
           height={height}

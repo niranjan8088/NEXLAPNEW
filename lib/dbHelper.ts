@@ -244,7 +244,7 @@ if (!globalRef.__nexbyteMockDb) {
         registrationId: "NBT-TR-2026-001",
         certificateId: "NBT-TR-2026-001",
         studentName: "Niranjan M",
-        photoUrl: "/assets/nexlaptech-logo.svg",
+        photoUrl: "/assets/nexlaptech-logo.png",
         courseTitle: "Full Stack Web Development",
         trainingType: "Advanced Web Technologies",
         internshipType: "N/A",
@@ -296,7 +296,7 @@ if (!globalRef.__nexbyteMockDb) {
       {
         id: "m-1",
         title: "Logo Horizontal",
-        url: "/assets/nexlaptech-logo.svg",
+        url: "/assets/nexlaptech-logo.png",
         fileType: "image/png",
         created_at: new Date().toISOString()
       }

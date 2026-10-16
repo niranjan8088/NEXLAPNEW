@@ -219,7 +219,7 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
       const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
       const link = document.createElement("a");
       link.href = url;
-      link.download = "NexByte_Catalog_Import_Template.csv";
+      link.download = "NexLapTech_Catalog_Import_Template.csv";
       link.click();
       URL.revokeObjectURL(url);
       return;
@@ -243,7 +243,7 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
       ["Price source", "Provide only verified supplier/manufacturer data. This importer does not verify live market prices."],
     ];
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(instructions), "Instructions");
-    XLSX.writeFile(workbook, "NexByte_Catalog_Import_Template.xlsx");
+    XLSX.writeFile(workbook, "NexLapTech_Catalog_Import_Template.xlsx");
   };
 
   const downloadErrorReport = () => {
@@ -251,7 +251,7 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
     const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = "NexByte_Catalog_Import_Report.csv";
+    link.download = "NexLapTech_Catalog_Import_Report.csv";
     link.click();
     URL.revokeObjectURL(url);
   };

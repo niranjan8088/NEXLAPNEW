@@ -528,8 +528,8 @@ export const faqs: FAQItem[] = [
 ];
 
 export const galleryImages = [
-  { src: "/assets/nexlaptech-logo.svg", alt: "Nex LapTech emblem" },
+  { src: "/assets/nexlaptech-logo.png", alt: "Nex LapTech emblem" },
   { src: "/images/poster-products.png", alt: "Nex LapTech product range — desktops, laptops, accessories, CCTV" },
   { src: "/images/poster-services.png", alt: "Nex LapTech service range — repair, networking, AMC and more" },
-  { src: "/assets/nexlaptech-logo.svg", alt: "Nex LapTech brand logo" },
+  { src: "/assets/nexlaptech-logo.png", alt: "Nex LapTech brand logo" },
 ];

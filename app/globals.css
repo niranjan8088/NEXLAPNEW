@@ -447,9 +447,9 @@ body {
 }
 
 :root {
-  --loader-bg: #f8fafc;
-  --brand-blue: #2563eb;
-  --brand-cyan: #0891b2;
+  --loader-bg: #020b1f;
+  --brand-blue: #1e6bff;
+  --brand-cyan: #19d3ff;
   --loader-duration: 1.6s;
 }
 
@@ -476,8 +476,8 @@ body {
   justify-content: center;
   overflow: hidden;
   padding: 20px 16px;
-  background: radial-gradient(ellipse at 50% 36%, rgba(14, 165, 233, 0.12), transparent 58%), var(--loader-bg);
-  color: #0f172a;
+  background: radial-gradient(ellipse at 50% 36%, rgba(30, 107, 255, 0.2), transparent 58%), var(--loader-bg);
+  color: #ffffff;
   opacity: 1;
   transform: scale(1);
 }
@@ -510,7 +510,7 @@ html.nexlap-entry-active body {
   justify-content: center;
   border-radius: 50%;
   filter: drop-shadow(0 0 22px rgba(25, 211, 255, 0.24));
-  animation: nexlap-logo-pulse 1.5s ease-in-out infinite alternate;
+  animation: nexlap-logo-pulse var(--loader-duration) ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 
@@ -530,7 +530,7 @@ html.nexlap-entry-active body {
   color: var(--brand-cyan);
   opacity: 0;
   transform: translateY(8px) scale(0.6);
-  animation: nexlap-hardware-snap 320ms cubic-bezier(0.22, 1, 0.36, 1) var(--part-delay) forwards;
+  animation: nexlap-hardware-snap calc(var(--loader-duration) / 5) cubic-bezier(0.22, 1, 0.36, 1) var(--part-delay) forwards;
   will-change: transform, opacity;
 }
 
@@ -543,7 +543,7 @@ html.nexlap-entry-active body {
 .nexlap-hardware-part span {
   overflow: hidden;
   max-width: 100%;
-  color: #475569;
+  color: #b8d8ff;
   font-size: 9px;
   line-height: 1.2;
   text-overflow: ellipsis;
@@ -567,7 +567,7 @@ html.nexlap-entry-active body {
   flex: 1;
   overflow: hidden;
   border-radius: 99px;
-  background: rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .nexlap-progress-value {
@@ -583,7 +583,7 @@ html.nexlap-entry-active body {
 
 .nexlap-progress-number {
   width: 34px;
-  color: #475569;
+  color: #d7e9ff;
   font-variant-numeric: tabular-nums;
   font-size: 11px;
   font-weight: 700;
@@ -592,7 +592,7 @@ html.nexlap-entry-active body {
 
 .nexlap-loader-caption {
   margin: -6px 0 0;
-  color: #64748b;
+  color: #b8d8ff;
   font-size: 11px;
 }
 
@@ -677,6 +677,9 @@ html.nexlap-entry-active body {
     opacity: 1;
     transform: none;
   }
+  .nexlap-hardware {
+    display: none;
+  }
   .nexlap-progress-value,
   .nexlap-route-progress,
   .nexlap-route-progress span {
@@ -692,6 +695,19 @@ html.nexlap-entry-active body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@keyframes nexlap-logo-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nexlap-logo-wrap {
+    animation: nexlap-logo-fade 180ms ease-out both;
+    animation-duration: 180ms !important;
+    transform: none;
   }
 }
 
