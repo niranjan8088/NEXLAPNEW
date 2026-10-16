@@ -309,7 +309,7 @@ export default function AdminOrdersPage() {
                   <MapPin className="h-3.5 w-3.5 text-nex-blueLight" /> Shipping Address
                 </div>
                 <div className="text-xs text-white leading-relaxed">
-                  {selectedOrder.shipping_address || "Standard Nex LapTech Hub Pick-Up"}
+                  {selectedOrder.shipping_address || "Standard NexLapTech Hub Pick-Up"}
                 </div>
                 <div className="text-[11px] text-nex-mist pt-1 border-t border-white/5">
                   Payment Method: <span className="text-white font-bold uppercase">{selectedOrder.payment_method || "COD"}</span>

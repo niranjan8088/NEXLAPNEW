@@ -244,7 +244,7 @@ export default function CartDrawer() {
               <div>
                 <h4 className="font-display text-lg font-bold">Order Confirmed!</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  Thank you for ordering with Nex LapTech.
+                  Thank you for ordering with NexLapTech.
                 </p>
               </div>
 

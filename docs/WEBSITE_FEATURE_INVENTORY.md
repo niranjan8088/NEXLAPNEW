@@ -1,7 +1,7 @@
 # WEBSITE FEATURE INVENTORY & ROUTE CATALOG
 
 **Document Revision Date:** October 9, 2026  
-**Project:** Nex LapTech
+**Project:** NexLapTech
 
 ---
 

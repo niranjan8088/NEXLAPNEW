@@ -656,7 +656,7 @@ export default function ProductDetailPage({
               {/* Brand & Stock Pill */}
               <div className="flex items-center justify-between">
                 <span className="px-3 py-1 bg-blue-50 text-[#2563EB] text-xs font-bold uppercase tracking-wider rounded-md">
-                  {product.brand || "Nex LapTech Original"}
+                  {product.brand || "NexLapTech Original"}
                 </span>
                 <span
                   className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center space-x-1 ${
@@ -689,7 +689,7 @@ export default function ProductDetailPage({
                 <span className="text-slate-300">•</span>
                 <span className="text-emerald-600 text-xs font-semibold flex items-center">
                   <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-                  Nex LapTech Assured
+                  NexLapTech Assured
                 </span>
               </div>
 
@@ -899,7 +899,7 @@ export default function ProductDetailPage({
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                 <div>
                   <span className="text-slate-500">Sold by: </span>
-                  <span className="font-bold text-slate-900">{product.sellerName || "Nex LapTech Official Store"}</span>
+                  <span className="font-bold text-slate-900">{product.sellerName || "NEXLAPTECH Official Store"}</span>
                   <span className="ml-2 text-emerald-600 font-semibold">(4.8 ★ Verified Seller)</span>
                 </div>
                 <button
@@ -980,7 +980,7 @@ export default function ProductDetailPage({
               <>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
                   <span className="text-slate-400 block font-semibold">Brand</span>
-                  <span className="font-bold text-slate-900">{product.brand || "Nex LapTech"}</span>
+                  <span className="font-bold text-slate-900">{product.brand || "NEXLAPTECH"}</span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
                   <span className="text-slate-400 block font-semibold">Category</span>
@@ -1028,7 +1028,7 @@ export default function ProductDetailPage({
               ))
             ) : (
               <div className="p-4 text-xs text-slate-500 italic text-center">
-                Standard Nex LapTech Hardware Specifications Apply.
+                Standard NexLapTech Hardware Specifications Apply.
               </div>
             )}
           </div>
@@ -1038,7 +1038,7 @@ export default function ProductDetailPage({
         <div className="mt-8 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
             <ShieldCheck className="w-5 h-5 text-[#7C3AED]" />
-            <span>Nex LapTech Care & Protection Plans</span>
+            <span>NEXLAPTECH Care & Protection Plans</span>
           </h2>
           {protectionPlans.length ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1094,7 +1094,7 @@ export default function ProductDetailPage({
                 <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                 <span>Customer Ratings & Reviews</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Empirical reviews from verified Nex LapTech customers</p>
+              <p className="text-xs text-slate-500 mt-0.5">Empirical reviews from verified NexLapTech customers</p>
             </div>
             <button
               onClick={() => setShowReviewForm(!showReviewForm)}
@@ -1185,7 +1185,7 @@ export default function ProductDetailPage({
                     </div>
                   </div>
                   <p className="text-slate-700 leading-relaxed pt-1">
-                    {rev.review_message || rev.quote || rev.overall_experience || "Great product from Nex LapTech!"}
+                    {rev.review_message || rev.quote || rev.overall_experience || "Great product from NexLapTech!"}
                   </p>
                 </div>
               ))

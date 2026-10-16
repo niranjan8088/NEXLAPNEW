@@ -104,7 +104,7 @@ export default function AuthGateway({
         {/* Welcome Header */}
         <div className="mb-10 max-w-md mx-auto">
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
-            Welcome to <span className="text-gradient-blue">Nex LapTech</span>
+            Welcome to <span className="text-gradient-blue">NEXLAPTECH</span>
           </h2>
           <p className="text-xs sm:text-sm text-nex-mist leading-relaxed">
             Choose how you want to continue:
@@ -254,7 +254,7 @@ export default function AuthGateway({
 
         {/* Footer Tagline */}
         <p className="text-[11px] text-white/30">
-          © {new Date().getFullYear()} Nex LapTech. All rights reserved. Server-side RBAC active.
+          © {new Date().getFullYear()} NEXLAPTECH. All rights reserved. Server-side RBAC active.
         </p>
       </div>
     </div>

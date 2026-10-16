@@ -1,6 +1,6 @@
 # Low-Cost Scaling Plan & Monthly Operating Cost Breakdown
 
-This document presents the detailed cost breakdown and scaling roadmap for Nex LapTech.
+This document presents the detailed cost breakdown and scaling roadmap for NexLapTech.
 
 ---
 

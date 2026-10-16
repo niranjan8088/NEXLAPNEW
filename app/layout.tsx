@@ -27,12 +27,12 @@ const SITE_URL = "https://nexbytetechnologies.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Nex LapTech | Laptops, PC Components & Accessories",
-    template: "%s | Nex LapTech",
+    default: "NEXLAPTECH | Laptops, Components & Accessories",
+    template: "%s | NEXLAPTECH",
   },
   description: business.description,
   keywords: [
-    "Nex LapTech",
+    "NEXLAPTECH",
     "computer store Bengaluru",
     "laptop repair Bengaluru",
     "gaming desktops",
@@ -43,42 +43,45 @@ export const metadata: Metadata = {
     "IT services Padmanabhanagar",
     "second hand laptops Bengaluru",
   ],
-  authors: [{ name: "Nex LapTech" }],
-  creator: "Nex LapTech",
-  applicationName: "Nex LapTech",
+  authors: [{ name: "NEXLAPTECH" }],
+  creator: "NEXLAPTECH",
+  applicationName: "NEXLAPTECH",
   formatDetection: { telephone: true, email: true, address: true },
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: SITE_URL,
-    siteName: "Nex LapTech",
-    title: "Nex LapTech | Laptops, PC Components & Accessories",
+    siteName: "NEXLAPTECH",
+    title: "NEXLAPTECH | Laptops, Components & Accessories",
     description: business.description,
     images: [
       {
-        url: "/assets/nexlaptech-logo.png",
-        width: 512,
-        height: 512,
-        alt: "Nex LapTech",
+        url: "/assets/nexlaptech-social-share.png",
+        width: 1200,
+        height: 630,
+        alt: "NEXLAPTECH Logo",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nex LapTech | Laptops, PC Components & Accessories",
+    title: "NEXLAPTECH | Laptops, Components & Accessories",
     description: business.description,
-    images: ["/assets/nexlaptech-logo.png"],
+    images: ["/assets/nexlaptech-social-share.png"],
   },
   icons: {
     icon: [
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/nexlaptech-favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/nexlaptech-favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/nexlaptech-favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/nexlaptech-android-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/nexlaptech-android-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/nexlaptech-favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
     ],
-    shortcut: "/favicon-32x32.png",
-    apple: "/android-chrome-192x192.png",
+    shortcut: "/nexlaptech-favicon.ico",
+    apple: "/nexlaptech-apple-touch-icon.png",
   },
   robots: {
     index: true,
@@ -93,7 +96,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020b1f",
+  themeColor: "#1E5BFF",
   width: "device-width",
   initialScale: 1,
 };
@@ -152,7 +155,7 @@ export default function RootLayout({
     <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`} data-theme="day" suppressHydrationWarning>
       <head>
         <style dangerouslySetInnerHTML={{ __html: `
-          :root { --loader-bg: #020b1f; --brand-blue: #1e6bff; --brand-cyan: #19d3ff; --loader-duration: 1.6s; }
+          :root { --loader-bg: #0B1F4D; --brand-blue: #1E5BFF; --brand-cyan: #19C3F0; --loader-duration: 1.6s; }
           #nexlap-entry-loader { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; overflow: hidden; padding: 20px 16px; background: radial-gradient(ellipse at 50% 36%, rgba(30,107,255,.2), transparent 58%), var(--loader-bg); color: #fff; }
           html.nexlap-entry-active #nexlap-entry-loader { display: flex; }
           html.nexlap-entry-active, html.nexlap-entry-active body { overflow: hidden; }

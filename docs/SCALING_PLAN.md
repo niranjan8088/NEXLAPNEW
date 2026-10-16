@@ -1,6 +1,6 @@
-# Nex LapTech - Enterprise Scaling Plan & Disaster Recovery Architecture
+# NexLapTech - Enterprise Scaling Plan & Disaster Recovery Architecture
 
-This document details the scaling roadmap and disaster recovery strategy for growing Nex LapTech from initial launch to **10K**, **100K**, and **1M** active monthly users.
+This document details the scaling roadmap and disaster recovery strategy for growing NexLapTech from initial launch to **10K**, **100K**, and **1M** active monthly users.
 
 ---
 

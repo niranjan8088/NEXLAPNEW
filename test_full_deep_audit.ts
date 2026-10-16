@@ -4,7 +4,7 @@ import path from "path";
 
 async function runDeepFunctionalAudit() {
   console.log("\n=======================================================================");
-  console.log("NEX LAPTECH COMPLETE 21-POINT FUNCTIONAL, DATA-FLOW & SECURITY AUDIT");
+  console.log("NEXLAPTECH COMPLETE 21-POINT FUNCTIONAL, DATA-FLOW & SECURITY AUDIT");
   console.log("=======================================================================\n");
 
   const results: Record<string, "PASS" | "FAIL"> = {};

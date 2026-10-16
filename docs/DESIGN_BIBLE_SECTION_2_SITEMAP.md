@@ -1,4 +1,4 @@
-# NEX LAPTECH
+# NEXLAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 2: Complete Site Map & Navigation Tree Architecture
 
@@ -7,7 +7,7 @@
 ## 1. Master Navigation Hierarchy
 
 ```
-NEX LAPTECH ENTERPRISE PLATFORM
+NEXLAPTECH ENTERPRISE PLATFORM
 │
 ├── 1. PUBLIC WEBSITE (www.nexbyte.com)
 │   ├── Homepage (/)

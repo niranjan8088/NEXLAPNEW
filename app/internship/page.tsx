@@ -275,7 +275,7 @@ export default function InternshipPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="section-eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-nex-blueLight shadow-glow-blue" />
-              Nex LapTech Academy
+              NexLapTech Academy
             </span>
             <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Internships &amp; <span className="text-gradient-blue">Projects.</span>
@@ -422,7 +422,7 @@ export default function InternshipPage() {
                 Student Success <span className="text-gradient-blue">Stories</span>
               </h2>
               <p className="mt-3 text-xs text-nex-mist max-w-lg mx-auto">
-                See what former interns have accomplished during their time at Nex LapTech.
+                See what former interns have accomplished during their time at NexLapTech.
               </p>
             </div>
 
@@ -487,7 +487,7 @@ export default function InternshipPage() {
                 <div>
                   <h3 className="font-display text-xl font-bold text-white">✓ Internship Application Submitted</h3>
                   <p className="text-xs text-nex-mist mt-1 max-w-md mx-auto leading-relaxed">
-                    Your application has been successfully submitted to Nex LapTech.
+                    Your application has been successfully submitted to NexLapTech.
                   </p>
                 </div>
 
@@ -526,7 +526,7 @@ export default function InternshipPage() {
                   </div>
                   <div>
                     <h3 className="font-display text-lg font-bold text-white">Internship Application Form</h3>
-                    <p className="text-xs text-nex-mist">Complete all required details to apply for Nex LapTech Academic Internship &amp; Project Support.</p>
+                    <p className="text-xs text-nex-mist">Complete all required details to apply for NexLapTech Academic Internship &amp; Project Support.</p>
                   </div>
                 </div>
 
@@ -888,7 +888,7 @@ export default function InternshipPage() {
                       <textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Any additional notes or questions for Nex LapTech team..."
+                        placeholder="Any additional notes or questions for NexLapTech team..."
                         rows={2}
                         className="w-full rounded-xl bg-white/[0.03] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none resize-none"
                       />
@@ -905,7 +905,7 @@ export default function InternshipPage() {
                         className="mt-0.5 rounded border-white/20 bg-nex-ink text-nex-blue focus:ring-0"
                       />
                       <span className="text-[11px] text-white/80 leading-relaxed">
-                        I confirm that the information provided is correct and I agree to be contacted by Nex LapTech regarding this internship application.
+                        I confirm that the information provided is correct and I agree to be contacted by NexLapTech regarding this internship application.
                       </span>
                     </label>
 

@@ -1,5 +1,5 @@
 /**
- * Centralized API Fetch Helper for Nex LapTech.
+ * Centralized API Fetch Helper for NexLapTech.
  * Guarantees that fetch responses are handled safely without crashing on non-JSON/HTML payloads.
  * Fulfills Task 2: Inspect every fetch, print status, headers, body if response.ok == false, read response.text() first.
  */

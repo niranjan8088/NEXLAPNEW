@@ -52,10 +52,10 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
       role: "assistant",
       content:
         portal === "customer"
-          ? "Hello! I'm **Nex LapTech Customer AI**.\n\nI can help you check your **orders, service bookings, laptops, and training certificates**. Ask me anything!"
+          ? "Hello! I'm **NexLapTech Customer AI**.\n\nI can help you check your **orders, service bookings, laptops, and training certificates**. Ask me anything!"
           : portal === "reseller"
-          ? "Hello! I'm **Nex LapTech Reseller AI**.\n\nI can analyze your **listed products, stock levels, orders, and customer messages**. How can I help you today?"
-          : "Hello! I'm **Nex LapTech Admin AI**.\n\nI can provide platform-wide insights on **orders, revenue, reseller applications, and catalog inventory**.",
+          ? "Hello! I'm **NexLapTech Reseller AI**.\n\nI can analyze your **listed products, stock levels, orders, and customer messages**. How can I help you today?"
+          : "Hello! I'm **NexLapTech Admin AI**.\n\nI can provide platform-wide insights on **orders, revenue, reseller applications, and catalog inventory**.",
       timestamp: new Date(),
       confidence: 1.0,
     },
@@ -223,7 +223,7 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
             <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
           </div>
           <span>
-            {portal === "customer" ? "Ask Nex LapTech AI" : portal === "reseller" ? "Reseller AI" : "Admin AI"}
+            {portal === "customer" ? "Ask NexLapTech AI" : portal === "reseller" ? "Reseller AI" : "Admin AI"}
           </span>
         </button>
       )}
@@ -376,7 +376,7 @@ export default function AiChatWidget({ portal }: { portal: "customer" | "reselle
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Ask Nex LapTech AI..."
+                placeholder="Ask NexLapTech AI..."
                 className={`flex-1 rounded-xl ${
                   portal === "customer"
                     ? "bg-white border border-[#E2E8F0] text-[#0F172A] placeholder-[#94A3B8]"

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import MarketplaceHome from "@/components/MarketplaceHome";
 
 export const metadata: Metadata = {
-  title: "Nex LapTech | Shop Laptops, Components & Accessories",
+  title: "NEXLAPTECH | Laptops, Components & Accessories",
 };
 
 export default async function HomePage() {

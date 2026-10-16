@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     await dispatchPipelineEvent({
       eventType: "RESELLER_APPLIED",
       title: "Reseller Application Submitted 🏪",
-      message: "Your Nex LapTech reseller application has been submitted and is under admin review.",
+      message: "Your NexLapTech reseller application has been submitted and is under admin review.",
       recipientRole: "reseller",
       recipientUserId: newReseller.id,
       referenceType: "reseller",

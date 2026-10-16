@@ -47,7 +47,7 @@ function AdminContactsContent() {
     // Dispatch real-time Customer notification
     await dispatchPipelineEvent({
       eventType: "MESSAGE_RECEIVED",
-      title: "💬 New reply from Nex LapTech Support",
+      title: "💬 New reply from NEXLAPTECH Support",
       message: replyText.trim().substring(0, 100),
       recipientUserId: replyModal.user_id || replyModal.customer_id,
       referenceType: "message",

@@ -1,6 +1,6 @@
-# Nex LapTech — Website
+# NEXLAPTECH — Website
 
-Premium, futuristic business website for **Nex LapTech**, built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, and GSAP.
+Premium, modern technology storefront for **NEXLAPTECH**, built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, and GSAP.
 
 ## Stack
 
@@ -41,8 +41,10 @@ lib/
   data.ts    — all business content (products, services, contact info, FAQs, etc.)
   utils.ts   — small class-name helper
 public/
-  assets/nexlaptech-logo.png, assets/nexlaptech-logo.svg
-  favicon-32x32.png, android-chrome-192x192.png, android-chrome-512x512.png
+  assets/nexlaptech-logo.png, assets/nexlaptech-horizontal.png
+  nexlaptech-favicon.ico, nexlaptech-favicon-16.png, nexlaptech-favicon-32.png, nexlaptech-favicon-48.png
+  nexlaptech-apple-touch-icon.png, nexlaptech-android-192.png, nexlaptech-android-512.png
+  assets/nexlaptech-social-share.png
   images/            — product photos and marketing images
   product-*.png        — individual product photos cropped from the product poster
   poster-products.png, poster-services.png — full posters (used in Gallery)
@@ -80,5 +82,5 @@ No paid services, databases, or third-party APIs are required to run this site.
 
 ## Brand and loading experience
 
-- The Nex LapTech logo source is `public/assets/nexlaptech-logo.png`; favicon and app icons are generated at 32, 192, and 512 pixels.
+- The NEXLAPTECH logo source is `public/assets/nexlaptech-logo.png`; horizontal, social-share, favicon, Apple touch, and Android/PWA variants are generated from the supplied logo.
 - The entry and route loader colors and assembly pacing are controlled by `--loader-bg`, `--brand-blue`, `--brand-cyan`, and `--loader-duration` in `app/globals.css`. The entry loader exits after load and has a 2.5-second safety limit.

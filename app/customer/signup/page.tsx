@@ -131,7 +131,7 @@ export default function CustomerSignUpPage() {
             <BrandLogo width={72} height={72} sizes="36px" priority className="h-full w-full" />
           </div>
           <span className="font-display text-lg font-bold">
-            NEX LAPTECH
+            NEXLAPTECH
           </span>
         </Link>
 
@@ -160,7 +160,7 @@ export default function CustomerSignUpPage() {
                 All your tech needs in one account.
               </h1>
               <p className="mt-2.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                Join Nex LapTech to manage hardware orders, laptop repairs, service bookings, and verified certificates.
+                Join NexLapTech to manage hardware orders, laptop repairs, service bookings, and verified certificates.
               </p>
             </div>
 
@@ -195,7 +195,7 @@ export default function CustomerSignUpPage() {
                   <div>
                     <h3 className="font-display text-xl font-bold">Account created successfully!</h3>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      Welcome to Nex LapTech, <strong>{successName}</strong>. You can now sign in to your account.
+                      Welcome to NexLapTech, <strong>{successName}</strong>. You can now sign in to your account.
                     </p>
                   </div>
                   <div className="pt-4">
@@ -212,10 +212,10 @@ export default function CustomerSignUpPage() {
                 <>
                   <div className="mb-6">
                     <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                      Create your Nex LapTech account
+                      Create your NexLapTech account
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Join Nex LapTech to manage purchases, repairs and services in one place.
+                      Join NexLapTech to manage purchases, repairs and services in one place.
                     </p>
                   </div>
 
@@ -427,7 +427,7 @@ export default function CustomerSignUpPage() {
 
       {/* Minimal Auth Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 border-t border-slate-200/60 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-        <p>© 2026 Nex LapTech. All rights reserved.</p>
+        <p>© 2026 NexLapTech. All rights reserved.</p>
         <div className="flex gap-4">
           <Link href="/contact" className="hover:text-nex-blue">Contact</Link>
           <Link href="/contact" className="hover:text-nex-blue">Privacy</Link>

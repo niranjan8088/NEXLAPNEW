@@ -167,7 +167,7 @@
       // PAGE 1: TITLE PAGE & EXECUTIVE SUMMARY
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.coverHeader },
-          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEXLAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "MASTER ENTERPRISE SYSTEM DESIGN DOCUMENT (SDD) & TECHNICAL MANUAL"),
           React.createElement(View, { style: styles.metaRow },
             React.createElement(Text, { style: styles.metaText }, "Version: v2.0 Enterprise (#1042-PROD)"),
@@ -214,7 +214,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master Enterprise SDD Document"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master Enterprise SDD Document"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -257,7 +257,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master Enterprise SDD Document"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master Enterprise SDD Document"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -291,7 +291,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master Enterprise SDD Document"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master Enterprise SDD Document"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -324,7 +324,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master Enterprise SDD Document"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master Enterprise SDD Document"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -357,18 +357,18 @@
         React.createElement(View, { style: styles.banner },
           React.createElement(Text, { style: styles.bannerTitle }, "✓ MASTER SYSTEM DESIGN & PRODUCTION READINESS CERTIFICATE"),
           React.createElement(Text, { style: styles.bannerText },
-            "This certifies that Nex LapTech Enterprise Platform v2.0 has satisfied all system architecture, security, performance, and bi-directional realtime synchronization requirements. Certified 100% Production Ready."
+            "This certifies that NexLapTech Enterprise Platform v2.0 has satisfied all system architecture, security, performance, and bi-directional realtime synchronization requirements. Certified 100% Production Ready."
           )
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master Enterprise SDD Document"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master Enterprise SDD Document"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )
     )
   );
 
-  await ReactPDF.renderToFile(React.createElement(MasterSddPDF), "NexByte_Enterprise_System_Design_Document.pdf");
-  console.log("NexByte_Enterprise_System_Design_Document.pdf Generated Successfully!");
+  await ReactPDF.renderToFile(React.createElement(MasterSddPDF), "NexLapTech_Enterprise_System_Design_Document.pdf");
+  console.log("NexLapTech_Enterprise_System_Design_Document.pdf Generated Successfully!");
 })();

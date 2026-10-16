@@ -9,7 +9,7 @@ export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<"profile" | "appearance" | "notifications" | "system">("appearance");
 
   // Profile
-  const [adminName, setAdminName] = useState("Nex LapTech Admin");
+  const [adminName, setAdminName] = useState("NexLapTech Admin");
   const [adminEmail, setAdminEmail] = useState("admin@nexbyte.com");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

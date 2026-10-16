@@ -1,5 +1,5 @@
 /**
- * NEX LAPTECH — PHASE 2 REGRESSION & COMPREHENSIVE SUITE
+ * NEXLAPTECH — PHASE 2 REGRESSION & COMPREHENSIVE SUITE
  * Verifies Category-Aware Specs, RAM/SSD Cross-Assignment Protection,
  * Specification Normalization (TESTS A through H), Admin Filter CRUD, and Option Expansion.
  */
@@ -20,7 +20,7 @@ function assert(condition: boolean, message: string) {
 
 async function runPhase2ComprehensiveSuite() {
   console.log("\n==================================================");
-  console.log("NEX LAPTECH PHASE 2: COMPREHENSIVE REGRESSION SUITE");
+  console.log("NEXLAPTECH PHASE 2: COMPREHENSIVE REGRESSION SUITE");
   console.log("==================================================\n");
 
   // TEST A: Laptop RAM = 16 GB

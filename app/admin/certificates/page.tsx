@@ -281,7 +281,7 @@ export default function AdminCertificatesPage() {
                 <div className="flex justify-between items-start mb-3 border-b border-white/5 pb-3">
                   <div>
                     <h3 className="font-bold text-white text-sm">{cert.studentName}</h3>
-                    <span className="text-[10px] text-nex-mist block mt-0.5">{cert.courseTitle} • {cert.college || "Nex LapTech Academy"}</span>
+                    <span className="text-[10px] text-nex-mist block mt-0.5">{cert.courseTitle} • {cert.college || "NEXLAPTECH Academy"}</span>
                   </div>
                   <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded border ${
                     cert.status === "verified" 

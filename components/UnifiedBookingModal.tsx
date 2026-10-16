@@ -721,7 +721,7 @@ export default function UnifiedBookingModal() {
                                     {msg.message}
                                   </div>
                                   <span className="text-[8px] text-white/30 mt-1">
-                                    {isAdmin ? "Nex LapTech Support" : "You"} •{" "}
+                                    {isAdmin ? "NexLapTech Support" : "You"} •{" "}
                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                                   </span>
                                 </div>
@@ -738,7 +738,7 @@ export default function UnifiedBookingModal() {
                             required
                             value={chatMessage}
                             onChange={(e) => setChatMessage(e.target.value)}
-                            placeholder="Type a reply to Nex LapTech Support..."
+                            placeholder="Type a reply to NexLapTech Support..."
                             className="flex-1 rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2 text-xs text-white focus:outline-none focus:border-nex-blue/50"
                           />
                           <button

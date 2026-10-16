@@ -109,7 +109,7 @@ export default function ResellerLoginPage() {
               <BrandLogo width={88} height={88} sizes="44px" priority className="relative h-full w-full" />
             </div>
             <span className="font-display text-2xl font-bold tracking-tight text-slate-950">
-              NEX LAPTECH
+              NEXLAPTECH
             </span>
           </Link>
 
@@ -132,7 +132,7 @@ export default function ResellerLoginPage() {
           <p className="mt-3 text-xs text-slate-600">
             {mode === "login"
               ? "Sign in to manage your products, orders, and customers."
-              : "Register as a Nex LapTech partner. Admin approval required."}
+              : "Register as a NexLapTech partner. Admin approval required."}
           </p>
         </div>
 
@@ -147,7 +147,7 @@ export default function ResellerLoginPage() {
                 </div>
                 <div>
                   <h2 className="font-display text-base font-bold text-slate-950">Reseller Portal</h2>
-                  <p className="text-xs text-slate-500">Nex LapTech Partner Management System</p>
+                  <p className="text-xs text-slate-500">NexLapTech Partner Management System</p>
                 </div>
               </div>
 
@@ -198,7 +198,7 @@ export default function ResellerLoginPage() {
                 </div>
                 <h3 className="font-display text-lg font-bold text-slate-950">Application Submitted!</h3>
                 <p className="mx-auto max-w-xs text-sm leading-relaxed text-slate-600">
-                  Your reseller application has been submitted to Nex LapTech admin for review.
+                  Your reseller application has been submitted to NexLapTech admin for review.
                   You will be notified via email once approved.
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-2">
@@ -296,7 +296,7 @@ export default function ResellerLoginPage() {
                 </div>
 
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-                  Your account will be reviewed by Nex LapTech admin before activation.
+                  Your account will be reviewed by NexLapTech admin before activation.
                 </div>
 
                 <button type="submit" disabled={loading}

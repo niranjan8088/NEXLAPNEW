@@ -116,7 +116,7 @@ export default function SignupPage() {
                   <BrandLogo width={64} height={64} sizes="36px" priority className="h-9 w-9" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-100">Nex LapTech</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-100">NexLapTech</p>
                   <p className="text-xl font-bold">Join the network</p>
                 </div>
               </div>
@@ -143,11 +143,11 @@ export default function SignupPage() {
 
           <div className="p-6 sm:p-8 lg:p-10">
             <div className="mb-8 flex items-center justify-between gap-3">
-              <Link href="/" className="inline-flex items-center gap-3" aria-label="Nex LapTech home">
+              <Link href="/" className="inline-flex items-center gap-3" aria-label="NexLapTech home">
                 <div className="rounded-full border border-slate-200 bg-slate-50 p-2">
                   <BrandLogo width={72} height={72} sizes="36px" priority className="h-9 w-9" />
                 </div>
-                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">NEX LAPTECH</span>
+                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">NEXLAPTECH</span>
               </Link>
 
               <Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100">
@@ -195,7 +195,7 @@ export default function SignupPage() {
 
             {selectedRole === "reseller" && (
               <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-3 text-[12px] leading-6 text-violet-800">
-                <strong className="font-bold">Reseller application:</strong> your account will be reviewed by Nex LapTech admin before approval.
+                <strong className="font-bold">Reseller application:</strong> your account will be reviewed by NexLapTech admin before approval.
               </div>
             )}
 

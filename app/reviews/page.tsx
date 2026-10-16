@@ -59,9 +59,9 @@ export default function CustomerReviewsPage() {
         return {
           id: String(review.id),
           productId: review.product_id,
-          productTitle: review.product_purchased || review.product_title || "Nex LapTech product or service",
+          productTitle: review.product_purchased || review.product_title || "NexLapTech product or service",
           productCategory: review.product_category || review.category || "Customer experience",
-          reviewerName: review.customer_name || review.customerName || "Nex LapTech customer",
+          reviewerName: review.customer_name || review.customerName || "NexLapTech customer",
           rating: Number(review.rating) || 0,
           title: review.overall_experience || "Customer review",
           comment: review.review_message || review.review || "",
@@ -183,7 +183,7 @@ export default function CustomerReviewsPage() {
             </div>
 
             <div className="text-center space-y-3">
-              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Bought from Nex LapTech?</h3>
+              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Bought from NEXLAPTECH?</h3>
               <p className="text-xs text-slate-500">Share your hardware experience with other buyers.</p>
               <button
                 onClick={() => { setLoadError(""); setShowWriteModal(true); }}
@@ -328,7 +328,7 @@ export default function CustomerReviewsPage() {
                   >
                     <option value="Samsung 980 PRO 1TB NVMe SSD">Samsung 980 PRO 1TB NVMe SSD</option>
                     <option value="Lenovo ThinkPad T490 (Refurbished)">Lenovo ThinkPad T490 (Refurbished)</option>
-                    <option value="Nex LapTech ROG Slayer R15 Gaming PC">Nex LapTech ROG Slayer R15 Gaming PC</option>
+                    <option value="NexLapTech ROG Slayer R15 Gaming PC">NexLapTech ROG Slayer R15 Gaming PC</option>
                     <option value="Dell Latitude 5440 Pro Laptop">Dell Latitude 5440 Pro Laptop</option>
                     <option value="EVM 512GB NVMe M.2 SSD">EVM 512GB NVMe M.2 SSD</option>
                   </select>

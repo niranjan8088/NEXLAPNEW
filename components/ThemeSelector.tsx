@@ -220,7 +220,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
               Global Appearance Theme
             </h3>
             <p className="text-xs text-neutral-500">
-              The Nex LapTech interface uses the light theme.
+              The NexLapTech interface uses the light theme.
             </p>
           </div>
 
@@ -294,7 +294,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
 
                 <div>
                   <h4 className="font-display font-extrabold text-base text-neutral-900">
-                    Nex LapTech Light
+                    NexLapTech Light
                   </h4>
                   <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
                     Bright surfaces, clear text, and subtle blue accents across every portal.
@@ -318,7 +318,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
               </h4>
             </div>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Reset appearance to the Nex LapTech light theme?
+              Reset appearance to the NexLapTech light theme?
             </p>
             <div className="flex justify-end gap-2 pt-2">
               <button

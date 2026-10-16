@@ -1,6 +1,6 @@
 /**
  * lib/billingUtils.ts
- * Single shared calculation engine for Nex LapTech Admin Billing & Invoice Module.
+ * Single shared calculation engine for NexLapTech Admin Billing & Invoice Module.
  * Financial calculations MUST use INTEGER PAISE internally to prevent floating point inaccuracies.
  */
 

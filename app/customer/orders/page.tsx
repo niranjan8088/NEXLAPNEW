@@ -43,7 +43,7 @@ export default function CustomerOrdersPage() {
             total_amount: 35000,
             status: "Delivered",
             tracking_number: "BLR-EXP-991204",
-            courier: "Nex LapTech Express",
+            courier: "NexLapTech Express",
             estimated_delivery: "2026-03-27",
             items: [
               {
@@ -63,7 +63,7 @@ export default function CustomerOrdersPage() {
             total_amount: 28500,
             status: "Out for Delivery",
             tracking_number: "BLR-EXP-104921",
-            courier: "Nex LapTech Priority",
+            courier: "NexLapTech Priority",
             estimated_delivery: "2026-04-01",
             items: [
               {
@@ -251,7 +251,7 @@ export default function CustomerOrdersPage() {
               </h3>
               {selectedOrder.tracking_number && (
                 <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  Courier: {selectedOrder.courier || "Nex LapTech Express"} • Tracking #{selectedOrder.tracking_number}
+                  Courier: {selectedOrder.courier || "NexLapTech Express"} • Tracking #{selectedOrder.tracking_number}
                 </p>
               )}
             </div>

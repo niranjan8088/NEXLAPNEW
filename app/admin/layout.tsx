@@ -280,7 +280,7 @@ export default function AdminLayout({
               {!isDesktopCollapsed && (
                 <div className="truncate">
                   <h2 className="truncate font-display text-sm font-extrabold tracking-tight text-slate-950">
-                    NEX LAPTECH
+                    NEXLAPTECH
                   </h2>
                   <span className="block text-[9px] font-semibold uppercase tracking-wider text-blue-700">
                     QUANTUM COMMAND

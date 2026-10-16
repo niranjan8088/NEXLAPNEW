@@ -75,7 +75,7 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
                 <Building2 className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h2 className="font-display text-sm font-extrabold text-slate-900 tracking-tight">Nex LapTech</h2>
+                <h2 className="font-display text-sm font-extrabold text-slate-900 tracking-tight">NEXLAPTECH</h2>
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider">RESELLER HUB</span>
               </div>
             </div>
@@ -171,4 +171,3 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
     </div>
   );
 }
-

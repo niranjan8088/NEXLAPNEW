@@ -1,5 +1,5 @@
 /**
- * Enterprise Production Express Backend Server for Nex LapTech
+ * Enterprise Production Express Backend Server for NexLapTech
  * Port: 3001 (default) or process.env.BACKEND_PORT
  * Subdomain: https://api.nexbyte.com
  * Features: Helmet, Rate Limiting, CORS, Compression, Supabase Storage, Health Check (/health), Graceful Shutdown
@@ -105,7 +105,7 @@ app.get("/health", async (req, res) => {
 
   res.status(200).json({
     status: "HEALTHY",
-    service: "Nex LapTech Low-Cost Enterprise Backend API",
+    service: "NexLapTech Low-Cost Enterprise Backend API",
     subdomain: "https://api.nexbyte.com",
     timestamp: new Date().toISOString(),
     uptimeSeconds: Math.floor(process.uptime()),
@@ -310,14 +310,14 @@ app.use((err, req, res, next) => {
 // 10. Server Startup & Graceful Shutdown
 const server = app.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🚀 Nex LapTech Enterprise Backend API running on Port ${PORT}`);
+  console.log(`🚀 NexLapTech Enterprise Backend API running on Port ${PORT}`);
   console.log(`🌐 API Domain: https://api.nexbyte.com`);
   console.log(`🏥 Health Check: http://localhost:${PORT}/health`);
   console.log(`=======================================================`);
 });
 
 const gracefulShutdown = (signal) => {
-  console.log(`\n[${signal}] Received. Shutting down Nex LapTech Backend API gracefully...`);
+  console.log(`\n[${signal}] Received. Shutting down NexLapTech Backend API gracefully...`);
   server.close(() => {
     console.log("[Server Closed]. HTTP connections terminated cleanly.");
     process.exit(0);

@@ -1,5 +1,5 @@
 /**
- * NEX LAPTECH — PHASE 1 E-COMMERCE CATALOG & FILTER SUITE
+ * NEXLAPTECH — PHASE 1 E-COMMERCE CATALOG & FILTER SUITE
  * Comprehensive empirical test script for normalization, filter engine, and API routes.
  */
 
@@ -30,7 +30,7 @@ function assert(condition: boolean, message: string) {
 
 async function runTestSuite() {
   console.log("\n==================================================");
-  console.log("NEX LAPTECH PHASE 1: DYNAMIC CATALOG & FILTER SUITE");
+  console.log("NEXLAPTECH PHASE 1: DYNAMIC CATALOG & FILTER SUITE");
   console.log("==================================================\n");
 
   // TEST 1: Data Normalization

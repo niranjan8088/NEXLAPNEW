@@ -33,7 +33,7 @@ export default function ContactPage() {
 
   const handleDownloadProfile = () => {
     // Generate a simple company profile blob and trigger download
-    const docText = `NEX LAPTECH COMPANY PROFILE
+    const docText = `NEXLAPTECH COMPANY PROFILE
 =======================================
 Premium Technology Platform, Computer Sales & Services
 
@@ -153,7 +153,7 @@ Trusted · Reliable · Affordable`;
               {/* Core contacts card */}
               <div className="glass-card p-6 bg-nex-ink border border-white/5 rounded-2xl">
                 <h3 className="font-display text-sm font-bold text-white mb-5 flex items-center gap-2">
-                  <Building className="h-4.5 w-4.5 text-nex-blueLight" /> Nex LapTech Support Desk
+                  <Building className="h-4.5 w-4.5 text-nex-blueLight" /> NexLapTech Support Desk
                 </h3>
                 
                 <div className="space-y-4 text-xs">

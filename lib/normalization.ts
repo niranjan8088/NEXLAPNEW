@@ -1,5 +1,5 @@
 /**
- * NEX LAPTECH — FILTER DATA NORMALIZATION UTILITIES
+ * NEXLAPTECH — FILTER DATA NORMALIZATION UTILITIES
  * Normalizes varied specification strings (e.g., "8GB", "8 GB", "8 gb") into clean,
  * consistent values for dynamic filter option extraction and matching without
  * altering original display labels.

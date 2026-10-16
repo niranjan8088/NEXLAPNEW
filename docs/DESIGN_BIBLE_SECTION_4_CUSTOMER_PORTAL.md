@@ -1,4 +1,4 @@
-# NEX LAPTECH
+# NEXLAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 4: Customer Portal UI/UX Specifications
 
@@ -32,7 +32,7 @@ Header link -> `Customer Login` / `My Account` or URL `/customer`.
 ### 7. Core UI Components & Widgets
 - **Active Booking Summary Card:** Displays active Reference ID (`NB-2026-XXXXXX`), product/service name, current status badge, and timeline progress bar.
 - **Certificate Downloads Grid:** Renders issued training and internship certificates with a 1-click **Download PDF** button.
-- **Support Chat Box:** Embedded 2-way live chat drawer linked to Nex LapTech Support Desk.
+- **Support Chat Box:** Embedded 2-way live chat drawer linked to NexLapTech Support Desk.
 
 ### 8. Backend APIs & Database Tables Used
 - `GET /api/bookings`

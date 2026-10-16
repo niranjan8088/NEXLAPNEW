@@ -70,10 +70,10 @@ export default function AuthGatewayLight({
     <main className="min-h-screen bg-[#f5f8fc] text-slate-900">
       <header className="border-b border-slate-200/80 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-8">
-          <Link href="/" className="flex items-center gap-3" aria-label="Nex LapTech home">
+          <Link href="/" className="flex items-center gap-3" aria-label="NEXLAPTECH home">
             <BrandLogo width={80} height={80} sizes="40px" priority className="h-10 w-10" />
             <span className="font-display text-lg font-extrabold tracking-tight">
-              NEX LAPTECH
+              NEXLAPTECH
             </span>
           </Link>
           <Link
@@ -90,13 +90,13 @@ export default function AuthGatewayLight({
         <section className="mb-8 flex flex-col justify-between gap-6 sm:mb-10 sm:flex-row sm:items-end">
           <div className="max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
-              <BadgeCheck className="h-3.5 w-3.5" /> Nex LapTech
+              <BadgeCheck className="h-3.5 w-3.5" /> NEXLAPTECH
             </div>
             <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
               Your technology, <span className="text-blue-700">all in one place.</span>
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-              Shop trusted hardware, coordinate service, or manage your Nex LapTech business account.
+              Shop trusted hardware, coordinate service, or manage your NexLapTech business account.
             </p>
           </div>
           <Link
@@ -187,7 +187,7 @@ export default function AuthGatewayLight({
         </section>
 
         <footer className="flex flex-col justify-between gap-2 pt-5 text-xs text-slate-500 sm:flex-row">
-          <span>© {new Date().getFullYear()} Nex LapTech</span>
+          <span>© {new Date().getFullYear()} NEXLAPTECH</span>
           <span>Secure access for customers, partners, and administrators</span>
         </footer>
       </div>

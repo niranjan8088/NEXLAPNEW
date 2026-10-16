@@ -179,7 +179,7 @@ export default function AdminDashboardHome() {
 
       setTopProducts(topP.length > 0 ? topP : [
         { name: "Asus ROG Strix G16 Gaming Laptop", count: 18 },
-        { name: "Nex LapTech Enterprise Server Rack 42U", count: 12 },
+        { name: "NexLapTech Enterprise Server Rack 42U", count: 12 },
         { name: "Lenovo ThinkPad P1 Workstation", count: 9 },
         { name: "Cisco Catalyst Managed Switch 48-Port", count: 7 }
       ]);
@@ -224,7 +224,7 @@ export default function AdminDashboardHome() {
             <span className="flex h-2 w-2 rounded-full bg-[#22C55E] animate-pulse" />
           </div>
           <h1 className="font-display text-2xl font-black tracking-tight text-white">
-            Nex LapTech Quantum Command Console
+            NexLapTech Quantum Command Console
           </h1>
           <p className="text-xs text-[#94A3B8] mt-1">
             Realtime database Telemetry, enterprise order telemetry, inventory security, and live client pipelines.

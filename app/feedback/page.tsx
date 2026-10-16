@@ -326,7 +326,7 @@ export default function FeedbackPage() {
                     className="h-5 w-5 rounded border-slate-300 bg-white text-blue-700 focus:ring-blue-600"
                   />
                   <label htmlFor="feedback-recommend" className="cursor-pointer select-none text-sm font-medium text-slate-700">
-                    I recommend Nex LapTech to others
+                    I recommend NexLapTech to others
                   </label>
                 </div>
 

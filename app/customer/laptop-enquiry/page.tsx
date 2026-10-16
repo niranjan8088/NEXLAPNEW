@@ -124,7 +124,7 @@ export default function CustomerLaptopEnquiryPage() {
             Laptop &amp; Device Requirement Enquiry
           </h1>
           <p className="text-xs sm:text-sm text-[#667085] dark:text-[#A1A1AA] max-w-2xl font-medium">
-            Tell us your specs, budget, and preference. Nex LapTech engineers will handpick the best refurbished or new laptop matching your exact workload.
+            Tell us your specs, budget, and preference. NexLapTech engineers will handpick the best refurbished or new laptop matching your exact workload.
           </p>
         </div>
       </div>

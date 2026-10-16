@@ -1,4 +1,4 @@
-# NEX LAPTECH
+# NEXLAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 6: Enterprise Design System Specification
 

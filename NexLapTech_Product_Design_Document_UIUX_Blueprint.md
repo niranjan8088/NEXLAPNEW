@@ -1,11 +1,11 @@
-# NEX LAPTECH
+# NEXLAPTECH
 ## Master Product Design Document (PDD) & UI/UX Architecture Blueprint
 
 ***
 
 ### Document Control & Design Metadata
 - **Document Title:** Master Product Design Document (PDD) & UI/UX Blueprint
-- **Project Name:** Nex LapTech Enterprise Platform
+- **Project Name:** NexLapTech Enterprise Platform
 - **Version:** v2.0 Production Release
 - **Design System:** Deep Space Dark Mode System (Glassmorphic + HSL Neon Accents)
 - **Target Devices:** Ultra-wide Desktop (1440px+), Laptop (1024px), Tablet (768px), Mobile (375px)
@@ -36,7 +36,7 @@
 
 ## 1. Project Overview & Business Objectives
 
-Nex LapTech is Bengaluru's premier IT solution hub, serving retail customers, gaming enthusiasts, corporate offices, and students. This Product Design Document (PDD) establishes the visual architecture, component hierarchies, interaction patterns, and user flows powering the Nex LapTech platform.
+NexLapTech is Bengaluru's premier IT solution hub, serving retail customers, gaming enthusiasts, corporate offices, and students. This Product Design Document (PDD) establishes the visual architecture, component hierarchies, interaction patterns, and user flows powering the NexLapTech platform.
 
 ```yaml
 Business Goals:
@@ -55,7 +55,7 @@ User Goals:
 ## 2. Information Architecture & Site Map Tree
 
 ```
-NEX LAPTECH PUBLIC WEBSITE (www.nexbyte.com)
+NEXLAPTECH PUBLIC WEBSITE (www.nexbyte.com)
 ├── Home (/)
 │   ├── Hero Banner & Quick Service CTA
 │   ├── Business Metrics Counter
@@ -120,7 +120,7 @@ Student Enrolls (/training) -> Admin Review -> Issue Certificate -> System Gener
 - **Path:** `/customer` and `/track`
 - **Sidebar Navigation:** Overview, My Bookings, Active Services, Certificates, Messages, Settings.
 - **Realtime Track Component:** Progress timeline bar showing order stages: `Submitted` -> `Contacted` -> `In Repair` -> `Completed`.
-- **Live Chat Drawer:** Embedded 2-way chat box between Customer and Nex LapTech Support Desk.
+- **Live Chat Drawer:** Embedded 2-way chat box between Customer and NexLapTech Support Desk.
 
 ***
 
@@ -171,7 +171,7 @@ All 21 Admin Modules (`/admin/*`) use a unified dashboard shell with sidebar:
 
 ```
 +------------------------------------------------------------------------+
-|  [NEX LAPTECH LOGO]  Home  Products  Services  Training  [Book Service]    |
+|  [NEXLAPTECH LOGO]  Home  Products  Services  Training  [Book Service]    |
 +------------------------------------------------------------------------+
 |                                                                        |
 |    ENGINEERING TOMORROW'S TECHNOLOGY, TODAY.                          |

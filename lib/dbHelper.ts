@@ -81,7 +81,7 @@ if (!globalRef.__nexbyteMockDb) {
       ...p,
       stock: p.stock ?? 12,
       discount: 10,
-      warranty: "1 Year Nex LapTech Warranty",
+      warranty: "1 Year NexLapTech Warranty",
       condition: p.category.includes("used") || p.category.includes("second") ? "premium_used" : "new",
       status: "show",
       featured: p.id === "p1" || p.id === "p2",
@@ -214,21 +214,21 @@ if (!globalRef.__nexbyteMockDb) {
     ],
     cms_content: {
       hero: {
-        headline: "Premium IT Solutions — Nex LapTech",
+        headline: "Premium IT Solutions — NexLapTech",
         subheadline: "Laptops, Gaming PCs, Servers, Accessories, Repairs & Academy Training.",
         cta: "Explore Products",
         secondary_cta: "Book a Service",
       },
       seo: {
-        title: "Nex LapTech — Hardware, Repairs & IT Training",
-        description: "Nex LapTech offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training.",
-        keywords: "laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, Nex LapTech",
+        title: "NexLapTech — Hardware, Repairs & IT Training",
+        description: "NexLapTech offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training.",
+        keywords: "laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, NexLapTech",
         og_image: "/images/poster-products.png",
       },
       footer: {
         tagline: "Your trusted partner for premium IT solutions.",
         address: "Bengaluru, Karnataka",
-        copyright: "© 2026 Nex LapTech. All rights reserved.",
+        copyright: "© 2026 NexLapTech. All rights reserved.",
       },
       contact_info: {
         phone1: "+91 8088979706",
@@ -1661,7 +1661,7 @@ export const dbHelper = {
       // 1. Create Admin Notification
       await dbHelper.notifications.create({
         title: "⭐ New Customer Review",
-        message: `${savedData.customer_name || "Customer"} left a ${savedData.rating}★ review for ${savedData.service_used || savedData.product_purchased || "Nex LapTech Services"}`,
+        message: `${savedData.customer_name || "Customer"} left a ${savedData.rating}★ review for ${savedData.service_used || savedData.product_purchased || "NexLapTech Services"}`,
         type: "review",
         meta: { review_id: savedData.id }
       });
@@ -1704,7 +1704,7 @@ export const dbHelper = {
         });
         await dbHelper.notifications.create({
           title: "✅ Review Approved!",
-          message: "Your review has been approved and is now publicly visible on Nex LapTech.",
+          message: "Your review has been approved and is now publicly visible on NexLapTech.",
           type: "review_update",
           customer_email: savedData.email
         });
@@ -1747,7 +1747,7 @@ export const dbHelper = {
         if (updates.admin_reply) {
           await dbHelper.notifications.create({
             title: "💬 Admin Replied to Your Review",
-            message: `Nex LapTech Team replied: "${updates.admin_reply}"`,
+            message: `NexLapTech Team replied: "${updates.admin_reply}"`,
             type: "review_reply",
             customer_email: savedData.email
           });
@@ -2858,7 +2858,7 @@ export const dbHelper = {
 
       return savedData;
     },
-    async reply(id: string, replyText: string, replyBy: string = "Nex LapTech Support") {
+    async reply(id: string, replyText: string, replyBy: string = "NexLapTech Support") {
       const payload = {
         admin_reply: replyText,
         reply: replyText,

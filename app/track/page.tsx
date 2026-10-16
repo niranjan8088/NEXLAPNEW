@@ -116,7 +116,7 @@ export default function TrackPage() {
       });
       setInfoReplyText((prev) => ({ ...prev, [internshipId]: "" }));
       handleSearchQuery(searchVal);
-      alert("Your response has been sent to the Nex LapTech team.");
+      alert("Your response has been sent to the NexLapTech team.");
     } catch {
       alert("Failed to send response.");
     }
@@ -368,7 +368,7 @@ export default function TrackPage() {
                             type="text"
                             value={infoReplyText[intern.id] || ""}
                             onChange={(e) => setInfoReplyText((prev) => ({ ...prev, [intern.id]: e.target.value }))}
-                            placeholder="Type your response to Nex LapTech team..."
+                            placeholder="Type your response to NexLapTech team..."
                             className="flex-1 bg-nex-ink border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
                           />
                           <button
@@ -409,7 +409,7 @@ export default function TrackPage() {
                     {/* Customer-Facing Reply Message */}
                     {intern.customer_reply && intern.status !== "more_info_required" && intern.status !== "rejected" && (
                       <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-white space-y-1">
-                        <span className="text-[10px] font-bold text-cyan-400 uppercase block">Message from Nex LapTech Team:</span>
+                        <span className="text-[10px] font-bold text-cyan-400 uppercase block">Message from NEXLAPTECH Team:</span>
                         <p className="leading-relaxed">{intern.customer_reply}</p>
                       </div>
                     )}
@@ -420,7 +420,7 @@ export default function TrackPage() {
                         <div className="flex items-center gap-3">
                           <Award className="h-8 w-8 text-teal-400 shrink-0" />
                           <div>
-                            <h4 className="font-bold text-white text-xs">Official Nex LapTech Completion Certificate Issued</h4>
+                            <h4 className="font-bold text-white text-xs">Official NEXLAPTECH Completion Certificate Issued</h4>
                             <p className="text-[10px] text-teal-300 font-mono mt-0.5">Registration ID: {intern.certificate_id}</p>
                           </div>
                         </div>
@@ -480,7 +480,7 @@ export default function TrackPage() {
                     {/* Customer Facing Reply Message */}
                     {enquiry.customer_reply && (
                       <div className="mt-6 border-t border-white/5 pt-4 p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-white">
-                        <span className="text-[10px] font-bold text-cyan-400 uppercase block mb-1">Message from Nex LapTech Team:</span>
+                        <span className="text-[10px] font-bold text-cyan-400 uppercase block mb-1">Message from NEXLAPTECH Team:</span>
                         <p className="leading-relaxed">{enquiry.customer_reply}</p>
                       </div>
                     )}
@@ -488,7 +488,7 @@ export default function TrackPage() {
                     {/* Recommended Products */}
                     {enquiry.recommended_products && enquiry.recommended_products.length > 0 && (
                       <div className="mt-6 border-t border-white/5 pt-4 space-y-3">
-                        <span className="text-[10px] font-bold uppercase text-cyan-400 tracking-wider block">Recommended Laptops by Nex LapTech</span>
+                        <span className="text-[10px] font-bold uppercase text-cyan-400 tracking-wider block">Recommended Laptops by NEXLAPTECH</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {enquiry.recommended_products.map((prod: any) => (
                             <div key={prod.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/10">

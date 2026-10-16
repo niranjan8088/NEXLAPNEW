@@ -103,7 +103,7 @@ export default function Hero() {
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-2 rounded-full bg-nex-blue/10 border border-nex-blue/20 px-3.5 py-1 text-xs font-bold text-nex-blue dark:text-nex-blueLight mb-4 shadow-sm">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>Nex LapTech Services</span>
+            <span>NEXLAPTECH Services</span>
           </div>
 
           <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
@@ -111,7 +111,7 @@ export default function Hero() {
           </h1>
 
           <p className="mt-3.5 text-sm sm:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            Buy computers, repair your device, upgrade your system, or book a service — Nex LapTech makes it simple.
+            Buy computers, repair your device, upgrade your system, or book a service — NexLapTech makes it simple.
           </p>
 
           {/* Quick Search Input */}

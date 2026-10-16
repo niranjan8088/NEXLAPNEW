@@ -481,7 +481,7 @@ export default function CheckoutPage() {
                     <label className="block text-slate-700 font-semibold mb-1">Company Registered Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. Nex LapTech Private Limited"
+                      placeholder="e.g. NexLapTech Private Limited"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -666,7 +666,7 @@ export default function CheckoutPage() {
 
               <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
                 <p>🔒 256-Bit SSL Encrypted &amp; Server-Verified Transaction</p>
-                <p>Official Nex LapTech Tax Invoice generated automatically upon placement.</p>
+                <p>Official NexLapTech Tax Invoice generated automatically upon placement.</p>
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 /**
- * NEX LAPTECH — DYNAMIC CATALOG FILTER ENGINE
+ * NEXLAPTECH — DYNAMIC CATALOG FILTER ENGINE
  * Dynamic filter definitions registry, category-aware filter loader,
  * product specification evaluator, and dynamic filter option calculator.
  */

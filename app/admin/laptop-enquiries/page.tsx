@@ -227,7 +227,7 @@ function LaptopEnquiriesContent() {
               <tbody>
                 {filtered.map((e) => {
                   const statusCfg = STATUS_OPTIONS.find((s) => s.value === e.status) || STATUS_OPTIONS[0];
-                  const waText = encodeURIComponent(`Hi ${e.customer_name}, this is Nex LapTech regarding your laptop enquiry ${e.reference_id || ""}. We reviewed your requirements (${e.laptop_type}) and would like to share suitable laptop options.`);
+                  const waText = encodeURIComponent(`Hi ${e.customer_name}, this is NexLapTech regarding your laptop enquiry ${e.reference_id || ""}. We reviewed your requirements (${e.laptop_type}) and would like to share suitable laptop options.`);
                   
                   return (
                     <tr key={e.id} className="border-b border-white/[0.03] hover:bg-white/[0.01] transition-colors">

@@ -142,7 +142,7 @@ export default function AdminInternshipsPage() {
   const handleConfirmApproval = async () => {
     await handleSaveAppDetails({
       status: "approved",
-      mentor: mentorText || "Nex LapTech Senior Tech Lead",
+      mentor: mentorText || "NexLapTech Senior Tech Lead",
       batch: batchText || "Batch A - 2026",
       customer_reply: `Congratulations! Your internship application ${selectedApp?.application_id} has been approved.`
     });

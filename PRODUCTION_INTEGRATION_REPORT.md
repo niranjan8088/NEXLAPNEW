@@ -1,7 +1,7 @@
-# NEX LAPTECH — FINAL LIVE PRODUCTION VALIDATION REPORT
+# NEXLAPTECH — FINAL LIVE PRODUCTION VALIDATION REPORT
 
 **Date**: July 30, 2026  
-**Project**: NEX LAPTECH Web Platform  
+**Project**: NEXLAPTECH Web Platform
 **Target Domains**: `https://nexbyte360.com`, `https://www.nexbyte360.com`  
 **Target Architecture**: Cloudflare (DNS/Security) $\rightarrow$ Vercel (Next.js 15 App Router & API Handlers) $\rightarrow$ Supabase (PostgreSQL / Auth / Realtime / Storage)
 
@@ -46,10 +46,10 @@
 
 ## 3. EXACT MANUAL ACTIONS REQUIRED BY USER
 
-To make NEX LAPTECH 100% live on `nexbyte360.com`, complete the following 4 steps:
+To make NEXLAPTECH 100% live on `nexbyte360.com`, complete the following 4 steps:
 
 ### STEP 1: SUPABASE DASHBOARD
-1. Go to [https://supabase.com](https://supabase.com) and create a new project named `NEX LAPTECH-PRODUCTION`.
+1. Go to [https://supabase.com](https://supabase.com) and create a new project named `NEXLAPTECH-PRODUCTION`.
 2. Open **SQL Editor** in your Supabase project dashboard.
 3. Copy the full contents of `docs/supabase_schema.sql` from your project repository, paste it into the SQL Editor, and click **RUN**.
 4. Go to **Project Settings $\rightarrow$ API** and copy:
@@ -58,7 +58,7 @@ To make NEX LAPTECH 100% live on `nexbyte360.com`, complete the following 4 step
    - **service_role secret key**
 
 ### STEP 2: VERCEL DASHBOARD
-1. Go to [https://vercel.com](https://vercel.com) and import your GitHub repository: `https://github.com/nirajan252006/NEX LAPTECH.git`.
+1. Go to [https://vercel.com](https://vercel.com) and import your GitHub repository: `https://github.com/nirajan252006/NEXLAPTECH.git`.
 2. Go to **Project Settings $\rightarrow$ Environment Variables** and add:
    ```env
    NEXT_PUBLIC_APP_URL=https://nexbyte360.com

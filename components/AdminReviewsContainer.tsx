@@ -590,7 +590,7 @@ export default function AdminReviewsContainer({ initialReviews }: Props) {
                     {/* Render existing Admin Reply */}
                     {review.admin_reply && (
                       <div className="rounded-xl border border-nex-blue/20 bg-nex-blue/5 p-3.5 text-xs text-white/90 max-w-2xl relative">
-                        <p className="font-semibold text-nex-blueLight">Response from Nex LapTech:</p>
+                        <p className="font-semibold text-nex-blueLight">Response from NexLapTech:</p>
                         <p className="mt-1">{review.admin_reply}</p>
                         {review.admin_reply_at && (
                           <p className="text-[9px] text-nex-mist mt-1">Replied on {formatDate(review.admin_reply_at)}</p>

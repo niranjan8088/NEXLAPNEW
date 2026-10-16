@@ -1,5 +1,5 @@
 -- ====================================================================
--- NEX LAPTECH — PRODUCTION SUPABASE POSTGRESQL SCHEMA
+-- NEXLAPTECH — PRODUCTION SUPABASE POSTGRESQL SCHEMA
 -- Target Database: Supabase PostgreSQL
 -- Realtime Tables: Enabled via supabase_realtime publication
 -- ====================================================================
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   specs JSONB,
   variants JSONB NOT NULL DEFAULT '[]'::jsonb,
   description TEXT,
-  warranty TEXT DEFAULT '1 Year Nex LapTech Warranty',
+  warranty TEXT DEFAULT '1 Year NexLapTech Warranty',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

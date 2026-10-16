@@ -132,7 +132,7 @@ function LoginPageContent() {
                   <BrandLogo width={64} height={64} sizes="36px" priority className="h-9 w-9" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-100">Nex LapTech</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-100">NexLapTech</p>
                   <p className="text-xl font-bold">Smart tech commerce</p>
                 </div>
               </div>
@@ -159,11 +159,11 @@ function LoginPageContent() {
 
           <div className="p-6 sm:p-8 lg:p-10">
             <div className="mb-8 flex items-center justify-between gap-3">
-              <Link href="/" className="inline-flex items-center gap-3" aria-label="Nex LapTech home">
+              <Link href="/" className="inline-flex items-center gap-3" aria-label="NexLapTech home">
                 <div className="rounded-full border border-slate-200 bg-slate-50 p-2">
                   <BrandLogo width={72} height={72} sizes="36px" priority className="h-9 w-9" />
                 </div>
-                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">NEX LAPTECH</span>
+                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">NEXLAPTECH</span>
               </Link>
 
               <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100">
@@ -339,7 +339,7 @@ function LoginPageContent() {
             <div className="mt-6 border-t border-slate-200 pt-5 text-center text-xs text-slate-500">
               {selectedRole === "reseller" ? (
                 <p>
-                  Want to sell on Nex LapTech? <Link href="/signup" className="font-bold text-violet-700 hover:underline">Become a partner</Link>
+                  Want to sell on NexLapTech? <Link href="/signup" className="font-bold text-violet-700 hover:underline">Become a partner</Link>
                 </p>
               ) : (
                 <p>

@@ -95,7 +95,7 @@ export default function AdminResellersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold text-white">Reseller Management</h1>
-          <p className="text-xs text-nex-mist mt-0.5">Approve, suspend, and manage Nex LapTech partner resellers.</p>
+          <p className="text-xs text-nex-mist mt-0.5">Approve, suspend, and manage NexLapTech partner resellers.</p>
         </div>
         <div className="flex items-center gap-2 text-xs font-bold text-nex-mist">
           <span className="bg-nex-blue/10 text-nex-blueLight border border-nex-blue/20 px-3 py-1.5 rounded-full">

@@ -188,7 +188,7 @@ export default function ResetPasswordPage() {
             Reset Your <span className="text-gradient-blue">Password.</span>
           </h1>
           <p className="mt-1 text-xs text-nex-mist">
-            Set a new secure password for your Nex LapTech account.
+            Set a new secure password for your NexLapTech account.
           </p>
         </div>
 

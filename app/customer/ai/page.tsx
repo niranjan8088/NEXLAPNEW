@@ -16,7 +16,7 @@ export default function CustomerAiPage() {
     {
       id: "m-init",
       sender: "ai",
-      text: "Hello! I am your Nex LapTech Customer AI Assistant. I can help track your hardware orders, check repair status, find promo codes, or answer questions about computer parts and services. How can I assist you today?",
+      text: "Hello! I am your NexLapTech Customer AI Assistant. I can help track your hardware orders, check repair status, find promo codes, or answer questions about computer parts and services. How can I assist you today?",
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     },
   ]);
@@ -98,7 +98,7 @@ export default function CustomerAiPage() {
             <Sparkles className="h-3.5 w-3.5" /> Customer-Scoped AI Assistant
           </span>
           <h1 className="font-display text-2xl font-extrabold text-[#111827] dark:text-white tracking-tight">
-            Nex LapTech AI Assistant
+            NexLapTech AI Assistant
           </h1>
           <p className="text-xs text-[#667085] dark:text-[#A1A1AA]">
             Instant support for your hardware orders, service requests, active deals, and technical queries.
@@ -151,7 +151,7 @@ export default function CustomerAiPage() {
               </div>
               <div className="rounded-2xl bg-[#F7F8FC] dark:bg-[#151518] p-3 text-xs text-[#667085] dark:text-[#A1A1AA] flex items-center gap-2 border border-[#E5E7EB] dark:border-[#27272A]">
                 <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#4F46E5]" />
-                <span>Checking your Nex LapTech account details...</span>
+                <span>Checking your NexLapTech account details...</span>
               </div>
             </div>
           )}

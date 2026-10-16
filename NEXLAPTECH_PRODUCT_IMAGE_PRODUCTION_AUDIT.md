@@ -1,4 +1,4 @@
-# Nex LapTech Product Multi-Image System — Production Hardening Audit
+# NexLapTech Product Multi-Image System — Production Hardening Audit
 
 **Audit Date**: 2026-07-31  
 **Target Environment**: Production Ready (Vercel + Supabase Storage / PostgreSQL)  
@@ -8,7 +8,7 @@
 
 ## 1. System Architecture
 
-The Nex LapTech Product Multi-Image System provides a production-hardened pipeline for product media management across the Admin Portal (`/admin/products`) and Customer Portal (`/products`).
+The NexLapTech Product Multi-Image System provides a production-hardened pipeline for product media management across the Admin Portal (`/admin/products`) and Customer Portal (`/products`).
 
 ```
 [ Admin Portal Modal ]

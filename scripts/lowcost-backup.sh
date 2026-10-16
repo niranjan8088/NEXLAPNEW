@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Nex LapTech Low-Cost Database & System Backup Script
+# NEXLAPTECH Low-Cost Database & System Backup Script
 # Purges backups older than 14 days to preserve low-cost VPS disk space
 
 set -e

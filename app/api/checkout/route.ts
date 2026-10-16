@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
       shipping_fee: shippingFee,
       total_amount: grandTotal,
       gst_details: gstDetails?.isGstInvoice ? gstDetails : null,
-      courier: deliveryOption === "express" ? "Nex LapTech Priority Express" : "Nex LapTech Standard Logistics",
+      courier: deliveryOption === "express" ? "NexLapTech Priority Express" : "NexLapTech Standard Logistics",
       tracking_number: `NEX-TRK-${Math.floor(100000 + Math.random() * 900000)}`,
       created_at: new Date().toISOString(),
     };

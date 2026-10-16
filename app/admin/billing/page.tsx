@@ -406,12 +406,12 @@ export default function AdminBillingPage() {
     const invNum = target.invoiceNumber || target.invoice_number;
     const token = target.shareToken || target.share_token || target.id;
     const shareUrl = `${window.location.origin}/invoice/view/${token}`;
-    const shareText = `Nex LapTech Invoice ${invNum} for ${target.customerName || target.customer_name}. Total: ${formatRupees(target.grandTotal || target.grand_total)}`;
+    const shareText = `NexLapTech Invoice ${invNum} for ${target.customerName || target.customer_name}. Total: ${formatRupees(target.grandTotal || target.grand_total)}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Nex LapTech Invoice ${invNum}`,
+          title: `NEXLAPTECH Invoice ${invNum}`,
           text: shareText,
           url: shareUrl
         });
@@ -511,7 +511,7 @@ export default function AdminBillingPage() {
                   Admin Billing &amp; Invoices
                 </h1>
                 <p className="text-xs text-[#94A3B8]">
-                  Create, calculate, issue &amp; manage tax-compliant Nex LapTech invoices.
+                  Create, calculate, issue &amp; manage tax-compliant NexLapTech invoices.
                 </p>
               </div>
             </div>
@@ -1142,7 +1142,7 @@ export default function AdminBillingPage() {
                         <BrandLogo width={64} height={64} className="h-full w-full" />
                       </div>
                       <span className="font-bold text-base tracking-tight text-slate-900">
-                        Nex LapTech
+                        NexLapTech
                       </span>
                     </div>
                     <p className="text-[10px] text-slate-500 font-medium">
@@ -1313,7 +1313,7 @@ export default function AdminBillingPage() {
 
                 {/* Footer Terms */}
                 <div className="border-t border-slate-200 pt-3 text-[9px] text-slate-400 text-center space-y-0.5">
-                  <p>Thank you for choosing Nex LapTech!</p>
+                  <p>Thank you for choosing NexLapTech!</p>
                   <p>Computers • Laptop Service • Gaming PCs • Bulk IT Hardware • CCTV Systems</p>
                 </div>
 
@@ -1604,7 +1604,7 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
                       <BrandLogo width={64} height={64} className="h-full w-full" />
             </div>
             <span className="font-bold text-base tracking-tight text-slate-900">
-              Nex LapTech
+              NexLapTech
             </span>
           </div>
           <p className="text-[10px] text-slate-500 font-semibold">
@@ -1783,7 +1783,7 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
 
       {/* Footer */}
       <div className="border-t border-slate-200 pt-3 text-[9px] text-slate-400 text-center space-y-0.5">
-        <p>Thank you for choosing Nex LapTech!</p>
+        <p>Thank you for choosing NexLapTech!</p>
         <p>Computers • Laptop Service • Gaming PCs • Bulk IT Hardware • CCTV Systems</p>
       </div>
     </div>

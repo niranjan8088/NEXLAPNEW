@@ -97,10 +97,19 @@ export default function Navbar() {
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Logo */}
-          <Link href={isAuthenticated ? "/customer" : "/"} className="flex items-center gap-2.5 group shrink-0">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full border border-blue-100 bg-white shadow-sm sm:h-11 sm:w-11">
-              <BrandLogo width={120} height={120} sizes="44px" priority className="h-full w-full" />
-            </div>
+          <Link
+            href={isAuthenticated ? "/customer" : "/"}
+            aria-label="NEXLAPTECH home"
+            className="flex h-10 w-40 shrink-0 items-center sm:h-11 sm:w-[180px]"
+          >
+            <BrandLogo
+              variant="horizontal"
+              width={1200}
+              height={300}
+              sizes="(max-width: 640px) 160px, 180px"
+              priority
+              className="h-full w-full"
+            />
           </Link>
 
           {/* Primary Navigation Links (Desktop) */}
@@ -405,4 +414,3 @@ export default function Navbar() {
     </>
   );
 }
-

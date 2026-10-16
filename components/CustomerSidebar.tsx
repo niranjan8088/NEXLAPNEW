@@ -375,7 +375,7 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen }: CustomerS
               </div>
 
               <p className="text-xs text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
-                Sign out of your Nex LapTech account? You will need to sign in again to access your orders, bookings, and profile.
+                Sign out of your NexLapTech account? You will need to sign in again to access your orders, bookings, and profile.
               </p>
 
               <div className="flex items-center justify-end gap-2 pt-2">

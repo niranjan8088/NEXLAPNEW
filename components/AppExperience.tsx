@@ -252,7 +252,7 @@ export default function AppExperience({ children }: { children: React.ReactNode 
             </div>
             <span className="nexlap-progress-number">{entryProgress}%</span>
           </div>
-          <p className="nexlap-loader-caption">Powering up Nex LapTech…</p>
+          <p className="nexlap-loader-caption">Powering up NexLapTech…</p>
         </div>
       </div>
 

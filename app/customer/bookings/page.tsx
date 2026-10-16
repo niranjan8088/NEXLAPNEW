@@ -173,7 +173,7 @@ export default function CustomerBookingsPage() {
                     {/* Admin Reply / Notes */}
                     {booking.replyMessage && (
                       <div className="mt-2 p-3 rounded-xl bg-[#EEF6FF] dark:bg-[#1a2744] border border-[#2563EB]/20 dark:border-[#60A5FA]/20">
-                        <p className="text-[11px] font-bold text-[#2563EB] dark:text-[#60A5FA] mb-1">Nex LapTech Response:</p>
+                        <p className="text-[11px] font-bold text-[#2563EB] dark:text-[#60A5FA] mb-1">NexLapTech Response:</p>
                         <p className="text-xs text-[#64748B] dark:text-[#94A3B8]">{booking.replyMessage}</p>
                       </div>
                     )}

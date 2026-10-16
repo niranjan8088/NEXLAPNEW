@@ -2,7 +2,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runPhase4Tests() {
   console.log("==================================================");
-  console.log("NEX LAPTECH PHASE 4: PRODUCT DETAILS & PURCHASE SUITE");
+  console.log("NEXLAPTECH PHASE 4: PRODUCT DETAILS & PURCHASE SUITE");
   console.log("==================================================");
 
   let passed = 0;

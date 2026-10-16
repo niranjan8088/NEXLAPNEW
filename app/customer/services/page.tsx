@@ -92,7 +92,7 @@ export default function CustomerServicesPage() {
       {/* Header */}
       <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#E6EAF0] dark:border-white/10 p-6 sm:p-8 shadow-sm space-y-2">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300">
-          <Wrench className="h-3.5 w-3.5 text-sky-600" /> Nex LapTech Service Center
+          <Wrench className="h-3.5 w-3.5 text-sky-600" /> NexLapTech Service Center
         </span>
         <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Professional Computer &amp; IT Services

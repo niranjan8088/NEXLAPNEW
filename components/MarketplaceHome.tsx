@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  Camera,
   Cpu,
   HardDrive,
+  Headphones,
   Keyboard,
   Laptop,
+  MemoryStick,
   Monitor,
+  Mouse,
   Search,
   ShieldCheck,
   ShoppingBag,
@@ -32,11 +34,13 @@ interface MarketplaceHomeProps {
 
 const categories = [
   { label: "Laptops", query: "business_laptops", Icon: Laptop, tone: "blue" },
-  { label: "Gaming PCs", query: "gaming_pcs", Icon: Cpu, tone: "violet" },
-  { label: "Storage", query: "storage", Icon: HardDrive, tone: "cyan" },
-  { label: "Peripherals", query: "peripherals", Icon: Keyboard, tone: "amber" },
-  { label: "Monitors", query: "monitors", Icon: Monitor, tone: "emerald" },
-  { label: "CCTV & security", query: "cctv", Icon: Camera, tone: "rose" },
+  { label: "Desktops", query: "desktop_systems", Icon: Monitor, tone: "violet" },
+  { label: "Processors", query: "desktop_components", Icon: Cpu, tone: "cyan" },
+  { label: "RAM", query: "ram", Icon: MemoryStick, tone: "amber" },
+  { label: "SSDs", query: "storage", Icon: HardDrive, tone: "emerald" },
+  { label: "Keyboards", query: "peripherals", Icon: Keyboard, tone: "rose" },
+  { label: "Mouse", query: "peripherals", Icon: Mouse, tone: "blue" },
+  { label: "Headsets", query: "audio", Icon: Headphones, tone: "cyan" },
 ];
 
 export default function MarketplaceHome({
@@ -91,7 +95,7 @@ export default function MarketplaceHome({
   const featuredProducts = products.slice(0, 8);
 
   return (
-    <div className="min-h-screen bg-[#f6f9fd] text-slate-900">
+    <div className="min-h-screen bg-[#F5F8FF] text-slate-900">
       <Navbar />
       <main className="mx-auto max-w-7xl px-4 pb-12 pt-24 sm:px-6 lg:px-8">
         <section className="overflow-hidden rounded-[28px] border border-blue-100 bg-white shadow-[0_12px_40px_rgba(30,64,175,0.07)]">
@@ -104,7 +108,7 @@ export default function MarketplaceHome({
                 Find the right tech. Make it yours.
               </h1>
               <p className="mt-4 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-                Shop laptops, components, gaming systems, and trusted accessories with local support from Nex LapTech.
+                Shop laptops, components, gaming systems, and trusted accessories with local support from NexLapTech.
               </p>
               <form onSubmit={submitSearch} className="mt-6 flex max-w-2xl gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100">
                 <Search className="ml-2 mt-2.5 h-5 w-5 shrink-0 text-blue-700" />
@@ -156,7 +160,7 @@ export default function MarketplaceHome({
               All categories <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
             {categories.map(({ label, query, Icon, tone }) => {
               const toneStyles: Record<string, string> = {
                 blue: "bg-blue-50 text-blue-700 group-hover:bg-blue-100",

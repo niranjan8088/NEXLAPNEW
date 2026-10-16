@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Nex LapTech One-Click Rollback Script
+# NEXLAPTECH One-Click Rollback Script
 set -e
 
 echo "========================================================="

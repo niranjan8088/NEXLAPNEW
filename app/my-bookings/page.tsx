@@ -269,7 +269,7 @@ export default function MyBookingsPage() {
                   {booking.replyMessage && (
                     <div className="glass-card p-6 bg-nex-ink border border-nex-blue/10 rounded-2xl bg-gradient-to-br from-nex-blue/[0.02] to-transparent shadow-[0_0_20px_rgba(30,94,255,0.06)]">
                       <h3 className="font-display text-sm font-bold text-white mb-4 flex items-center gap-2">
-                        <MessageSquare className="h-4.5 w-4.5 text-nex-blueLight" /> Official Reply from Nex LapTech
+                        <MessageSquare className="h-4.5 w-4.5 text-nex-blueLight" /> Official Reply from NexLapTech
                       </h3>
                       <div className="p-4.5 rounded-xl bg-white/[0.03] border border-white/10 text-xs text-white/95 whitespace-pre-line leading-relaxed">
                         {booking.replyMessage}
@@ -292,7 +292,7 @@ export default function MyBookingsPage() {
                           return (
                             <div className="text-center py-16 space-y-1">
                               <p className="text-xs text-white/70">No message history yet.</p>
-                              <p className="text-[10px] text-nex-mist">Type a message below to start two-way chat with Nex LapTech technical support.</p>
+                              <p className="text-[10px] text-nex-mist">Type a message below to start two-way chat with NexLapTech technical support.</p>
                             </div>
                           );
                         }
@@ -315,7 +315,7 @@ export default function MyBookingsPage() {
                                 {msg.message}
                               </div>
                               <span className="text-[9px] text-white/30 mt-1">
-                                {isAdmin ? "Nex LapTech Support" : "You"} •{" "}
+                                {isAdmin ? "NexLapTech Support" : "You"} •{" "}
                                 {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                               </span>
                             </div>

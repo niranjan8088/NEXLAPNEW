@@ -36,12 +36,12 @@ export async function PATCH(request: NextRequest) {
     // PIPELINE EVENT (ADMIN → RESELLER ONBOARDING STATUS)
     let eventType: any = "RESELLER_APPROVED";
     let title = "Reseller Account Approved 🎉";
-    let msg = `Your Nex LapTech reseller application for ${updated?.business_name || "your business"} has been approved!`;
+    let msg = `Your NexLapTech reseller application for ${updated?.business_name || "your business"} has been approved!`;
 
     if (status === "suspended") {
       eventType = "RESELLER_SUSPENDED";
       title = "Reseller Account Suspended ⚠️";
-      msg = `Your reseller partner account has been suspended. Please contact Nex LapTech Admin.`;
+      msg = `Your reseller partner account has been suspended. Please contact NexLapTech Admin.`;
     } else if (status === "rejected") {
       eventType = "RESELLER_REJECTED";
       title = "Reseller Application Status";

@@ -167,7 +167,7 @@
       // PAGE 1: TITLE PAGE, EXECUTIVE DASHBOARD & SPECS
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.coverHeader },
-          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEXLAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "ENTERPRISE QA, SECURITY & DEPLOYMENT AUDIT REPORT"),
           React.createElement(View, { style: styles.metaRow },
             React.createElement(Text, { style: styles.metaText }, "Version: v1.0.0 Enterprise (#1042)"),
@@ -231,7 +231,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Report"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Enterprise Report"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -315,7 +315,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Report"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Enterprise Report"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -355,7 +355,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Report"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Enterprise Report"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -410,7 +410,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Report"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Enterprise Report"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -451,19 +451,19 @@
         React.createElement(View, { style: styles.banner },
           React.createElement(Text, { style: styles.bannerTitle }, "✓ CERTIFICATE OF ENTERPRISE PRODUCTION READINESS"),
           React.createElement(Text, { style: styles.bannerText },
-            "The Nex LapTech enterprise application has passed all 428 test cases, load benchmarks, security requirements, and bi-directional realtime synchronization criteria. Certified 100% Production Ready."
+            "The NexLapTech enterprise application has passed all 428 test cases, load benchmarks, security requirements, and bi-directional realtime synchronization criteria. Certified 100% Production Ready."
           )
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Report"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Enterprise Report"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )
     )
   );
 
-  await ReactPDF.renderToFile(React.createElement(QAReportPDF), "NexByte_Enterprise_QA_Report.pdf");
-  await ReactPDF.renderToFile(React.createElement(QAReportPDF), "NexByte_Enterprise_QA_Final_Report.pdf");
+  await ReactPDF.renderToFile(React.createElement(QAReportPDF), "NexLapTech_Enterprise_QA_Report.pdf");
+  await ReactPDF.renderToFile(React.createElement(QAReportPDF), "NexLapTech_Enterprise_QA_Final_Report.pdf");
   console.log("Both PDF Reports Rendered Successfully!");
 })();

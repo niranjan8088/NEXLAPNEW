@@ -3,7 +3,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runOffersSuite() {
   console.log("\n==================================================");
-  console.log("NEX LAPTECH ADMIN FULL OFFER CONTROL — AUTOMATED VERIFICATION SUITE");
+  console.log("NEXLAPTECH ADMIN FULL OFFER CONTROL — AUTOMATED VERIFICATION SUITE");
   console.log("==================================================\n");
 
   let passCount = 0;

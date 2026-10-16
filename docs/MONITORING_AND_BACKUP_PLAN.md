@@ -1,4 +1,4 @@
-# Nex LapTech - Monitoring, Backup & Disaster Recovery Plan
+# NexLapTech - Monitoring, Backup & Disaster Recovery Plan
 
 This document outlines the free monitoring strategy, automated backup retention, and disaster recovery protocol.
 

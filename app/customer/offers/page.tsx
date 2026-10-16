@@ -50,7 +50,7 @@ export default function CustomerOffersPage() {
           <Tag className="h-3.5 w-3.5 text-amber-500" /> Offers for You
         </span>
         <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Save More on Your Nex LapTech Purchase
+          Save More on Your NexLapTech Purchase
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
           Copy promo codes and apply them during checkout or service booking to unlock instant savings on laptops, parts, and technician services.

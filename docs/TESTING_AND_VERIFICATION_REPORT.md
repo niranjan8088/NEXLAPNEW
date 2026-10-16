@@ -1,7 +1,7 @@
 # TESTING AND VERIFICATION REPORT
 
 **Document Revision Date:** October 9, 2026  
-**Project:** Nex LapTech
+**Project:** NexLapTech
 
 ---
 

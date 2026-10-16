@@ -1,4 +1,4 @@
-# NEX LAPTECH
+# NEXLAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 7 & 8: Workflows & System Architecture
 

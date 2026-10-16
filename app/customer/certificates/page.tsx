@@ -48,13 +48,13 @@ export default function CustomerCertificatesPage() {
       <div className="relative overflow-hidden rounded-3xl bg-white dark:bg-[#0D0D0F] border border-[#E5E7EB] dark:border-[#27272A] p-6 sm:p-8 text-[#111827] dark:text-white shadow-xs">
         <div className="relative z-10 space-y-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF2FF] dark:bg-[#1E1638] border border-[#4F46E5]/20 dark:border-[#7C5CFF]/30 px-3 py-1 text-xs font-bold text-[#4F46E5] dark:text-[#7C5CFF]">
-            <Award className="h-4 w-4" /> Official Nex LapTech Certification Vault
+            <Award className="h-4 w-4" /> Official NexLapTech Certification Vault
           </span>
           <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
             My Verified Certificates
           </h1>
           <p className="text-xs sm:text-sm text-[#667085] dark:text-[#A1A1AA] max-w-2xl font-medium">
-            View, download, and share your official Nex LapTech Academy credentials with QR verification and unique Registration IDs.
+            View, download, and share your official NexLapTech Academy credentials with QR verification and unique Registration IDs.
           </p>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function CustomerCertificatesPage() {
             No certificates issued yet
           </h3>
           <p className="text-xs text-[#667085] dark:text-[#A1A1AA] max-w-sm mx-auto">
-            Certificates are automatically issued upon completion of your Nex LapTech IT Training or Academy Internship program.
+            Certificates are automatically issued upon completion of your NexLapTech IT Training or Academy Internship program.
           </p>
           <Link
             href="/customer/training"

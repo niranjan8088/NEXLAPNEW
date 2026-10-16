@@ -45,7 +45,7 @@ export default function CustomerSupportPage() {
       a: "Go to your Bookings tab in the Customer Portal. You will see real-time updates as your assigned technician diagnoses and completes your service."
     },
     {
-      q: "What is covered under the Nex LapTech E-Warranty?",
+      q: "What is covered under the NexLapTech E-Warranty?",
       a: "Our E-Warranty covers hardware failures, motherboard faults, RAM/SSD issues, and keyboard defects. You can view full terms on the E-Warranty page."
     },
     {

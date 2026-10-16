@@ -3,7 +3,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runBillingSuite() {
   console.log("\n==================================================");
-  console.log("NEX LAPTECH ADMIN BILLING MODULE — AUTOMATED VERIFICATION SUITE");
+  console.log("NEXLAPTECH ADMIN BILLING MODULE — AUTOMATED VERIFICATION SUITE");
   console.log("==================================================\n");
 
   let passCount = 0;

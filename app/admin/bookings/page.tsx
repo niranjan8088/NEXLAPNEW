@@ -213,7 +213,7 @@ export default function AdminBookingsConsole() {
         sender: 'admin',
         replyMessage: replyText.trim(),
         replyDate: now,
-        replyBy: 'Nex LapTech Admin',
+        replyBy: 'NexLapTech Admin',
         status: newStatus,
       }),
     });
@@ -263,7 +263,7 @@ export default function AdminBookingsConsole() {
           </style>
         </head>
         <body onload="window.print(); window.close();">
-          <h2>NEX LAPTECH - SERVICE BOOKING</h2>
+          <h2>NEXLAPTECH - SERVICE BOOKING</h2>
           <table>
             <tr><td class="label">Booking ID</td><td>${b.bookingId || b.id}</td></tr>
             <tr><td class="label">Customer Name</td><td>${b.customerName || b.customer_name}</td></tr>
@@ -277,7 +277,7 @@ export default function AdminBookingsConsole() {
             <tr><td class="label">Client message</td><td>${b.message || "None"}</td></tr>
             <tr><td class="label">Internal notes</td><td>${b.notes || "None"}</td></tr>
           </table>
-          <p style="margin-top: 50px; text-align: center; font-size: 11px;">Authorised Nex LapTech Service Center</p>
+          <p style="margin-top: 50px; text-align: center; font-size: 11px;">Authorised NexLapTech Service Center</p>
         </body>
       </html>
     `);
@@ -293,11 +293,11 @@ export default function AdminBookingsConsole() {
     if (!selectedBooking) return;
     if (type === "available") {
       setReplyText(
-        `Hello Sir/Madam,\n\nThank you for contacting Nex LapTech.\n\nWe are pleased to inform you that "${selectedBooking.productName}" is currently available.\n\n- Ref Price: ${selectedBooking.budget !== "N/A" ? selectedBooking.budget : "Standard rate"}\n- Warranty: 6 Months Nex LapTech Support\n\nPlease let us know if you would like to proceed with confirmation.\n\nBest regards,\nNex LapTech Team`
+        `Hello Sir/Madam,\n\nThank you for contacting NexLapTech.\n\nWe are pleased to inform you that "${selectedBooking.productName}" is currently available.\n\n- Ref Price: ${selectedBooking.budget !== "N/A" ? selectedBooking.budget : "Standard rate"}\n- Warranty: 6 Months NexLapTech Support\n\nPlease let us know if you would like to proceed with confirmation.\n\nBest regards,\nNexLapTech Team`
       );
     } else {
       setReplyText(
-        `Hello Sir/Madam,\n\nThank you for contacting Nex LapTech.\n\nCurrently, "${selectedBooking.productName}" is out of stock. We expect fresh units next week.\n\nWe can offer alternative specifications. Please reply to discuss options.\n\nBest regards,\nNex LapTech Team`
+        `Hello Sir/Madam,\n\nThank you for contacting NexLapTech.\n\nCurrently, "${selectedBooking.productName}" is out of stock. We expect fresh units next week.\n\nWe can offer alternative specifications. Please reply to discuss options.\n\nBest regards,\nNexLapTech Team`
       );
     }
   };

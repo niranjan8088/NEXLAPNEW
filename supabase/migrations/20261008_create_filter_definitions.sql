@@ -1,5 +1,5 @@
 -- ===================================================================
--- NEX LAPTECH — DYNAMIC E-COMMERCE CATALOG MIGRATION
+-- NEXLAPTECH — DYNAMIC E-COMMERCE CATALOG MIGRATION
 -- Migration: 20261008_create_filter_definitions.sql
 -- Description: Creates filter_definitions schema, populates default
 --              laptop filters, and adds optimized catalog indexes.

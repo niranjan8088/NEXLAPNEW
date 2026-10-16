@@ -71,13 +71,13 @@ export default function VerifyPage() {
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="section-eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-glow-blue" />
-              Nex LapTech Systems Accreditation
+              NexLapTech Systems Accreditation
             </span>
             <h1 className="font-display text-3xl font-black tracking-tight text-white sm:text-5xl">
               Verify <span className="text-gradient-blue">Certificate.</span>
             </h1>
             <p className="mt-3 text-xs text-nex-mist leading-relaxed">
-              Verify credentials issued by Nex LapTech. Enter the Registration ID to view authentic training records and placement certification.
+              Verify credentials issued by NexLapTech. Enter the Registration ID to view authentic training records and placement certification.
             </p>
           </div>
 
@@ -131,7 +131,7 @@ export default function VerifyPage() {
                     <span className="text-4xl block">⛔</span>
                     <h3 className="font-display text-xl font-bold text-red-400">Certificate Revoked</h3>
                     <p className="text-xs text-white/80 max-w-md mx-auto leading-relaxed">
-                      This accreditation record (<strong className="font-mono text-white">{certificate.registrationId}</strong> issued to {certificate.studentName}) has been officially <strong className="text-red-400">REVOKED</strong> by Nex LapTech and is no longer valid for academic or professional verification.
+                      This accreditation record (<strong className="font-mono text-white">{certificate.registrationId}</strong> issued to {certificate.studentName}) has been officially <strong className="text-red-400">REVOKED</strong> by NexLapTech and is no longer valid for academic or professional verification.
                     </p>
                     <div className="pt-2 text-[10px] text-red-300/60 font-mono">
                       Revocation Status: REVOKED • Issue Date: {certificate.completionDate || certificate.issueDate || "N/A"}
@@ -157,13 +157,13 @@ export default function VerifyPage() {
                             <Award className="h-6 w-6" />
                           </div>
                           <div className="text-left">
-                            <h3 className="font-display text-sm font-bold text-white print:text-black">Nex LapTech Academy</h3>
+                            <h3 className="font-display text-sm font-bold text-white print:text-black">NEXLAPTECH Academy</h3>
                             <span className="text-[9px] text-nex-mist uppercase tracking-widest block">Systems Certification Portal</span>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-3.5 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider print:bg-green-100 print:text-green-800 print:border-green-200">
-                          <ShieldCheck className="h-4 w-4 shrink-0" /> Verified by Nex LapTech
+                          <ShieldCheck className="h-4 w-4 shrink-0" /> Verified by NexLapTech
                         </div>
                       </div>
 
@@ -187,7 +187,7 @@ export default function VerifyPage() {
                             </div>
                             <div>
                               <span className="text-[10px] text-nex-mist block uppercase">College / Institution</span>
-                              <span className="font-bold text-white block mt-0.5 print:text-black">{certificate.college || "Nex LapTech Academy"}</span>
+                              <span className="font-bold text-white block mt-0.5 print:text-black">{certificate.college || "NEXLAPTECH Academy"}</span>
                             </div>
                             <div>
                               <span className="text-[10px] text-nex-mist block uppercase">Course Title</span>

@@ -81,7 +81,7 @@ export default function CustomerEWarrantyPage() {
           expiryDate: "2027-02-15",
           warrantyDuration: "1 Year",
           status: "active",
-          coverageTerms: "1 Year Nex LapTech Hardware & Motherboard Repair Guarantee including free diagnostic and battery replacement.",
+          coverageTerms: "1 Year NexLapTech Hardware & Motherboard Repair Guarantee including free diagnostic and battery replacement.",
           invoiceNumber: "NEX-2026-0129",
           customerName: "Valued Customer"
         },
@@ -95,7 +95,7 @@ export default function CustomerEWarrantyPage() {
           expiryDate: "2027-05-01",
           warrantyDuration: "3 Years",
           status: "active",
-          coverageTerms: "3 Years Brand Warranty with instant replacement support at Nex LapTech Authorized Hubs.",
+          coverageTerms: "3 Years Brand Warranty with instant replacement support at NexLapTech Authorized Hubs.",
           invoiceNumber: "NEX-2024-0412",
           customerName: "Valued Customer"
         }
@@ -148,7 +148,7 @@ export default function CustomerEWarrantyPage() {
 
         <div className="relative z-10 max-w-2xl space-y-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 mb-1">
-            <ShieldCheck className="h-4 w-4 text-[#0EA5E9]" /> Official Nex LapTech E-Warranty Vault
+            <ShieldCheck className="h-4 w-4 text-[#0EA5E9]" /> Official NexLapTech E-Warranty Vault
           </span>
           <h1 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             Digital Hardware Warranties &amp; RMA Portal
@@ -251,7 +251,7 @@ export default function CustomerEWarrantyPage() {
             <ShieldCheck className="h-5 w-5 text-emerald-500" />
             <span>My Hardware E-Warranties ({warranties.length})</span>
           </h2>
-          <span className="text-xs text-slate-500">Auto-linked with your Nex LapTech invoices</span>
+          <span className="text-xs text-slate-500">Auto-linked with your NEXLAPTECH invoices</span>
         </div>
 
         {loading ? (
@@ -336,7 +336,7 @@ export default function CustomerEWarrantyPage() {
             <div className="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
               <div>
                 <h2 className="font-display text-xl font-extrabold text-slate-900 tracking-tight">
-                  Nex LapTech
+                  NexLapTech
                 </h2>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
                   Official Electronic Warranty Certificate
@@ -379,7 +379,7 @@ export default function CustomerEWarrantyPage() {
               <div className="space-y-1 text-xs">
                 <h4 className="font-bold text-slate-900">Warranty Coverage Terms &amp; Conditions:</h4>
                 <p className="text-slate-600 leading-relaxed text-[11px] bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  {selectedWarrantyCert.coverageTerms} This electronic certificate certifies that the product identified by serial number {selectedWarrantyCert.serialNumber} is covered against manufacturing defects, hardware failure, and component malfunction under Nex LapTech official service terms.
+                  {selectedWarrantyCert.coverageTerms} This electronic certificate certifies that the product identified by serial number {selectedWarrantyCert.serialNumber} is covered against manufacturing defects, hardware failure, and component malfunction under NexLapTech official service terms.
                 </p>
               </div>
 
@@ -389,12 +389,12 @@ export default function CustomerEWarrantyPage() {
                   <QrCode className="h-12 w-12 text-slate-800" />
                   <div className="text-[10px] text-slate-500">
                     <p className="font-bold text-slate-800">Scan to Verify Warranty</p>
-                    <p>Nex LapTech Authorized Service Network</p>
+                    <p>NexLapTech Authorized Service Network</p>
                   </div>
                 </div>
 
                 <div className="text-right text-[10px] text-slate-500">
-                  <p className="font-bold text-slate-800">Nex LapTech Digital Stamp</p>
+                  <p className="font-bold text-slate-800">NexLapTech Digital Stamp</p>
                   <p>Bangalore, KA 560070</p>
                 </div>
               </div>

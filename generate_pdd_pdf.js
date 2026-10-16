@@ -167,7 +167,7 @@
       // PAGE 1: TITLE PAGE, OVERVIEW & INFORMATION ARCHITECTURE
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.coverHeader },
-          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEXLAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "MASTER PRODUCT DESIGN DOCUMENT (PDD) & UI/UX ARCHITECTURE BLUEPRINT"),
           React.createElement(View, { style: styles.metaRow },
             React.createElement(Text, { style: styles.metaText }, "Version: v2.0 Production Release"),
@@ -210,7 +210,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Product Design Document (PDD)"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Product Design Document (PDD)"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -248,7 +248,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Product Design Document (PDD)"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Product Design Document (PDD)"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -280,7 +280,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Product Design Document (PDD)"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Product Design Document (PDD)"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -311,7 +311,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Product Design Document (PDD)"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Product Design Document (PDD)"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -322,18 +322,18 @@
         React.createElement(View, { style: styles.banner },
           React.createElement(Text, { style: styles.bannerTitle }, "✓ MASTER PRODUCT DESIGN & UI/UX BLUEPRINT APPROVED"),
           React.createElement(Text, { style: styles.bannerText },
-            "This certifies that Nex LapTech Enterprise Product Design Document (PDD) and UI/UX Blueprint have been approved for client presentation, engineering implementation, and design system governance."
+            "This certifies that NexLapTech Enterprise Product Design Document (PDD) and UI/UX Blueprint have been approved for client presentation, engineering implementation, and design system governance."
           )
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Product Design Document (PDD)"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Product Design Document (PDD)"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )
     )
   );
 
-  await ReactPDF.renderToFile(React.createElement(PddPDF), "NexByte_Product_Design_Document_UIUX_Blueprint.pdf");
-  console.log("NexByte_Product_Design_Document_UIUX_Blueprint.pdf Generated Successfully!");
+  await ReactPDF.renderToFile(React.createElement(PddPDF), "NexLapTech_Product_Design_Document_UIUX_Blueprint.pdf");
+  console.log("NexLapTech_Product_Design_Document_UIUX_Blueprint.pdf Generated Successfully!");
 })();

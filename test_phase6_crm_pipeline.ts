@@ -2,7 +2,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runPhase6CrmPipelineTests() {
   console.log("==================================================");
-  console.log("NEX LAPTECH PHASE 6: CUSTOMER / ADMIN / RESELLER CRM SUITE");
+  console.log("NEXLAPTECH PHASE 6: CUSTOMER / ADMIN / RESELLER CRM SUITE");
   console.log("==================================================");
 
   let passed = 0;
@@ -54,7 +54,7 @@ async function runPhase6CrmPipelineTests() {
     const updatedOrder = await dbHelper.orders.update(newOrder.id, { status: "Shipped", tracking_number: "NEX-TRK-P6-991" });
     const custOrderNotif = await dbHelper.notifications.create({
       title: "🚚 Order Shipped",
-      message: `Your order #${newOrder.order_id} has been shipped via Nex LapTech Express.`,
+      message: `Your order #${newOrder.order_id} has been shipped via NexLapTech Express.`,
       type: "order",
       recipient_role: "customer",
       user_id: custId,
@@ -176,7 +176,7 @@ async function runPhase6CrmPipelineTests() {
     assert(customerToAdminMsg.id !== undefined, "11. Customer → Admin Message: Support ticket created for Admin");
 
     // 12. Admin → Customer Reply
-    const adminReply = await dbHelper.messages.reply(customerToAdminMsg.id, "Tax invoice has been attached to your order dashboard.", "Nex LapTech Support");
+    const adminReply = await dbHelper.messages.reply(customerToAdminMsg.id, "Tax invoice has been attached to your order dashboard.", "NexLapTech Support");
     assert(adminReply.admin_reply.includes("Tax invoice"), "12. Admin → Customer Reply: Admin response saved and linked to ticket");
 
     // 13. Customer Notification List

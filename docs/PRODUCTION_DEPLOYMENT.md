@@ -1,6 +1,6 @@
-# Nex LapTech - Enterprise Production VPS Deployment Guide
+# NexLapTech - Enterprise Production VPS Deployment Guide
 
-This document provides step-by-step instructions for deploying Nex LapTech on a Linux Cloud VPS (DigitalOcean / AWS EC2 / Hetzner / Linode) using **Nginx**, **PM2**, **Cloudflare**, and **Supabase**.
+This document provides step-by-step instructions for deploying NexLapTech on a Linux Cloud VPS (DigitalOcean / AWS EC2 / Hetzner / Linode) using **Nginx**, **PM2**, **Cloudflare**, and **Supabase**.
 
 ---
 
@@ -81,8 +81,8 @@ pm2 startup systemd
 
 ```bash
 # 1. Copy Nginx config
-sudo cp nginx/nexbyte.conf /etc/nginx/sites-available/nexbyte.conf
-sudo ln -sf /etc/nginx/sites-available/nexbyte.conf /etc/nginx/sites-enabled/
+sudo cp nginx/nexlaptech.conf /etc/nginx/sites-available/nexlaptech.conf
+sudo ln -sf /etc/nginx/sites-available/nexlaptech.conf /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 
 # 2. Test Nginx syntax
@@ -119,7 +119,7 @@ curl -i https://nexbyte.com/health
 
 # Output should return:
 # HTTP/2 200 
-# {"status":"HEALTHY","service":"Nex LapTech Enterprise API Backend",...}
+# {"status":"HEALTHY","service":"NexLapTech Enterprise API Backend",...}
 
 # 2. Check PM2 status
 pm2 status

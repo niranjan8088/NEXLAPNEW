@@ -167,7 +167,7 @@
       // PAGE 1: TITLE PAGE & BUSINESS ARCHITECTURE
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.coverHeader },
-          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEXLAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "MASTER UI/UX DESIGN BIBLE & ENTERPRISE PDD v1.0"),
           React.createElement(View, { style: styles.metaRow },
             React.createElement(Text, { style: styles.metaText }, "Version: v1.0 Master Design Bible"),
@@ -212,7 +212,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master UI/UX Design Bible v1.0"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master UI/UX Design Bible v1.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -243,7 +243,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master UI/UX Design Bible v1.0"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master UI/UX Design Bible v1.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -275,7 +275,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master UI/UX Design Bible v1.0"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master UI/UX Design Bible v1.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -307,7 +307,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master UI/UX Design Bible v1.0"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master UI/UX Design Bible v1.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -323,13 +323,13 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Master UI/UX Design Bible v1.0"),
+          React.createElement(Text, { style: styles.footerText }, "NexLapTech Master UI/UX Design Bible v1.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )
     )
   );
 
-  await ReactPDF.renderToFile(React.createElement(DesignBiblePDF), "NexByte_Master_UIUX_Design_Bible_v1.pdf");
-  console.log("NexByte_Master_UIUX_Design_Bible_v1.pdf Generated Successfully!");
+  await ReactPDF.renderToFile(React.createElement(DesignBiblePDF), "NexLapTech_Master_UIUX_Design_Bible_v1.pdf");
+  console.log("NexLapTech_Master_UIUX_Design_Bible_v1.pdf Generated Successfully!");
 })();

@@ -117,7 +117,7 @@ export default function CustomerInternshipPage() {
             <Briefcase className="h-4 w-4" /> Academic &amp; Industry Internships
           </span>
           <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Nex LapTech Student Internship Portal
+            NexLapTech Student Internship Portal
           </h1>
           <p className="text-xs sm:text-sm text-[#667085] dark:text-[#A1A1AA] max-w-2xl font-medium">
             Gain hands-on industry experience in Embedded Systems, Full-Stack Web Development, Cyber Security, and Hardware Engineering with official certification.

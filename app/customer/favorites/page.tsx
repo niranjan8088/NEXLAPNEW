@@ -12,7 +12,7 @@ export default function CustomerFavoritesPage() {
   const [favorites, setFavorites] = useState([
     {
       id: "fav-1",
-      name: "Nex LapTech ROG Slayer R15 Gaming PC",
+      name: "NexLapTech ROG Slayer R15 Gaming PC",
       category: "Gaming PC",
       price: 98500,
       image: "/images/product-gaming-desktops.png",

@@ -408,7 +408,7 @@ export default function ReviewsContainer({
                 {review.admin_reply && (
                   <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-[11px] leading-relaxed text-white/80">
                     <p className="font-semibold text-nex-blueLight flex items-center gap-1">
-                      Response from Nex LapTech:
+                      Response from NexLapTech:
                     </p>
                     <p className="mt-1">{review.admin_reply}</p>
                     {review.admin_reply_at && (

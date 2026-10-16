@@ -117,7 +117,7 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
             {/* Page title — desktop only */}
             <div className="hidden sm:flex flex-col min-w-0">
               <span className="text-[10px] font-bold text-[#0891B2] dark:text-[#0891B2] tracking-wider uppercase">
-                Nex LapTech
+                NEXLAPTECH
               </span>
               <h1 className="text-base font-extrabold text-[#0F172A] dark:text-[#F8FAFC] truncate">
                 {getPageTitle()}
@@ -214,7 +214,7 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
                       {/* User info */}
                       <div className="px-3 py-2.5 border-b border-[#E2E8F0] dark:border-[#263247] mb-1">
                         <p className="font-bold text-xs text-[#111827] dark:text-[#F8FAFC] truncate">
-                          {userProfile.full_name || "Nex LapTech Customer"}
+                          {userProfile.full_name || "NEXLAPTECH Customer"}
                         </p>
                         <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] truncate mt-0.5">{userProfile.email}</p>
                       </div>

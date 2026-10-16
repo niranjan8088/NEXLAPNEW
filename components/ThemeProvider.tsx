@@ -21,7 +21,7 @@ export interface ThemeConfig {
 export const THEME_PRESETS: Record<ThemeId, ThemeConfig> = {
   day: {
     id: "day",
-    name: "Nex LapTech Light",
+    name: "NexLapTech Light",
     description: "Premium light storefront experience",
     mode: "light",
     primary: "#2563EB",
@@ -32,7 +32,7 @@ export const THEME_PRESETS: Record<ThemeId, ThemeConfig> = {
   },
   night: {
     id: "night",
-    name: "Nex LapTech Light",
+    name: "NexLapTech Light",
     description: "Premium light storefront experience",
     mode: "light",
     primary: "#2563EB",
