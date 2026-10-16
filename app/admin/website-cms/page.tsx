@@ -50,15 +50,15 @@ export default function AdminWebsiteCMS() {
   const [loading, setLoading] = useState(true);
 
   // Hero fields
-  const [heroHeadline, setHeroHeadline] = useState("Premium IT Solutions — NexByte Technologies");
+  const [heroHeadline, setHeroHeadline] = useState("Premium IT Solutions — Nex LapTech");
   const [heroSubheadline, setHeroSubheadline] = useState("Laptops, Gaming PCs, Servers, Accessories, Repairs & Academy Training.");
   const [heroCTA, setHeroCTA] = useState("Explore Products");
   const [heroSecondaryCTA, setHeroSecondaryCTA] = useState("Book a Service");
 
   // SEO fields
-  const [metaTitle, setMetaTitle] = useState("NexByte Technologies — Hardware, Repairs & IT Training");
-  const [metaDescription, setMetaDescription] = useState("NexByte Technologies offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training in Tamil Nadu.");
-  const [metaKeywords, setMetaKeywords] = useState("laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, NexByte");
+  const [metaTitle, setMetaTitle] = useState("Nex LapTech — Hardware, Repairs & IT Training");
+  const [metaDescription, setMetaDescription] = useState("Nex LapTech offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training in Tamil Nadu.");
+  const [metaKeywords, setMetaKeywords] = useState("laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, Nex LapTech");
   const [ogImage, setOgImage] = useState("/images/poster-products.png");
 
   // Banners
@@ -70,7 +70,7 @@ export default function AdminWebsiteCMS() {
   const [prodSub, setProdSub] = useState("Premium hardware selection for students, professionals, and gamers.");
   const [srvTitle, setSrvTitle] = useState("Our IT Services");
   const [srvSub, setSrvSub] = useState("Motherboard repairs, software setups, network wiring, and CCTV integrations.");
-  const [trainTitle, setTrainTitle] = useState("NexByte Academy Training");
+  const [trainTitle, setTrainTitle] = useState("Nex LapTech Academy Training");
   const [trainSub, setTrainSub] = useState("Learn practical desktop and laptop repairing skills from certified engineers.");
   const [internTitle, setInternTitle] = useState("IEEE Project Internships");
   const [internSub, setInternSub] = useState("Submit candidate applications for engineering academic project slots.");

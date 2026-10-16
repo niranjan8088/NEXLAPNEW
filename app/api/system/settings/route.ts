@@ -18,9 +18,16 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { policy, forcedTheme } = body;
 
+    if (policy !== "personal" && policy !== "forced") {
+      return NextResponse.json({ success: false, error: "Policy must be personal or forced." }, { status: 400 });
+    }
+    if (forcedTheme !== "day" && forcedTheme !== "night") {
+      return NextResponse.json({ success: false, error: "Theme must be day or night." }, { status: 400 });
+    }
+
     const updated = await db.systemSettings.update(
-      policy || "personal",
-      forcedTheme || "day"
+      policy,
+      forcedTheme
     );
 
     return NextResponse.json({

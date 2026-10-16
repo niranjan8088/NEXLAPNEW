@@ -1,13 +1,13 @@
 # PENDING WORK AND ROADMAP
 
 **Document Revision Date:** October 9, 2026  
-**Project:** NexByte Technologies
+**Project:** Nex LapTech
 
 ---
 
 ## 📌 Status Summary
 
-The NexByte Technologies codebase is **Production Ready (v1.0)** with fully functional customer, admin, and reseller portals. The following enhancements represent post-v1 roadmap optimizations.
+The Nex LapTech codebase is **Production Ready (v1.0)** with fully functional customer, admin, and reseller portals. The following enhancements represent post-v1 roadmap optimizations.
 
 ---
 

@@ -73,6 +73,10 @@ export async function POST(request: Request) {
       paymentMethod,
       paymentStatus,
       amountPaid,
+      paymentReference,
+      paymentBank,
+      bankTransferType,
+      cardType,
     } = body;
 
     if (!customerName || !String(customerName).trim()) {
@@ -109,6 +113,30 @@ export async function POST(request: Request) {
         { error: "Invalid 15-character Indian GSTIN format." },
         { status: 400 }
       );
+    }
+
+    const validPaymentMethods = ["cash", "upi", "bank_transfer", "card", "other"];
+    if (paymentMethod && !validPaymentMethods.includes(paymentMethod)) {
+      return NextResponse.json({ error: "Invalid payment method." }, { status: 400 });
+    }
+
+    for (const [label, value] of [
+      ["Payment reference", paymentReference],
+      ["Bank name", paymentBank],
+    ] as const) {
+      if (value != null && (typeof value !== "string" || value.length > 120)) {
+        return NextResponse.json(
+          { error: `${label} must be 120 characters or fewer.` },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (bankTransferType && !["neft", "rtgs"].includes(bankTransferType)) {
+      return NextResponse.json({ error: "Invalid bank transfer type." }, { status: 400 });
+    }
+    if (cardType && !["debit", "credit"].includes(cardType)) {
+      return NextResponse.json({ error: "Invalid card type." }, { status: 400 });
     }
 
     const sanitizedItems = sanitizeInvoiceItems(items);
@@ -156,6 +184,14 @@ export async function POST(request: Request) {
       grandTotal: calculated.grandTotal,
       paymentMethod: paymentMethod || "cash",
       paymentStatus: calculated.paymentStatus,
+      paymentReference: ["upi", "bank_transfer", "card"].includes(paymentMethod)
+        ? String(paymentReference || "").trim()
+        : "",
+      paymentBank: ["bank_transfer", "card"].includes(paymentMethod)
+        ? String(paymentBank || "").trim()
+        : "",
+      bankTransferType: paymentMethod === "bank_transfer" ? bankTransferType || "neft" : "",
+      cardType: paymentMethod === "card" ? cardType || "debit" : "",
       amountPaidPaise: calculated.amountPaidPaise,
       amountPaid: calculated.amountPaid,
       balanceDuePaise: calculated.balanceDuePaise,

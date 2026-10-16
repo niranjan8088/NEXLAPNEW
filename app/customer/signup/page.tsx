@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import {
   User,
   Mail,
@@ -128,17 +128,10 @@ export default function CustomerSignUpPage() {
       <header className="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-slate-200/60 dark:border-white/5">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="relative h-9 w-9">
-            <Image
-              src="/images/logo-icon-transparent.png"
-              alt="NexByte Technologies"
-              fill
-              sizes="36px"
-              className="object-contain"
-              priority
-            />
+            <BrandLogo width={72} height={72} sizes="36px" priority className="h-full w-full" />
           </div>
           <span className="font-display text-lg font-bold">
-            NEX<span className="text-nex-blue">BYTE</span>
+            NEX LAPTECH
           </span>
         </Link>
 
@@ -167,7 +160,7 @@ export default function CustomerSignUpPage() {
                 All your tech needs in one account.
               </h1>
               <p className="mt-2.5 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                Join NexByte to manage hardware orders, laptop repairs, service bookings, and verified certificates.
+                Join Nex LapTech to manage hardware orders, laptop repairs, service bookings, and verified certificates.
               </p>
             </div>
 
@@ -202,7 +195,7 @@ export default function CustomerSignUpPage() {
                   <div>
                     <h3 className="font-display text-xl font-bold">Account created successfully!</h3>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                      Welcome to NexByte Technologies, <strong>{successName}</strong>. You can now sign in to your account.
+                      Welcome to Nex LapTech, <strong>{successName}</strong>. You can now sign in to your account.
                     </p>
                   </div>
                   <div className="pt-4">
@@ -219,10 +212,10 @@ export default function CustomerSignUpPage() {
                 <>
                   <div className="mb-6">
                     <h2 className="font-display text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                      Create your NexByte account
+                      Create your Nex LapTech account
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      Join NexByte to manage purchases, repairs and services in one place.
+                      Join Nex LapTech to manage purchases, repairs and services in one place.
                     </p>
                   </div>
 
@@ -434,7 +427,7 @@ export default function CustomerSignUpPage() {
 
       {/* Minimal Auth Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 border-t border-slate-200/60 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-        <p>© 2026 NexByte Technologies. All rights reserved.</p>
+        <p>© 2026 Nex LapTech. All rights reserved.</p>
         <div className="flex gap-4">
           <Link href="/contact" className="hover:text-nex-blue">Contact</Link>
           <Link href="/contact" className="hover:text-nex-blue">Privacy</Link>

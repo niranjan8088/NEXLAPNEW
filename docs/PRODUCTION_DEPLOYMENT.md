@@ -1,6 +1,6 @@
-# NexByte Technologies - Enterprise Production VPS Deployment Guide
+# Nex LapTech - Enterprise Production VPS Deployment Guide
 
-This document provides step-by-step instructions for deploying NexByte Technologies on a Linux Cloud VPS (DigitalOcean / AWS EC2 / Hetzner / Linode) using **Nginx**, **PM2**, **Cloudflare**, and **Supabase**.
+This document provides step-by-step instructions for deploying Nex LapTech on a Linux Cloud VPS (DigitalOcean / AWS EC2 / Hetzner / Linode) using **Nginx**, **PM2**, **Cloudflare**, and **Supabase**.
 
 ---
 
@@ -119,7 +119,7 @@ curl -i https://nexbyte.com/health
 
 # Output should return:
 # HTTP/2 200 
-# {"status":"HEALTHY","service":"NexByte Technologies Enterprise API Backend",...}
+# {"status":"HEALTHY","service":"Nex LapTech Enterprise API Backend",...}
 
 # 2. Check PM2 status
 pm2 status

@@ -2,287 +2,158 @@
 
 import { ChangeEvent, useMemo, useState } from "react";
 import * as XLSX from "xlsx";
-import { AlertCircle, CheckCircle2, Download, FileSpreadsheet, Loader2, Upload, X } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  FileSpreadsheet,
+  Loader2,
+  Upload,
+  X,
+} from "lucide-react";
 
 interface ProductCatalogImportProps {
   onImported: () => void;
 }
 
-interface ProductImportRow {
+type ImportAction = "add" | "variant" | "update" | "skip" | "review";
+type ImportStatus = "ready" | "review" | "invalid" | "duplicate";
+type ImportSource = {
+  sku: string;
+  title: string;
+  description: string;
+  category: string;
+  brand: string;
+  price: number | null;
+  compareAtPrice: number | null;
+  costPrice: number | null;
+  stock: number | null;
+  imageUrl: string;
+  condition: string;
+  specs: Record<string, string>;
+  parentSku: string;
+  variantGroup: string;
+  variantType: string;
+  variantValue: string;
+  variantSku: string;
+  variantPrice: number | null;
+  variantStock: number | null;
+  variantImageUrl: string;
+  variantSpecs: Record<string, string>;
+};
+interface ImportPreviewRow {
   rowNumber: number;
-  payload: Record<string, unknown>;
+  source: ImportSource;
   errors: string[];
-  variantCount: number;
+  warnings: string[];
+  status: ImportStatus;
+  action: ImportAction;
+  canAdd: boolean;
+  canAddVariant: boolean;
+  canUpdate: boolean;
+  isVariantMatch: boolean;
+  targetProductId?: string;
+  targetProductTitle?: string;
+  updateFields: string[];
+  selected: boolean;
+  fields: string[];
+}
+interface ImportResult {
+  rowNumber: number;
+  sku: string;
+  action: ImportAction;
+  status: "imported" | "updated" | "failed" | "skipped";
+  message: string;
 }
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
-const MAX_IMPORT_ROWS = 100;
-const HEADER_ALIASES: Record<string, string[]> = {
-  sku: ["sku", "productsku", "sellersku", "itemsku"],
-  title: ["title", "productname", "name", "itemname"],
-  description: ["description", "productdescription", "details"],
-  category: ["category", "productcategory", "department"],
-  brand: ["brand", "brandname", "manufacturer"],
-  price: ["price", "sellingprice", "saleprice"],
-  compareAtPrice: ["compareatprice", "mrp", "listprice", "originalprice"],
-  costPrice: ["costprice", "purchaseprice"],
-  stock: ["stock", "quantity", "qty", "inventory", "stockquantity"],
-  imageUrl: ["image", "imageurl", "productimage", "mainimage"],
-  condition: ["condition", "itemcondition"],
-  specs: ["specs", "specifications", "productspecs"],
-  variants: ["variants", "productvariants"],
-  variantName: ["variantname", "optionname"],
-  variantSku: ["variantsku", "optionsku"],
-  variantPrice: ["variantprice", "optionprice"],
-  variantCompareAtPrice: ["variantcompareatprice", "variantmrp"],
-  variantCostPrice: ["variantcostprice"],
-  variantStock: ["variantstock", "optionstock"],
-  variantImageUrl: ["variantimage", "variantimageurl", "optionimage"],
-  variantAttributes: ["variantattributes", "optionattributes"],
+const TEMPLATE_COLUMNS = [
+  "sku", "title", "description", "category", "brand", "price", "compareAtPrice",
+  "costPrice", "stock", "imageUrl", "condition", "specs", "parentSku",
+  "variantGroup", "variantType", "variantValue", "variantSku", "variantPrice",
+  "variantStock", "variantImageUrl", "variantSpecs",
+];
+const FIELD_LABELS: Record<string, string> = {
+  title: "Title",
+  description: "Description",
+  category: "Category",
+  brand: "Brand",
+  price: "Price",
+  compareAtPrice: "Compare-at price",
+  costPrice: "Cost price",
+  stock: "Stock",
+  imageUrl: "Image",
+  condition: "Condition",
+  specs: "Specifications",
+  variantType: "Variant type",
+  variantValue: "Variant value",
+  variantPrice: "Variant price",
+  variantStock: "Variant stock",
+  variantImageUrl: "Variant image",
+  variantSpecs: "Variant specifications",
+};
+const STATUS_LABELS: Record<ImportStatus, string> = {
+  ready: "Ready",
+  review: "Review required",
+  invalid: "Invalid",
+  duplicate: "SKU match / conflict",
 };
 
-function normalizeHeader(value: unknown) {
-  return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+function toCsvCell(value: unknown) {
+  let safeValue = String(value ?? "");
+  if (/^[\s]*[=+\-@]/.test(safeValue)) safeValue = `'${safeValue}`;
+  return `"${safeValue.replace(/"/g, '""')}"`;
 }
 
-function getField(row: Record<string, unknown>, field: string) {
-  const aliases = HEADER_ALIASES[field] || [field.toLowerCase()];
-  const key = Object.keys(row).find((header) => aliases.includes(normalizeHeader(header)));
-  return key ? row[key] : undefined;
-}
-
-function parseRows(rawRows: Record<string, unknown>[]): ProductImportRow[] {
-  const parsedRows = rawRows.map((row, index) => {
-    const title = String(getField(row, "title") ?? "").trim();
-    const category = String(getField(row, "category") ?? "").trim().toLowerCase().replace(/[\s&/]+/g, "_").replace(/[^a-z0-9_-]/g, "");
-    const priceValue = getField(row, "price");
-    const stockValue = getField(row, "stock");
-    const compareValue = getField(row, "compareAtPrice");
-    const costValue = getField(row, "costPrice");
-    const price = Number(priceValue);
-    const stock = stockValue === undefined || stockValue === "" ? 10 : Number(stockValue);
-    const compareAtPrice = compareValue === undefined || compareValue === "" ? undefined : Number(compareValue);
-    const costPrice = costValue === undefined || costValue === "" ? undefined : Number(costValue);
-    const sku = String(getField(row, "sku") ?? "").trim().toUpperCase();
-    const imageUrl = String(getField(row, "imageUrl") ?? "").trim();
-    const errors: string[] = [];
-    const specs: Record<string, string> = {};
-    const variantName = String(getField(row, "variantName") ?? "").trim();
-    const variantSku = String(getField(row, "variantSku") ?? "").trim().toUpperCase();
-    const variantPriceValue = getField(row, "variantPrice");
-    const variantPrice = variantPriceValue === undefined || variantPriceValue === "" ? undefined : Number(variantPriceValue);
-    const variantCompareValue = getField(row, "variantCompareAtPrice");
-    const variantCompareAtPrice = variantCompareValue === undefined || variantCompareValue === "" ? undefined : Number(variantCompareValue);
-    const variantCostValue = getField(row, "variantCostPrice");
-    const variantCostPrice = variantCostValue === undefined || variantCostValue === "" ? undefined : Number(variantCostValue);
-    const variantStockValue = getField(row, "variantStock");
-    const variantStock = variantStockValue === undefined || variantStockValue === "" ? undefined : Number(variantStockValue);
-    const variantImage = String(getField(row, "variantImageUrl") ?? "").trim();
-    let variantAttributes: Record<string, string> | undefined;
-
-    const rawSpecs = getField(row, "specs");
-    if (rawSpecs && typeof rawSpecs === "object" && !Array.isArray(rawSpecs)) {
-      Object.entries(rawSpecs as Record<string, unknown>).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && String(value).trim()) specs[key] = String(value).trim();
-      });
-    } else if (rawSpecs !== undefined && String(rawSpecs).trim()) {
-      try {
-        const parsedSpecs = JSON.parse(String(rawSpecs));
-        if (!parsedSpecs || typeof parsedSpecs !== "object" || Array.isArray(parsedSpecs)) throw new Error();
-        Object.entries(parsedSpecs as Record<string, unknown>).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && String(value).trim()) specs[key] = String(value).trim();
-        });
-      } catch {
-        errors.push("Specs must be valid JSON with key/value pairs.");
-      }
-    }
-
-    const knownHeaders = new Set(Object.values(HEADER_ALIASES).flat());
-    Object.entries(row).forEach(([header, value]) => {
-      const normalizedHeader = normalizeHeader(header);
-      if (!normalizedHeader || knownHeaders.has(normalizedHeader) || value === undefined || value === null || !String(value).trim()) return;
-      const label = header.replace(/^spec(?:ification)?s?[\s_-]*/i, "").trim();
-      specs[label || header.trim()] = String(value).trim();
-    });
-
-    if (!title) errors.push("Product name is required.");
-    if (!category) errors.push("Category is required.");
-    if (priceValue === undefined || priceValue === "" || !Number.isFinite(price) || price < 0) errors.push("Price must be a valid non-negative number.");
-    if (!Number.isFinite(stock) || stock < 0) errors.push("Stock must be a valid non-negative number.");
-    if (compareAtPrice !== undefined && (!Number.isFinite(compareAtPrice) || compareAtPrice < 0)) errors.push("MRP/compare-at price is invalid.");
-    if (costPrice !== undefined && (!Number.isFinite(costPrice) || costPrice < 0)) errors.push("Cost price is invalid.");
-    if (imageUrl && !/^https?:\/\//i.test(imageUrl) && !imageUrl.startsWith("/")) errors.push("Image must be an http(s) URL or a site-relative path.");
-    if (variantPrice !== undefined && (!Number.isFinite(variantPrice) || variantPrice < 0)) errors.push("Variant price must be a valid non-negative number.");
-    if (variantCompareAtPrice !== undefined && (!Number.isFinite(variantCompareAtPrice) || variantCompareAtPrice < 0)) errors.push("Variant compare-at price is invalid.");
-    if (variantCostPrice !== undefined && (!Number.isFinite(variantCostPrice) || variantCostPrice < 0)) errors.push("Variant cost price is invalid.");
-    if (variantStock !== undefined && (!Number.isInteger(variantStock) || variantStock < 0)) errors.push("Variant stock must be a non-negative whole number.");
-    if (variantImage && !/^https?:\/\//i.test(variantImage) && !variantImage.startsWith("/")) errors.push("Variant image must be an http(s) URL or a site-relative path.");
-
-    const rawAttributes = getField(row, "variantAttributes");
-    if (rawAttributes && typeof rawAttributes === "object" && !Array.isArray(rawAttributes)) {
-      variantAttributes = Object.fromEntries(
-        Object.entries(rawAttributes as Record<string, unknown>)
-          .filter(([, value]) => value !== undefined && value !== null && String(value).trim())
-          .map(([key, value]) => [key.trim(), String(value).trim()])
-      );
-    } else if (rawAttributes !== undefined && String(rawAttributes).trim()) {
-      try {
-        const parsed = JSON.parse(String(rawAttributes));
-        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
-        const entries = Object.entries(parsed as Record<string, unknown>)
-          .filter(([, value]) => value !== undefined && value !== null && String(value).trim());
-        if (entries.some(([, value]) => typeof value === "object")) throw new Error();
-        variantAttributes = Object.fromEntries(entries.map(([key, value]) => [key.trim(), String(value).trim()]));
-      } catch {
-        errors.push("Variant attributes must be valid JSON with key/value pairs.");
-      }
-    }
-
-    const image = imageUrl ? [{ url: imageUrl, is_primary: true, sort_order: 1 }] : [];
-    const payload: Record<string, unknown> = {
-      sku: sku || undefined,
-      title,
-      description: String(getField(row, "description") ?? "").trim(),
-      category,
-      brand: String(getField(row, "brand") ?? "").trim() || undefined,
-      price,
-      compareAtPrice,
-      costPrice,
-      stock,
-      images: image,
-      specs,
-      condition: String(getField(row, "condition") ?? "new").trim().toLowerCase() || "new",
-    };
-    const normalizedParentPayload = JSON.stringify(payload);
-
-    let explicitVariants: Record<string, unknown>[] = [];
-    const rawVariants = getField(row, "variants");
-    if (rawVariants && String(rawVariants).trim()) {
-      try {
-        const parsed = typeof rawVariants === "string" ? JSON.parse(rawVariants) : rawVariants;
-        if (!Array.isArray(parsed)) throw new Error();
-        explicitVariants = parsed as Record<string, unknown>[];
-        if (explicitVariants.some((variant) => !variant || typeof variant !== "object" || Array.isArray(variant))) throw new Error();
-      } catch {
-        errors.push("Variants must be a valid JSON array of variant objects.");
-      }
-    }
-
-    const hasVariantColumns = Boolean(
-      variantName || variantSku || variantPrice !== undefined || variantCompareAtPrice !== undefined ||
-      variantCostPrice !== undefined || variantStock !== undefined || variantImage || variantAttributes
-    );
-    if (hasVariantColumns && (!variantName || variantPrice === undefined)) {
-      errors.push("Variant name and variant price are required when variant columns are used.");
-    }
-    if (hasVariantColumns) {
-      explicitVariants.push({
-        name: variantName,
-        sku: variantSku || undefined,
-        price: variantPrice,
-        compareAtPrice: variantCompareAtPrice,
-        costPrice: variantCostPrice,
-        stock: variantStock,
-        image: variantImage || undefined,
-        attributes: variantAttributes,
-      });
-    }
-
-    explicitVariants.forEach((variant, variantIndex) => {
-      const name = String(variant.name ?? "").trim();
-      const variantPrice = Number(variant.price);
-      if (!name) errors.push(`Variant ${variantIndex + 1} needs an explicit name.`);
-      if (variant.price === undefined || variant.price === null || variant.price === "" || !Number.isFinite(variantPrice) || variantPrice < 0) {
-        errors.push(`Variant ${variantIndex + 1} needs a valid non-negative price.`);
-      }
-      const compareAtPrice = variant.compareAtPrice;
-      if (compareAtPrice !== undefined && compareAtPrice !== null && compareAtPrice !== "" &&
-        (!Number.isFinite(Number(compareAtPrice)) || Number(compareAtPrice) < 0)) {
-        errors.push(`Compare-at price for variant "${name || variantIndex + 1}" is invalid.`);
-      }
-      const costPrice = variant.costPrice;
-      if (costPrice !== undefined && costPrice !== null && costPrice !== "" &&
-        (!Number.isFinite(Number(costPrice)) || Number(costPrice) < 0)) {
-        errors.push(`Cost price for variant "${name || variantIndex + 1}" is invalid.`);
-      }
-      const stock = variant.stock;
-      if (stock !== undefined && stock !== null && stock !== "" &&
-        (!Number.isInteger(Number(stock)) || Number(stock) < 0)) {
-        errors.push(`Stock for variant "${name || variantIndex + 1}" must be a non-negative whole number.`);
-      }
-      const image = String(variant.image ?? variant.variantImageUrl ?? "").trim();
-      if (image && !/^https?:\/\//i.test(image) && !image.startsWith("/")) {
-        errors.push(`Image for variant "${name || variantIndex + 1}" must be an http(s) URL or a site-relative path.`);
-      }
-      if (variant.attributes !== undefined &&
-        (!variant.attributes || typeof variant.attributes !== "object" || Array.isArray(variant.attributes) ||
-          Object.values(variant.attributes as Record<string, unknown>).some((value) =>
-            value !== null && typeof value === "object"
-          ))) {
-        errors.push(`Attributes for variant "${name || variantIndex + 1}" must contain only text or numeric values.`);
-      }
-    });
-
-    return {
-      rowNumber: index + 2,
-      sku,
-      payload,
-      normalizedParentPayload,
-      variants: explicitVariants,
-      errors,
-    };
+function makeReport(previewRows: ImportPreviewRow[], results: ImportResult[]) {
+  const resultByRow = new Map(results.map((result) => [result.rowNumber, result]));
+  const rows = previewRows.filter((row) => {
+    const result = resultByRow.get(row.rowNumber);
+    return row.status !== "ready" || result?.status === "failed";
   });
-
-  const groups = new Map<string, typeof parsedRows>();
-  parsedRows.forEach((row) => {
-    const key = row.sku ? `sku:${row.sku}` : `row:${row.rowNumber}`;
-    groups.set(key, [...(groups.get(key) || []), row]);
+  const header = ["row", "sku", "title", "action", "status", "messages"];
+  const data = rows.map((row) => {
+    const result = resultByRow.get(row.rowNumber);
+    return [
+      row.rowNumber,
+      row.source.variantSku || row.source.sku,
+      row.source.title,
+      result?.action || row.action,
+      result?.status || row.status,
+      [...row.errors, ...row.warnings, ...(result?.status === "failed" ? [result.message] : [])].join(" | "),
+    ];
   });
-
-  return [...groups.values()].map((group) => {
-    const first = group[0];
-    const errors = group.flatMap((row) => row.errors.map((error) => `Row ${row.rowNumber}: ${error}`));
-    const hasRepeatedSku = group.length > 1;
-    const variants = group.flatMap((row) => row.variants);
-    if (hasRepeatedSku && group.some((row) => row.variants.length === 0)) {
-      errors.push("Repeated product SKUs are only allowed when every row defines an explicit variant name and price.");
-    }
-    if (group.some((row) => row.normalizedParentPayload !== first.normalizedParentPayload)) {
-      errors.push("Rows with the same product SKU must have identical parent product details; put variant-specific data in variant columns.");
-    }
-
-    const variantNames = new Set<string>();
-    const variantSkus = new Set<string>();
-    variants.forEach((variant) => {
-      const name = String(variant.name ?? "").trim().toLowerCase();
-      const sku = String(variant.sku ?? "").trim().toUpperCase();
-      if (name && variantNames.has(name)) errors.push(`Variant name "${String(variant.name).trim()}" is duplicated.`);
-      if (sku && variantSkus.has(sku)) errors.push(`Variant SKU "${sku}" is duplicated.`);
-      if (name) variantNames.add(name);
-      if (sku) variantSkus.add(sku);
-    });
-    if (variants.length) first.payload.variants = variants;
-
-    return {
-      rowNumber: first.rowNumber,
-      payload: first.payload,
-      errors: [...new Set(errors)],
-      variantCount: variants.length,
-    };
-  });
+  results.filter((result) => result.status === "failed" && !rows.some((row) => row.rowNumber === result.rowNumber))
+    .forEach((result) => data.push([result.rowNumber, result.sku, "", result.action, result.status, result.message]));
+  return [header, ...data].map((row) => row.map(toCsvCell).join(",")).join("\r\n");
 }
 
 export default function ProductCatalogImport({ onImported }: ProductCatalogImportProps) {
   const [open, setOpen] = useState(false);
   const [fileName, setFileName] = useState("");
-  const [rows, setRows] = useState<ProductImportRow[]>([]);
+  const [rows, setRows] = useState<ImportPreviewRow[]>([]);
   const [fileError, setFileError] = useState("");
   const [parsing, setParsing] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [progress, setProgress] = useState("");
-  const [result, setResult] = useState("");
-  const validRows = useMemo(() => rows.filter((row) => row.errors.length === 0), [rows]);
-  const invalidCount = rows.length - validRows.length;
+  const [confirming, setConfirming] = useState(false);
+  const [results, setResults] = useState<ImportResult[]>([]);
+  const [filter, setFilter] = useState<"all" | ImportStatus>("all");
+
+  const visibleRows = useMemo(
+    () => filter === "all" ? rows : rows.filter((row) => row.status === filter),
+    [filter, rows]
+  );
+  const selectedRows = rows.filter((row) =>
+    row.selected && row.action !== "skip" && row.action !== "review" &&
+    (row.action !== "update" || row.fields.length > 0)
+  );
+  const readyToAddCount = rows.filter((row) => row.action === "add" && row.canAdd).length;
+  const variantCount = rows.filter((row) => row.action === "variant" && row.canAddVariant).length;
+  const updateCount = rows.filter((row) => row.action === "update" && row.canUpdate).length;
+  const invalidCount = rows.filter((row) => row.status === "invalid").length;
+  const duplicateCount = rows.filter((row) => row.status === "duplicate").length;
+  const reviewCount = rows.filter((row) => row.status === "review").length;
+  const succeededCount = results.filter((result) => result.status === "imported" || result.status === "updated").length;
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -290,23 +161,31 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
     if (!file) return;
 
     setFileError("");
-    setResult("");
     setRows([]);
-    if (file.size > MAX_FILE_BYTES) {
-      setFileError("Choose a spreadsheet smaller than 10 MB.");
+    setResults([]);
+    setConfirming(false);
+    setFileName(file.name);
+    if (!/\.(xlsx|csv)$/i.test(file.name)) {
+      setFileError("Choose an .xlsx or .csv file.");
+      return;
+    }
+    if (file.size <= 0 || file.size > MAX_FILE_BYTES) {
+      setFileError("Choose a non-empty spreadsheet smaller than 10 MB.");
       return;
     }
 
     setParsing(true);
-    setFileName(file.name);
     try {
-      const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      if (!sheet) throw new Error("The selected file does not contain a worksheet.");
-      const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false });
-      if (rawRows.length === 0) throw new Error("The first worksheet is empty.");
-      if (rawRows.length > MAX_IMPORT_ROWS) throw new Error(`Import is limited to ${MAX_IMPORT_ROWS} rows per file.`);
-      setRows(parseRows(rawRows));
+      const form = new FormData();
+      form.set("file", file);
+      const response = await fetch("/api/admin/catalog-import", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not preview this catalog.");
+      setRows((data.rows as ImportPreviewRow[]).map((row) => ({
+        ...row,
+        selected: row.action === "add" && row.canAdd,
+        fields: [],
+      })));
     } catch (error) {
       setFileError(error instanceof Error ? error.message : "Could not read this spreadsheet.");
     } finally {
@@ -314,53 +193,120 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
     }
   };
 
-  const downloadTemplate = () => {
-    const headers = ["sku", "title", "description", "category", "brand", "price", "compareAtPrice", "costPrice", "stock", "imageUrl", "condition", "specs", "variantName", "variantSKU", "variantPrice", "variantCompareAtPrice", "variantCostPrice", "variantStock", "variantImageUrl", "variantAttributes", "variants"];
-    const example = ["NL-SSD-001", "Example NVMe SSD", "Example product description", "storage", "Example Brand", "5999", "7499", "4200", "12", "https://example.com/product.jpg", "new", '{"interface":"PCIe Gen 4","formFactor":"M.2 2280"}', "1TB", "NL-SSD-001-1TB", "5999", "7499", "4200", "12", "https://example.com/1tb.jpg", '{"capacity":"1TB"}', ""];
-    const csv = [headers, example].map((row) => row.map((value) => `"${value.replaceAll('"', '""')}"`).join(",")).join("\r\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const updateRow = (rowNumber: number, update: Partial<ImportPreviewRow>) => {
+    setRows((current) => current.map((row) => row.rowNumber === rowNumber ? { ...row, ...update } : row));
+  };
+
+  const selectSafeProducts = () => {
+    setRows((current) => current.map((row) => ({
+      ...row,
+      selected: row.canAdd && row.action === "add",
+    })));
+    setConfirming(false);
+  };
+
+  const selectAllVariants = () => {
+    setRows((current) => current.map((row) => ({
+      ...row,
+      selected: row.canAddVariant && row.action === "variant",
+    })));
+    setConfirming(false);
+  };
+
+  const downloadTemplate = (format: "xlsx" | "csv") => {
+    if (format === "csv") {
+      const content = `${TEMPLATE_COLUMNS.map(toCsvCell).join(",")}\r\n`;
+      const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "NexByte_Catalog_Import_Template.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    const workbook = XLSX.utils.book_new();
+    const template = XLSX.utils.aoa_to_sheet([TEMPLATE_COLUMNS]);
+    template["!cols"] = TEMPLATE_COLUMNS.map((column) => ({ wch: Math.max(14, column.length + 2) }));
+    XLSX.utils.book_append_sheet(workbook, template, "Import Template");
+    const instructions = [
+      ["Column", "Instructions"],
+      ["Original columns", "sku, title, description, category, brand, price, compareAtPrice, costPrice, stock, imageUrl, condition, specs are retained unchanged."],
+      ["Variant columns", "parentSku, variantGroup, variantType, variantValue, variantSku, variantPrice, variantStock, variantImageUrl, variantSpecs are appended."],
+      ["SKU", "Use one unique SKU per sellable product or variant. For a variant, sku and variantSku must match."],
+      ["Variants", "Set parentSku to an exact parent SKU. Variant rows require brand, category, variantType, variantValue, variantPrice, and variantStock. Variants are never inferred."],
+      ["Pricing and stock", "Do not leave sellable price or stock unknown. A variant's own price and stock are never copied from its parent."],
+      ["Specifications", 'Use JSON objects, for example {"interface":"PCIe Gen 4"}. Do not enter formulas.'],
+      ["Updates", "Existing SKU rows are never overwritten automatically. Select Update and explicitly select non-empty fields."],
+      ["Blank fields", "Blank values preserve existing data; this template does not provide a clear-field operation."],
+      ["Images", "Use a verified http(s) URL or a site-relative path. Do not invent image locations."],
+      ["Price source", "Provide only verified supplier/manufacturer data. This importer does not verify live market prices."],
+    ];
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(instructions), "Instructions");
+    XLSX.writeFile(workbook, "NexByte_Catalog_Import_Template.xlsx");
+  };
+
+  const downloadErrorReport = () => {
+    const content = makeReport(rows, results);
+    const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = "nex-laptech-product-import-template.csv";
+    link.download = "NexByte_Catalog_Import_Report.csv";
     link.click();
     URL.revokeObjectURL(url);
   };
 
-  const importRows = async () => {
+  const confirmImport = async () => {
     setImporting(true);
     setFileError("");
-    let imported = 0;
-    const failures: string[] = [];
-    for (const row of validRows) {
-      setProgress(`Importing product ${imported + failures.length + 1} of ${validRows.length}...`);
-      try {
-        const response = await fetch("/api/admin/products", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(row.payload),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Product could not be imported.");
-        imported += 1;
-      } catch (error) {
-        failures.push(`Row ${row.rowNumber}: ${error instanceof Error ? error.message : "Import failed."}`);
-      }
+    try {
+      const response = await fetch("/api/admin/catalog-import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "commit",
+          rows: rows.map((row) => ({ ...row.source, __rowNumber: row.rowNumber })),
+          choices: rows.map(({ rowNumber, selected, action, fields }) => ({ rowNumber, selected, action, fields })),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Catalog import failed.");
+      const completedResults = data.results as ImportResult[];
+      setResults(completedResults);
+      const completedRows = new Set(
+        completedResults
+          .filter((result) => result.status === "imported" || result.status === "updated")
+          .map((result) => result.rowNumber)
+      );
+      setRows((current) => current.map((row) =>
+        completedRows.has(row.rowNumber) ? { ...row, selected: false } : row
+      ));
+      setConfirming(false);
+      if (data.summary?.succeeded > 0) onImported();
+    } catch (error) {
+      setFileError(error instanceof Error ? error.message : "Catalog import failed.");
+    } finally {
+      setImporting(false);
     }
-    setProgress("");
-    setImporting(false);
-    setResult(`${imported} product${imported === 1 ? "" : "s"} imported${failures.length ? `; ${failures.length} failed` : " successfully"}.`);
-    if (imported > 0) onImported();
-    if (failures.length) setFileError(failures.slice(0, 5).join(" "));
   };
 
   const close = () => {
-    if (importing) return;
+    if (importing || parsing) return;
     setOpen(false);
     setFileName("");
     setRows([]);
+    setResults([]);
     setFileError("");
-    setResult("");
+    setConfirming(false);
   };
+
+  const availableActions = (row: ImportPreviewRow): Array<{ value: ImportAction; label: string; available: boolean }> => [
+    { value: "add", label: "Add new product", available: row.canAdd },
+    { value: "variant", label: "Add variant", available: row.canAddVariant },
+    { value: "update", label: "Update existing", available: row.canUpdate },
+    { value: "skip", label: "Skip", available: true },
+    { value: "review", label: "Review required", available: true },
+  ];
 
   return (
     <>
@@ -370,76 +316,226 @@ export default function ProductCatalogImport({ onImported }: ProductCatalogImpor
 
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 p-3 backdrop-blur-sm sm:p-6" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
-          <section role="dialog" aria-modal="true" aria-labelledby="catalog-import-title" className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl">
+          <section role="dialog" aria-modal="true" aria-labelledby="catalog-import-title" className="max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-2xl">
             <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 sm:px-6">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-700">Catalog tools</p>
-                <h2 id="catalog-import-title" className="mt-1 text-lg font-extrabold">Import products</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-blue-700">Admin catalog tools</p>
+                <h2 id="catalog-import-title" className="mt-1 text-lg font-extrabold">Import and review products</h2>
               </div>
               <button type="button" onClick={close} aria-label="Close catalog import" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"><X className="h-5 w-5" /></button>
             </header>
 
             <div className="space-y-5 p-5 sm:p-6">
-              <div className="flex flex-col gap-3 rounded-xl border border-blue-100 bg-blue-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-bold text-slate-900">Your catalog, in one upload</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-600">CSV, XLSX, or XLS. Up to 100 rows and 10 MB. Required columns: title, category, price. Import only variants explicitly listed in variant columns or a JSON variants array. Repeated product SKUs group rows only when their parent details match.</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-600">Variant columns: variantName, variantSKU, variantPrice, variantCompareAtPrice, variantCostPrice, variantStock, variantImageUrl, and variantAttributes (JSON). No colors, capacities, or combinations are inferred.</p>
+              <div className="flex flex-col gap-4 rounded-xl border border-blue-100 bg-blue-50/70 p-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-3xl">
+                  <p className="text-sm font-bold text-slate-900">Upload, inspect, then confirm</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    CSV or XLSX, up to 10 MB and 100 product rows. The server validates the file and previews duplicate SKUs and possible product matches without writing to the catalog. Variants must name an exact parentSku and include their own SKU, price, and stock.
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    Existing SKUs are never overwritten automatically. Updates require explicit field selection; blank fields preserve existing data. Similar products are marked for review rather than merged.
+                  </p>
                 </div>
-                <button type="button" onClick={downloadTemplate} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-100">
-                  <Download className="h-3.5 w-3.5" /> Download template
-                </button>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <button type="button" onClick={() => downloadTemplate("xlsx")} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-100">
+                    <Download className="h-3.5 w-3.5" /> XLSX template
+                  </button>
+                  <button type="button" onClick={() => downloadTemplate("csv")} className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs font-bold text-blue-800 hover:bg-blue-100">
+                    <Download className="h-3.5 w-3.5" /> CSV template
+                  </button>
+                </div>
               </div>
 
-              <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center transition hover:border-blue-400 hover:bg-blue-50/50">
+              <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-5 py-7 text-center transition hover:border-blue-400 hover:bg-blue-50/50">
                 {parsing ? <Loader2 className="h-7 w-7 animate-spin text-blue-700" /> : <Upload className="h-7 w-7 text-blue-700" />}
-                <span className="text-sm font-bold text-slate-800">{parsing ? "Reading spreadsheet..." : fileName || "Choose a catalog file"}</span>
-                <span className="text-xs text-slate-500">CSV, Excel workbook</span>
-                <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFile} disabled={parsing || importing} className="sr-only" />
+                <span className="text-sm font-bold text-slate-800">{parsing ? "Validating on server..." : fileName || "Choose a catalog file"}</span>
+                <span className="text-xs text-slate-500">CSV or XLSX; formulas are rejected</span>
+                <input type="file" accept=".csv,.xlsx" onChange={handleFile} disabled={parsing || importing} className="sr-only" />
               </label>
 
               {fileError && <div role="alert" className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs font-medium text-rose-800"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{fileError}</div>}
-              {result && <div role="status" className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-800"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />{result}</div>}
+              {succeededCount > 0 && <div role="status" className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-800"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />{succeededCount} catalog change{succeededCount === 1 ? "" : "s"} completed. See row results below.</div>}
 
               {rows.length > 0 && (
                 <>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-                    <span className="font-bold text-slate-800">{rows.length} products found</span>
-                    <span className="text-emerald-700">{validRows.length} ready</span>
-                    {invalidCount > 0 && <span className="text-rose-700">{invalidCount} need attention</span>}
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+                    {[
+                      ["Rows", rows.length, "text-slate-900"],
+                      ["New products", readyToAddCount, "text-emerald-700"],
+                      ["New variants", variantCount, "text-blue-700"],
+                      ["Updates", updateCount, "text-indigo-700"],
+                      ["SKU matches", duplicateCount, "text-amber-700"],
+                      ["Review", reviewCount, "text-orange-700"],
+                      ["Invalid", invalidCount, "text-rose-700"],
+                    ].map(([label, value, color]) => (
+                      <div key={String(label)} className="rounded-lg border border-slate-200 bg-white px-3 py-2">
+                        <p className={`text-lg font-extrabold ${color}`}>{value}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+                      </div>
+                    ))}
                   </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={selectSafeProducts} className="rounded-md border border-slate-200 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50">Select safe new products</button>
+                      <button type="button" onClick={selectAllVariants} className="rounded-md border border-slate-200 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50">Select verified variant rows</button>
+                      {(results.length > 0 || rows.some((row) => row.status !== "ready")) && <button type="button" onClick={downloadErrorReport} className="rounded-md border border-slate-200 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 hover:bg-slate-50">Download error report</button>}
+                    </div>
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                      Filter
+                      <select value={filter} onChange={(event) => setFilter(event.target.value as "all" | ImportStatus)} className="rounded-md border border-slate-300 bg-white px-2 py-1.5">
+                        <option value="all">All statuses</option>
+                        <option value="ready">Ready</option>
+                        <option value="duplicate">SKU matches / conflicts</option>
+                        <option value="review">Review required</option>
+                        <option value="invalid">Invalid</option>
+                      </select>
+                    </label>
+                  </div>
+
                   <div className="overflow-x-auto rounded-xl border border-slate-200">
-                    <table className="w-full min-w-[620px] border-collapse text-left text-xs">
+                    <table className="w-full min-w-[1050px] border-collapse text-left text-xs">
                       <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500">
-                        <tr><th className="px-3 py-2.5">Row</th><th className="px-3 py-2.5">Product</th><th className="px-3 py-2.5">Category</th><th className="px-3 py-2.5">Price</th><th className="px-3 py-2.5">Variants</th><th className="px-3 py-2.5">Stock</th><th className="px-3 py-2.5">Validation</th></tr>
+                        <tr>
+                          <th className="w-10 px-3 py-2.5">Use</th>
+                          <th className="px-3 py-2.5">Row / status</th>
+                          <th className="px-3 py-2.5">SKU / product</th>
+                          <th className="px-3 py-2.5">Variant</th>
+                          <th className="px-3 py-2.5">Price / stock</th>
+                          <th className="px-3 py-2.5">Action</th>
+                        </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {rows.slice(0, 8).map((row) => (
-                          <tr key={row.rowNumber} className="align-top">
-                            <td className="px-3 py-2.5 text-slate-500">{row.rowNumber}</td>
-                            <td className="max-w-48 truncate px-3 py-2.5 font-semibold text-slate-800">{String(row.payload.title || "Untitled")}</td>
-                            <td className="px-3 py-2.5 text-slate-600">{String(row.payload.category || "-")}</td>
-                            <td className="px-3 py-2.5 text-slate-700">{Number.isFinite(Number(row.payload.price)) ? `₹${Number(row.payload.price).toLocaleString("en-IN")}` : "-"}</td>
-                            <td className="px-3 py-2.5 text-slate-700">{row.variantCount ? `${row.variantCount}: ${((row.payload.variants || []) as Array<{ name?: string }>).map((variant) => variant.name).join(", ")}` : "None"}</td>
-                            <td className="px-3 py-2.5 text-slate-700">{String(row.payload.stock ?? "-")}</td>
-                            <td className={`px-3 py-2.5 font-semibold ${row.errors.length ? "text-rose-700" : "text-emerald-700"}`}>{row.errors.length ? row.errors.join(" ") : "Ready"}</td>
-                          </tr>
-                        ))}
+                        {visibleRows.map((row) => {
+                          const result = results.find((entry) => entry.rowNumber === row.rowNumber);
+                          const rowSku = row.source.variantSku || row.source.sku;
+                          const selectable = row.errors.length === 0 && row.action !== "review" && row.action !== "skip";
+                          return (
+                            <tr key={row.rowNumber} className="align-top hover:bg-slate-50/70">
+                              <td className="px-3 py-3">
+                                <input
+                                  aria-label={`Select row ${row.rowNumber}`}
+                                  type="checkbox"
+                                  checked={row.selected}
+                                  disabled={!selectable || importing}
+                                  onChange={(event) => updateRow(row.rowNumber, { selected: event.target.checked, ...(event.target.checked ? {} : { fields: [] }) })}
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-700 focus:ring-blue-600 disabled:opacity-40"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <p className="font-bold text-slate-800">Row {row.rowNumber}</p>
+                                <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                  row.status === "ready" ? "bg-emerald-50 text-emerald-700" :
+                                  row.status === "duplicate" ? "bg-amber-50 text-amber-700" :
+                                  row.status === "review" ? "bg-orange-50 text-orange-700" : "bg-rose-50 text-rose-700"
+                                }`}>{STATUS_LABELS[row.status]}</span>
+                                {result && <p className={`mt-1 font-bold ${result.status === "failed" ? "text-rose-700" : "text-emerald-700"}`}>{result.status}: {result.message}</p>}
+                              </td>
+                              <td className="max-w-[320px] px-3 py-3">
+                                <p className="font-bold text-slate-900">{row.source.title || "Untitled row"}</p>
+                                <p className="mt-0.5 text-slate-600">{rowSku || "Missing SKU"} · {row.source.brand || "Brand not supplied"}</p>
+                                <p className="mt-0.5 text-[10px] text-slate-500">{row.source.category || "No category"}{row.targetProductTitle ? ` · Parent: ${row.targetProductTitle}` : ""}</p>
+                                {[...row.errors, ...row.warnings].map((message, index) => (
+                                  <p key={`${row.rowNumber}-${index}`} className={`mt-1 leading-4 ${index < row.errors.length ? "text-rose-700" : "text-amber-700"}`}>{message}</p>
+                                ))}
+                              </td>
+                              <td className="px-3 py-3 text-slate-700">
+                                {row.source.variantType || row.source.variantValue ? (
+                                  <>
+                                    <p className="font-semibold">{row.source.variantType}: {row.source.variantValue}</p>
+                                    <p className="mt-0.5 text-[10px] text-slate-500">Parent SKU: {row.source.parentSku || "Missing"}</p>
+                                    {row.source.variantGroup && <p className="mt-0.5 text-[10px] text-slate-500">Group: {row.source.variantGroup}</p>}
+                                  </>
+                                ) : "—"}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-3 text-slate-700">
+                                <p>₹{row.source.variantPrice ?? row.source.price ?? "—"}</p>
+                                <p className="mt-0.5 text-[10px] text-slate-500">Stock: {row.source.variantStock ?? row.source.stock ?? "—"}</p>
+                              </td>
+                              <td className="min-w-[190px] px-3 py-3">
+                                <select
+                                  aria-label={`Action for row ${row.rowNumber}`}
+                                  value={row.action}
+                                  disabled={importing || Boolean(result && result.status !== "failed")}
+                                  onChange={(event) => {
+                                    const action = event.target.value as ImportAction;
+                                    const actionAvailable = availableActions(row).find((option) => option.value === action)?.available;
+                                    updateRow(row.rowNumber, {
+                                      action,
+                                      selected: Boolean(actionAvailable && action !== "skip" && action !== "review" && action !== "update" && row.errors.length === 0),
+                                      fields: [],
+                                    });
+                                    setConfirming(false);
+                                  }}
+                                  className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-[11px] font-semibold"
+                                >
+                                  {availableActions(row).map((option) => (
+                                    <option key={option.value} value={option.value} disabled={!option.available}>{option.label}</option>
+                                  ))}
+                                </select>
+                                {row.action === "update" && row.canUpdate && (
+                                  <fieldset className="mt-2 space-y-1 rounded-md bg-slate-50 p-2">
+                                    <legend className="px-1 text-[10px] font-bold text-slate-600">Select fields to update</legend>
+                                    {row.updateFields.filter((field) => {
+                                      const value = row.source[field as keyof ImportSource];
+                                      return value !== null && value !== undefined && value !== "";
+                                    }).map((field) => (
+                                      <label key={field} className="flex items-center gap-1.5 text-[10px] text-slate-700">
+                                        <input
+                                          type="checkbox"
+                                          checked={row.fields.includes(field)}
+                                          disabled={importing}
+                                          onChange={(event) => updateRow(row.rowNumber, {
+                                            fields: event.target.checked ? [...row.fields, field] : row.fields.filter((selected) => selected !== field),
+                                          })}
+                                          className="h-3 w-3 rounded border-slate-300 text-blue-700"
+                                        />
+                                        {FIELD_LABELS[field] || field}
+                                      </label>
+                                    ))}
+                                    {row.fields.length === 0 && <p className="text-[10px] text-amber-700">Choose at least one field.</p>}
+                                  </fieldset>
+                                )}
+                                {row.action === "variant" && row.canAddVariant && (
+                                  <p className="mt-2 rounded-md bg-blue-50 px-2 py-1.5 text-[10px] leading-4 text-blue-800">
+                                    Select this row only after verifying the exact product family and configuration.
+                                  </p>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
-                    {rows.length > 8 && <p className="border-t border-slate-100 px-3 py-2 text-[11px] text-slate-500">Showing the first 8 of {rows.length} rows.</p>}
+                  </div>
+
+                  <div className="sticky bottom-0 flex flex-col gap-3 border-t border-slate-200 bg-white py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs text-slate-600">
+                      {selectedRows.length} selected change{selectedRows.length === 1 ? "" : "s"} · {results.filter((result) => result.status === "failed").length} failed
+                    </p>
+                    {!confirming ? (
+                      <button
+                        type="button"
+                        disabled={selectedRows.length === 0 || importing}
+                        onClick={() => setConfirming(true)}
+                        className="rounded-lg bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      >
+                        Review {selectedRows.length} selected change{selectedRows.length === 1 ? "" : "s"}
+                      </button>
+                    ) : (
+                      <div className="flex flex-wrap items-center justify-end gap-2">
+                        <span className="mr-1 text-xs font-semibold text-slate-700">Confirm {selectedRows.length} selected database change{selectedRows.length === 1 ? "" : "s"}?</span>
+                        <button type="button" onClick={() => setConfirming(false)} disabled={importing} className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700">Back to preview</button>
+                        <button type="button" onClick={confirmImport} disabled={importing || selectedRows.length === 0} className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-800 disabled:opacity-50">
+                          {importing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                          {importing ? "Importing..." : "Confirm import"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
             </div>
-
-            <footer className="sticky bottom-0 flex flex-col-reverse gap-2 border-t border-slate-200 bg-white px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
-              <button type="button" onClick={close} disabled={importing} className="rounded-lg border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Close</button>
-              <button type="button" onClick={importRows} disabled={importing || validRows.length === 0} className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-700 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50">
-                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                {importing ? progress || "Importing..." : `Import ${validRows.length} product${validRows.length === 1 ? "" : "s"}`}
-              </button>
-            </footer>
           </section>
         </div>
       )}

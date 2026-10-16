@@ -19,7 +19,7 @@ import {
 import Image from "next/image";
 
 const MILESTONES = [
-  { year: "2020", title: "Founding in Tumkur", desc: "NexByte Technologies established as a dedicated computer repair service center, focusing on chip-level troubleshooting." },
+  { year: "2020", title: "Founding in Tumkur", desc: "Nex LapTech established as a dedicated computer repair service center, focusing on chip-level troubleshooting." },
   { year: "2022", title: "Expansion to Bengaluru", desc: "Opened head office in Padmanabhanagar, scaling IT maintenance contracts (AMC) and custom PC construction." },
   { year: "2024", title: "Academy & Training Division", desc: "Launched hardware repair certifications and student IEEE project support courses." },
   { year: "2026", title: "Enterprise Systems Platform", desc: "Integrated cloud management portals, scaling hardware supply chains across Karnataka." },
@@ -41,13 +41,13 @@ export default function AboutPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="section-eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-nex-blueLight shadow-glow-blue" />
-              NEXBYTE STORY
+              NEX LAPTECH STORY
             </span>
             <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
               About Our <span className="text-gradient-blue">Enterprise.</span>
             </h1>
             <p className="mt-4 text-base text-nex-mist leading-relaxed">
-              We started with a simple belief: high-fidelity hardware servicing should be transparent, prompt, and accessible. Today, NexByte is an integrated IT hardware partner and academic hub.
+              We started with a simple belief: high-fidelity hardware servicing should be transparent, prompt, and accessible. Today, Nex LapTech is an integrated IT hardware partner and academic hub.
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default function AboutPage() {
                 </h3>
 
                 <p className="text-xs text-nex-mist leading-relaxed">
-                  As the founding technician and director of NexByte, I have overseen the troubleshooting of hundreds of liquid-damaged motherboards, micro-chip shorts, and structural laptop failures. Our goal is to extend NexByte into a modular corporate supplier, while offering the best hands-on practical academy for aspiring engineers in Karnataka.
+                  As the founding technician and director of Nex LapTech, I have overseen the troubleshooting of hundreds of liquid-damaged motherboards, micro-chip shorts, and structural laptop failures. Our goal is to extend Nex LapTech into a modular corporate supplier, while offering the best hands-on practical academy for aspiring engineers in Karnataka.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-4 border-t border-white/5">

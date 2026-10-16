@@ -170,10 +170,10 @@
       // =========================================================
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.headerBox },
-          React.createElement(Text, { style: styles.brandTitle }, "NEXBYTE TECHNOLOGIES"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "ENTERPRISE QUALITY ASSURANCE (QA) & AUDIT FINAL REPORT"),
           React.createElement(View, { style: styles.metaRow },
-            React.createElement(Text, { style: styles.metaText }, "Project: NexByte Technologies"),
+            React.createElement(Text, { style: styles.metaText }, "Project: Nex LapTech"),
             React.createElement(Text, { style: styles.metaText }, "Version: v1.0.0 Enterprise"),
             React.createElement(Text, { style: styles.metaText }, "Audit Date: July 24, 2026"),
             React.createElement(Text, { style: styles.metaText }, "Grade: A+ (98.6%)")
@@ -235,7 +235,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Audit"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Audit"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -305,7 +305,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Audit"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Audit"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -351,7 +351,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Audit"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Audit"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -411,7 +411,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Audit"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Audit"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -458,12 +458,12 @@
         React.createElement(View, { style: styles.banner },
           React.createElement(Text, { style: styles.bannerTitle }, "✓ FINAL CERTIFICATE OF ENTERPRISE QA COMPLIANCE"),
           React.createElement(Text, { style: styles.bannerText },
-            "The NexByte Technologies enterprise application has satisfied all 428 test cases, load benchmarks, security requirements, and bi-directional realtime synchronization criteria. Certified 100% Production Ready."
+            "The Nex LapTech enterprise application has satisfied all 428 test cases, load benchmarks, security requirements, and bi-directional realtime synchronization criteria. Certified 100% Production Ready."
           )
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Audit"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Audit"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )

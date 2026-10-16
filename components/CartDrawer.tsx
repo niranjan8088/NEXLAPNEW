@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/lib/cartStore";
 import { ShoppingBag, X, Trash2, Plus, Minus, ArrowRight, CheckCircle2, Loader2, Sparkles, Tag } from "lucide-react";
 import { getSafeImageSrc } from "@/lib/utils";
 import { safeJsonFetch } from "@/lib/apiHelper";
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, getTotal, getItemCount } = useCartStore();
+  const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, getTotal, getItemCount, appliedOfferCode, setAppliedOfferCode } = useCartStore();
   
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [customerName, setCustomerName] = useState("");
@@ -19,16 +19,21 @@ export default function CartDrawer() {
   const [completedOrder, setCompletedOrder] = useState<any | null>(null);
 
   // Referral / Promo Offer State
-  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [promoCodeInput, setPromoCodeInput] = useState(appliedOfferCode);
   const [appliedOffer, setAppliedOffer] = useState<{
     code: string;
-    discount_value: number;
-    discount_type: "percentage" | "flat";
+    discountValue: number;
+    discountType: "percentage" | "fixed";
+    maximumDiscount: number;
     title: string;
   } | null>(null);
   const [promoError, setPromoError] = useState("");
   const [promoSuccess, setPromoSuccess] = useState("");
   const [validatingPromo, setValidatingPromo] = useState(false);
+
+  useEffect(() => {
+    if (appliedOfferCode) setPromoCodeInput(appliedOfferCode);
+  }, [appliedOfferCode]);
 
   if (!isOpen) return null;
 
@@ -37,11 +42,13 @@ export default function CartDrawer() {
   // Calculate discount according to rule: Subtotal -> Offer Discount -> Grand Total
   let discountAmount = 0;
   if (appliedOffer) {
-    if (appliedOffer.discount_type === "percentage") {
-      discountAmount = Math.round((subtotal * appliedOffer.discount_value) / 100);
+  if (appliedOffer.discountType === "percentage") {
+    discountAmount = Math.round((subtotal * appliedOffer.discountValue) / 100);
     } else {
-      discountAmount = Math.min(subtotal, appliedOffer.discount_value);
+    discountAmount = appliedOffer.discountValue;
     }
+  if (appliedOffer.maximumDiscount > 0) discountAmount = Math.min(discountAmount, appliedOffer.maximumDiscount);
+  discountAmount = Math.min(discountAmount, subtotal);
   }
 
   const taxableSubtotal = Math.max(0, subtotal - discountAmount);
@@ -64,26 +71,31 @@ export default function CartDrawer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: promoCodeInput.trim(),
-          amount: subtotal,
+          offerCode: promoCodeInput.trim(),
+          cartItems: items,
+          subtotalAmount: subtotal,
         }),
       });
 
       if (!res.ok || !res.data?.valid) {
-        setPromoError(res.data?.message || res.error || "Invalid or expired referral code.");
+        setPromoError(res.data?.error || res.error || "Invalid or expired referral code.");
         setAppliedOffer(null);
+        setAppliedOfferCode("");
       } else {
         const offer = res.data.offer;
         setAppliedOffer({
           code: offer.code,
-          discount_value: Number(offer.discount_value),
-          discount_type: offer.discount_type,
-          title: offer.title,
+          discountValue: Number(offer.discountValue),
+          discountType: offer.discountType,
+          maximumDiscount: Number(offer.maximumDiscount) || 0,
+          title: offer.name,
         });
-        setPromoSuccess(`Referral code applied — ${res.data.discount_label || "Discount Applied"}`);
-        setPromoCodeInput("");
+        setAppliedOfferCode(offer.code);
+        setPromoSuccess(`Offer applied — you save ₹${Number(res.data.discountAmount || 0).toLocaleString("en-IN")}`);
       }
     } catch (e: any) {
+      setAppliedOffer(null);
+      setAppliedOfferCode("");
       setPromoError("Failed to validate code. Please try again.");
     } finally {
       setValidatingPromo(false);
@@ -92,6 +104,7 @@ export default function CartDrawer() {
 
   const handleRemovePromo = () => {
     setAppliedOffer(null);
+    setAppliedOfferCode("");
     setPromoSuccess("");
     setPromoError("");
   };

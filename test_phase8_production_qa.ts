@@ -1,7 +1,7 @@
 import { dbHelper } from './lib/dbHelper';
 
 /**
- * NEXBYTE TECHNOLOGIES — PHASE 8: PRODUCTION READINESS, E2E QA & SECURITY AUDIT TEST SUITE
+ * NEX LAPTECH — PHASE 8: PRODUCTION READINESS, E2E QA & SECURITY AUDIT TEST SUITE
  * 
  * Verifies end-to-end purchasing workflows, security authorization, idempotency, atomic stock safety,
  * server commission rules, GST invoice persistence, notification reliability, data isolation, and address safety.
@@ -9,7 +9,7 @@ import { dbHelper } from './lib/dbHelper';
 
 async function runPhase8ProductionQA() {
   console.log('==================================================');
-  console.log('NEXBYTE PHASE 8: PRODUCTION READINESS & SECURITY AUDIT');
+  console.log('NEX LAPTECH PHASE 8: PRODUCTION READINESS & SECURITY AUDIT');
   console.log('==================================================\n');
 
   let passCount = 0;

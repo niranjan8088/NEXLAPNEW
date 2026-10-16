@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import {
   Mail,
   ArrowRight,
@@ -58,17 +58,10 @@ export default function CustomerForgotPasswordPage() {
       <header className="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between border-b border-slate-200/60 dark:border-white/5">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="relative h-9 w-9">
-            <Image
-              src="/images/logo-icon-transparent.png"
-              alt="NexByte Technologies"
-              fill
-              sizes="36px"
-              className="object-contain"
-              priority
-            />
+            <BrandLogo width={72} height={72} sizes="36px" priority className="h-full w-full" />
           </div>
           <span className="font-display text-lg font-bold">
-            NEX<span className="text-nex-blue">BYTE</span>
+            NEX LAPTECH
           </span>
         </Link>
 
@@ -199,7 +192,7 @@ export default function CustomerForgotPasswordPage() {
 
       {/* Minimal Auth Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 border-t border-slate-200/60 dark:border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-        <p>© 2026 NexByte Technologies. All rights reserved.</p>
+        <p>© 2026 Nex LapTech. All rights reserved.</p>
         <div className="flex gap-4">
           <Link href="/contact" className="hover:text-nex-blue">Contact</Link>
           <Link href="/contact" className="hover:text-nex-blue">Privacy</Link>

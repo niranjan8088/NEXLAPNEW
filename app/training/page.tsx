@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 
 const COURSE_TIMELINE = [
   {
@@ -79,7 +79,7 @@ export default function TrainingPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="section-eyebrow">
               <span className="h-1.5 w-1.5 rounded-full bg-nex-blueLight shadow-glow-blue" />
-              NexByte Academy
+              Nex LapTech Academy
             </span>
             <h1 className="font-display text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Desktop Repair <span className="text-gradient-blue">Training.</span>
@@ -135,7 +135,7 @@ export default function TrainingPage() {
               </div>
               <div>
                 <h4 className="text-xs text-nex-mist font-semibold">Certification</h4>
-                <p className="text-sm font-bold text-white mt-0.5">NexByte Verified Certificate</p>
+                <p className="text-sm font-bold text-white mt-0.5">Nex LapTech Verified Certificate</p>
               </div>
             </div>
           </div>
@@ -287,13 +287,7 @@ export default function TrainingPage() {
               </div>
 
               <div className="relative h-48 w-48 rounded-2xl overflow-hidden border border-white/10 p-2 bg-white flex items-center justify-center shrink-0">
-                <Image
-                  src="/images/logo-icon.png"
-                  alt="NexByte Academy Emblem"
-                  width={140}
-                  height={140}
-                  className="object-contain"
-                />
+                <BrandLogo width={280} height={280} className="h-full w-full" />
                 <div className="absolute inset-0 bg-gradient-to-t from-nex-black/40 to-transparent" />
               </div>
             </div>
@@ -324,7 +318,7 @@ export default function TrainingPage() {
                 <div className="flex justify-between items-center mb-6">
                   <span className="text-[10px] text-nex-mist tracking-widest uppercase font-semibold">Reg ID: NB-2026-TR8</span>
                   <Award className="h-8 w-8 text-nex-blueLight" />
-                  <span className="text-[10px] text-nex-mist tracking-widest uppercase font-semibold">NexByte Academy</span>
+                  <span className="text-[10px] text-nex-mist tracking-widest uppercase font-semibold">Nex LapTech Academy</span>
                 </div>
 
                 <span className="font-display text-[10px] tracking-[0.3em] text-nex-blueLight font-bold uppercase block mb-4">
@@ -343,7 +337,7 @@ export default function TrainingPage() {
 
                 <div className="mt-10 flex justify-between items-end border-t border-white/5 pt-6 text-[9px] text-nex-mist">
                   <div className="text-left">
-                    <p className="font-semibold text-white/90">NexByte Technical Director</p>
+                    <p className="font-semibold text-white/90">Nex LapTech Technical Director</p>
                     <p className="mt-0.5">Authorised Signature</p>
                   </div>
                   <div>

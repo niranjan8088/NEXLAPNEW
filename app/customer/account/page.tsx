@@ -331,7 +331,7 @@ export default function CustomerAccountPortal() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                      {profile?.full_name || "NexByte Customer"}
+                      {profile?.full_name || "Nex LapTech Customer"}
                     </h1>
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400 uppercase">
                       <ShieldCheck className="h-3 w-3" /> Active Customer
@@ -976,7 +976,7 @@ export default function CustomerAccountPortal() {
                           : "mr-auto bg-white/[0.06] border border-white/10 text-nex-mist"
                       }`}
                     >
-                      <p className="font-bold text-[11px] text-white/80">{m.sender === "customer" ? "You" : "NexByte Support"}</p>
+                      <p className="font-bold text-[11px] text-white/80">{m.sender === "customer" ? "You" : "Nex LapTech Support"}</p>
                       <p className="leading-relaxed">{m.message}</p>
                       <p className="text-[9px] text-white/40 text-right">{new Date(m.created_at || Date.now()).toLocaleTimeString()}</p>
                     </div>
@@ -989,7 +989,7 @@ export default function CustomerAccountPortal() {
                   type="text"
                   value={newMessageText}
                   onChange={(e) => setNewMessageText(e.target.value)}
-                  placeholder="Type a message to NexByte Support..."
+                  placeholder="Type a message to Nex LapTech Support..."
                   className="flex-1 rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3 text-xs text-white focus:border-nex-blue focus:outline-none"
                 />
                 <button

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import Link from "next/link";
 import { Printer, Download, Share2, AlertCircle, CheckCircle, Receipt } from "lucide-react";
 import { formatRupees, sanitizeInvoiceItems } from "@/lib/billingUtils";
@@ -54,7 +54,7 @@ export default function PublicInvoiceViewPage({
           <h2 className="font-display text-lg font-bold text-black dark:text-white">Invoice Not Found</h2>
           <p className="text-xs text-neutral-500">{errorMsg || "The invoice link is invalid or expired."}</p>
           <Link href="/" className="bg-black text-white dark:bg-white dark:text-black font-bold inline-block text-xs py-2 px-6 rounded-xl">
-            Return to NexByte Home
+            Return to Nex LapTech Home
           </Link>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function PublicInvoiceViewPage({
         <div className="flex items-center justify-between bg-neutral-100 dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 print:hidden">
           <div className="flex items-center gap-2">
             <Receipt className="h-5 w-5 text-black dark:text-white" />
-            <span className="text-xs font-bold text-black dark:text-white">NexByte Tax Invoice: {numStr}</span>
+            <span className="text-xs font-bold text-black dark:text-white">Nex LapTech Tax Invoice: {numStr}</span>
           </div>
           <button
             onClick={() => window.print()}
@@ -110,15 +110,10 @@ export default function PublicInvoiceViewPage({
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <div className="relative h-9 w-9">
-                  <Image
-                    src="/images/logo-icon-transparent.png"
-                    alt="NexByte"
-                    fill
-                    className="object-contain"
-                  />
+                  <BrandLogo width={72} height={72} className="h-full w-full" />
                 </div>
                 <span className="font-bold text-lg tracking-tight text-slate-900">
-                  NEX<span className="text-blue-600">BYTE</span> TECHNOLOGIES
+                  Nex LapTech
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-semibold">
@@ -259,7 +254,7 @@ export default function PublicInvoiceViewPage({
 
           {/* Footer Terms */}
           <div className="border-t border-slate-200 pt-4 text-[9px] text-slate-400 text-center space-y-0.5">
-            <p>Thank you for choosing NexByte Technologies!</p>
+            <p>Thank you for choosing Nex LapTech!</p>
             <p>Computers • Laptop Service • Gaming PCs • Bulk IT Hardware • CCTV Systems</p>
           </div>
         </div>

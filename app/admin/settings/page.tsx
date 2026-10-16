@@ -9,7 +9,7 @@ export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState<"profile" | "appearance" | "notifications" | "system">("appearance");
 
   // Profile
-  const [adminName, setAdminName] = useState("NexByte Admin");
+  const [adminName, setAdminName] = useState("Nex LapTech Admin");
   const [adminEmail, setAdminEmail] = useState("admin@nexbyte.com");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -47,7 +47,7 @@ export default function AdminSettingsPage() {
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `NexByte_Full_Export_${new Date().toISOString().slice(0, 10)}.json`;
+    link.download = `NexLapTech_Full_Export_${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

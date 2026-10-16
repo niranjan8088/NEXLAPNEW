@@ -97,7 +97,7 @@ export default function AdminReportsDashboard() {
     const csvContent = "data:text/csv;charset=utf-8," + rows.join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", `NexByte_Report_${period}_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `NexLapTech_Report_${period}_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

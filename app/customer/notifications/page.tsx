@@ -9,7 +9,7 @@ export default function CustomerNotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([
     {
       id: "notif-1",
-      title: "Welcome to NexByte Customer Portal",
+      title: "Welcome to Nex LapTech Customer Portal",
       message: "Track repair bookings, browse genuine PC hardware, and enjoy instant technician support.",
       time: "Just now",
       type: "system",

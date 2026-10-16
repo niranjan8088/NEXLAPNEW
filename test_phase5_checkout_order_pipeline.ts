@@ -2,7 +2,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runPhase5Tests() {
   console.log("==================================================");
-  console.log("NEXBYTE PHASE 5: CHECKOUT, ORDER & INVOICE SUITE");
+  console.log("NEX LAPTECH PHASE 5: CHECKOUT, ORDER & INVOICE SUITE");
   console.log("==================================================");
 
   let passed = 0;
@@ -69,7 +69,7 @@ async function runPhase5Tests() {
         companyName: "Phase 5 Solutions Pvt Ltd",
         gstin: "29AAAAA0000A1Z5"
       },
-      courier: "NexByte Standard Logistics",
+      courier: "Nex LapTech Standard Logistics",
       tracking_number: "NEX-TRK-987654"
     });
 

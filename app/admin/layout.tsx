@@ -36,7 +36,6 @@ import {
   Receipt,
   Tag,
   Sun,
-  Moon,
   ChevronDown,
   ChevronRight,
   SlidersHorizontal,
@@ -46,7 +45,7 @@ import { realtimeSync } from "@/lib/realtimeSync";
 import { useAutoLogout } from "@/lib/useAutoLogout";
 import { useNotificationStore } from "@/lib/notificationStore";
 import QuickNotificationsPopover from "@/components/QuickNotificationsPopover";
-import { useTheme } from "@/components/ThemeProvider";
+import BrandLogo from "@/components/BrandLogo";
 
 // ─── Primary Immediate Navigation Links ──────────────────────────────────────
 
@@ -54,6 +53,7 @@ const PRIMARY_NAV_ITEMS = [
   { label: "Overview Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Billing & Invoices", href: "/admin/billing", icon: Receipt },
   { label: "Offers Management", href: "/admin/offers", icon: Tag },
+  { label: "Protection Plans", href: "/admin/protection-plans", icon: Shield },
   { label: "Bookings", href: "/admin/bookings", icon: Calendar },
   { label: "Products", href: "/admin/products", icon: ShoppingBag },
   { label: "Orders", href: "/admin/orders", icon: Package },
@@ -125,7 +125,6 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const [loggingOut, setLoggingOut] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
@@ -201,13 +200,13 @@ export default function AdminLayout({
         title={isDesktopCollapsed ? item.label : undefined}
         className={`relative flex items-center gap-3 rounded-xl px-3 py-2 text-[12px] font-bold tracking-wide transition-all ${
           active
-            ? "bg-[#2563EB] text-white shadow-md shadow-[#2563EB]/30 border border-blue-400/40"
-            : "text-[#94A3B8] hover:text-white hover:bg-[#17243B]"
+            ? "bg-blue-700 text-white shadow-sm border border-blue-600"
+            : "text-slate-600 hover:text-blue-800 hover:bg-slate-100"
         } ${isDesktopCollapsed ? "justify-center px-2" : ""}`}
       >
         <item.icon
           className={`h-4 w-4 shrink-0 transition-colors ${
-            active ? "text-white" : "text-[#06B6D4]"
+            active ? "text-white" : "text-blue-700"
           }`}
         />
         {!isDesktopCollapsed && <span className="truncate">{item.label}</span>}
@@ -225,22 +224,22 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-[#080D1B] text-[#F8FAFC] overflow-hidden relative">
+    <div className="portal-light admin-portal relative flex min-h-screen overflow-hidden bg-slate-50 text-slate-900">
       {/* Auto-logout warning overlay */}
       {showWarning && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#080D1B]/85 backdrop-blur-md" />
-          <div className="relative border border-amber-500/30 bg-[#111B32] rounded-2xl p-8 max-w-sm text-center shadow-2xl">
+          <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm" />
+          <div className="relative max-w-sm rounded-xl border border-amber-200 bg-white p-8 text-center shadow-xl">
             <AlertCircle className="h-12 w-12 text-amber-400 mx-auto mb-4 animate-pulse" />
-            <h3 className="font-display text-lg font-bold text-white mb-2">Session Expiring</h3>
-            <p className="text-xs text-[#94A3B8] mb-4">
+            <h3 className="mb-2 font-display text-lg font-bold text-slate-950">Session Expiring</h3>
+            <p className="mb-4 text-sm text-slate-600">
               You will be automatically logged out in <span className="text-amber-400 font-bold text-base">{countdown}s</span> due to inactivity.
             </p>
             <div className="flex gap-2 justify-center">
-              <button onClick={dismissWarning} className="bg-[#2563EB] text-white py-2 px-6 rounded-xl text-xs font-bold">
+              <button onClick={dismissWarning} className="rounded-lg bg-blue-700 px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-800">
                 Stay Logged In
               </button>
-              <button onClick={autoLogout} className="border border-red-500 text-red-400 py-2 px-4 rounded-xl text-xs font-bold">
+              <button onClick={autoLogout} className="rounded-lg border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-50">
                 Log Out Now
               </button>
             </div>
@@ -258,23 +257,32 @@ export default function AdminLayout({
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 border-r border-[#26364D] bg-[#0B1528] flex flex-col justify-between shrink-0 transform transition-all duration-300 ease-in-out md:translate-x-0 md:static print:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex shrink-0 transform flex-col justify-between border-r border-slate-200 bg-white transition-all duration-300 ease-in-out md:static md:translate-x-0 print:hidden ${
           isMobileOpen ? "translate-x-0" : "-translate-x-full"
         } ${isDesktopCollapsed ? "w-20" : "w-64"}`}
       >
         <div className="p-4 flex-1 flex flex-col min-h-0">
           {/* Logo Brand & Collapse Toggle */}
-          <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#26364D]">
+          <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3">
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#2563EB] to-[#8B5CF6] text-white shadow-md shadow-[#2563EB]/30 shrink-0">
-                <Shield className="h-5 w-5" />
+              <div
+                className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-blue-100 bg-white shadow-sm ${
+                  isDesktopCollapsed ? "h-9 w-9" : "h-14 w-14"
+                }`}
+              >
+                <BrandLogo
+                  width={isDesktopCollapsed ? 52 : 120}
+                  height={isDesktopCollapsed ? 52 : 120}
+                  sizes={isDesktopCollapsed ? "52px" : "120px"}
+                  className="h-full w-full"
+                />
               </div>
               {!isDesktopCollapsed && (
                 <div className="truncate">
-                  <h2 className="font-display text-sm font-extrabold tracking-tight text-white truncate">
-                    NEXBYTE
+                  <h2 className="truncate font-display text-sm font-extrabold tracking-tight text-slate-950">
+                    NEX LAPTECH
                   </h2>
-                  <span className="text-[9px] text-[#06B6D4] font-semibold tracking-wider uppercase block">
+                  <span className="block text-[9px] font-semibold uppercase tracking-wider text-blue-700">
                     QUANTUM COMMAND
                   </span>
                 </div>
@@ -284,7 +292,7 @@ export default function AdminLayout({
               <button
                 onClick={toggleDesktopCollapse}
                 title={isDesktopCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                className="hidden md:flex p-1.5 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#17243B] transition-colors"
+                className="hidden rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 md:flex"
               >
                 {isDesktopCollapsed ? (
                   <ChevronRight className="h-4 w-4" />
@@ -294,7 +302,7 @@ export default function AdminLayout({
               </button>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="md:hidden p-1.5 rounded-lg text-[#94A3B8] hover:text-white transition-colors"
+                className="rounded-lg p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 md:hidden"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -302,23 +310,23 @@ export default function AdminLayout({
           </div>
 
           {/* Nav Links */}
-          <nav className="flex-1 overflow-y-auto pr-1 pb-4 scrollbar-thin scrollbar-thumb-[#26364D] space-y-3">
+          <nav className="flex-1 space-y-3 overflow-y-auto pr-1 pb-4 scrollbar-thin scrollbar-thumb-slate-300">
             {/* 1. Primary Immediate Links */}
             <div className="space-y-1">
               {!isDesktopCollapsed && (
-                <p className="px-3 text-[10px] font-extrabold uppercase tracking-widest text-[#06B6D4] mb-2">
+                <p className="mb-2 px-3 text-[10px] font-extrabold uppercase tracking-widest text-blue-700">
                   COMMAND NAVIGATION
                 </p>
               )}
               {PRIMARY_NAV_ITEMS.map(renderNavItem)}
             </div>
 
-            <div className="h-px bg-[#26364D] my-3 mx-1" />
+            <div className="mx-1 my-3 h-px bg-slate-200" />
 
             {/* 2. Collapsible Secondary Groups */}
             <div className="space-y-2">
               {!isDesktopCollapsed && (
-                <p className="px-3 text-[10px] font-extrabold uppercase tracking-widest text-[#94A3B8] mb-1">
+                <p className="mb-1 px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                   ENTERPRISE MODULES
                 </p>
               )}
@@ -329,21 +337,21 @@ export default function AdminLayout({
                     {!isDesktopCollapsed ? (
                       <button
                         onClick={() => toggleGroup(group.id)}
-                        className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-[11px] font-bold text-[#94A3B8] hover:bg-[#17243B] hover:text-white transition-all text-left"
+                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-950"
                       >
                         <span className="truncate">{group.title}</span>
                         {isExpanded ? (
-                          <ChevronDown className="h-3.5 w-3.5 text-[#06B6D4] shrink-0" />
+                          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-blue-700" />
                         ) : (
-                          <ChevronRight className="h-3.5 w-3.5 text-[#94A3B8] shrink-0" />
+                          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-500" />
                         )}
                       </button>
                     ) : (
-                      <div className="h-px bg-[#26364D]/50 my-1" />
+                      <div className="my-1 h-px bg-slate-200" />
                     )}
 
                     {(isExpanded || isDesktopCollapsed) && (
-                      <div className={isDesktopCollapsed ? "space-y-1" : "space-y-1 ml-2 pl-2 border-l border-[#26364D]"}>
+                      <div className={isDesktopCollapsed ? "space-y-1" : "ml-2 space-y-1 border-l border-slate-200 pl-2"}>
                         {group.items.map(renderNavItem)}
                       </div>
                     )}
@@ -355,15 +363,15 @@ export default function AdminLayout({
         </div>
 
         {/* Footer actions */}
-        <div className="p-3 mx-2 mb-2 border-t border-[#26364D] space-y-1">
+        <div className="mx-2 mb-2 space-y-1 border-t border-slate-200 p-3">
           <Link
             href="/"
             title="Back to Website"
-            className={`flex items-center gap-3 rounded-xl px-3 py-2 text-[12px] font-semibold text-[#94A3B8] hover:bg-[#17243B] hover:text-white transition-colors ${
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 ${
               isDesktopCollapsed ? "justify-center px-2" : ""
             }`}
           >
-            <Home className="h-4 w-4 text-[#06B6D4] shrink-0" />
+            <Home className="h-4 w-4 shrink-0 text-blue-700" />
             {!isDesktopCollapsed && <span className="truncate">Back to Website</span>}
           </Link>
           <button
@@ -383,15 +391,15 @@ export default function AdminLayout({
       {/* Main dashboard content container */}
       <div className="flex-1 flex flex-col min-w-0 max-h-screen overflow-hidden print:max-h-none print:overflow-visible">
         {/* Header Navigation */}
-        <header className="h-16 border-b border-[#26364D] bg-[#0B1528]/95 backdrop-blur-xl px-4 md:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30 print:hidden">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xl print:hidden md:px-8">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg text-[#94A3B8] hover:text-white transition-colors"
+              className="-ml-2 rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 md:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="font-display text-sm font-bold text-white tracking-wide hidden md:block">
+            <h1 className="hidden font-display text-sm font-bold tracking-wide text-slate-950 md:block">
               {[...PRIMARY_NAV_ITEMS, ...COLLAPSIBLE_GROUPS.flatMap((g) => g.items)].find(
                 (item) => isActive(item.href)
               )?.label || "Admin Command Console"}
@@ -401,30 +409,26 @@ export default function AdminLayout({
             <button
               id="admin-command-palette-btn"
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex items-center gap-2.5 rounded-xl border border-[#26364D] bg-[#111B32] px-3.5 py-1.5 text-xs text-[#94A3B8] hover:bg-[#17243B] hover:border-[#06B6D4]/40 transition-all text-left"
+              className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-left text-xs text-slate-600 transition-all hover:border-blue-300 hover:bg-blue-50"
             >
-              <Sparkles className="h-3.5 w-3.5 text-[#06B6D4]" />
+              <Sparkles className="h-3.5 w-3.5 text-blue-700" />
               <span className="hidden sm:inline">Quantum Command...</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-[#17243B] text-[#94A3B8] border border-[#26364D] ml-2">
+              <kbd className="ml-2 hidden rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold text-slate-600 sm:inline-block">
                 Ctrl+K
               </kbd>
             </button>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle Theme"
-              title={theme === "day" ? "Switch to Night Mode" : "Switch to Day Mode"}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#26364D] bg-[#111B32] text-white hover:bg-[#17243B] transition-colors"
+            {/* Theme is fixed to light mode. */}
+            <div
+              role="status"
+              aria-label="Light theme active"
+              title="Light theme active"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition-colors hover:bg-slate-100"
             >
-              {theme === "day" ? (
-                <Moon className="h-4 w-4 text-[#06B6D4]" />
-              ) : (
-                <Sun className="h-4 w-4 text-amber-400" />
-              )}
-            </button>
+              <Sun className="h-4 w-4 text-amber-500" />
+            </div>
 
             {/* Notification Popover */}
             <QuickNotificationsPopover role="admin" />
@@ -432,7 +436,7 @@ export default function AdminLayout({
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="hidden md:flex text-[12px] font-bold text-[#94A3B8] hover:text-white transition-colors ml-2"
+              className="ml-2 hidden text-xs font-semibold text-slate-600 transition-colors hover:text-slate-950 md:flex"
             >
               Logout
             </button>
@@ -440,13 +444,13 @@ export default function AdminLayout({
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-[#080D1B] text-[#F8FAFC] scrollbar-thin scrollbar-thumb-[#26364D] print:p-0 print:bg-white print:overflow-visible">
+        <main className="flex-1 overflow-y-auto bg-slate-50 p-4 text-slate-900 scrollbar-thin scrollbar-thumb-slate-300 print:overflow-visible print:bg-white print:p-0 md:p-8">
           <Suspense
             fallback={
               <div className="w-full h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-8 w-8 rounded-full border-2 border-[#2563EB] border-t-transparent animate-spin" />
-                  <p className="text-[11px] text-[#94A3B8] font-medium">Loading Quantum Console...</p>
+                  <p className="text-xs font-medium text-slate-500">Loading admin console...</p>
                 </div>
               </div>
             }

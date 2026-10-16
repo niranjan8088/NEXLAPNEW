@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, Eye, EyeOff, AlertTriangle, CheckCircle2, ArrowRight, KeyRound } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -178,23 +178,17 @@ export default function ResetPasswordPage() {
           <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
             <div className="relative h-10 w-10">
               <div className="absolute inset-0 rounded-full bg-nex-blue/30 blur-md group-hover:bg-nex-blue/50 transition-colors" />
-              <Image
-                src="/images/logo-icon-transparent.png"
-                alt="NexByte Technologies"
-                fill
-                className="relative object-contain"
-                priority
-              />
+              <BrandLogo width={80} height={80} sizes="40px" priority className="relative h-full w-full" />
             </div>
             <span className="font-display text-xl font-bold tracking-tight text-white">
-              NEX<span className="text-nex-blueLight">BYTE</span>
+              NEX <span className="text-nex-blueLight">LAPTECH</span>
             </span>
           </Link>
           <h1 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
             Reset Your <span className="text-gradient-blue">Password.</span>
           </h1>
           <p className="mt-1 text-xs text-nex-mist">
-            Set a new secure password for your NexByte account.
+            Set a new secure password for your Nex LapTech account.
           </p>
         </div>
 

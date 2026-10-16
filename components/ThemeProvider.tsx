@@ -21,27 +21,29 @@ export interface ThemeConfig {
 export const THEME_PRESETS: Record<ThemeId, ThemeConfig> = {
   day: {
     id: "day",
-    name: "Arctic Glass Light",
-    description: "Bright, Clean & Premium Light UI",
+    name: "Nex LapTech Light",
+    description: "Premium light storefront experience",
     mode: "light",
     primary: "#2563EB",
-    accent: "#0891B2",
-    bg: "#FFFFFF",
+    accent: "#0EA5E9",
+    bg: "#F8FAFC",
     surface: "#FFFFFF",
     text: "#0F172A",
   },
   night: {
     id: "night",
-    name: "Arctic Glass Dark",
-    description: "Sleek Arctic Glass Dark Mode",
-    mode: "dark",
+    name: "Nex LapTech Light",
+    description: "Premium light storefront experience",
+    mode: "light",
     primary: "#2563EB",
-    accent: "#0891B2",
-    bg: "#0B1220",
-    surface: "#101B2B",
-    text: "#F8FAFC",
+    accent: "#0EA5E9",
+    bg: "#F8FAFC",
+    surface: "#FFFFFF",
+    text: "#0F172A",
   },
 };
+
+const normalizeTheme = (value?: ThemeId | null): ThemeId => "day";
 
 interface ThemeContextType {
   theme: ThemeId;
@@ -66,32 +68,24 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Computed effective active theme
   const effectiveThemeId: ThemeId =
     globalPolicy === "forced" && THEME_PRESETS[forcedTheme]
-      ? forcedTheme
+      ? normalizeTheme(forcedTheme)
       : THEME_PRESETS[userTheme]
-      ? userTheme
+      ? normalizeTheme(userTheme)
       : "day";
 
   const activeThemeConfig = THEME_PRESETS[effectiveThemeId] || THEME_PRESETS["day"];
 
   // Apply DOM attributes instantly
   const applyThemeToDom = (themeId: ThemeId) => {
-    const target = themeId === "night" ? "night" : "day";
+    const target = "day";
     document.documentElement.setAttribute("data-theme", target);
-    if (target === "night") {
-      document.documentElement.classList.add("dark", "night");
-      document.documentElement.classList.remove("light", "day");
-    } else {
-      document.documentElement.classList.add("light", "day");
-      document.documentElement.classList.remove("dark", "night");
-    }
+    document.documentElement.classList.add("light", "day");
+    document.documentElement.classList.remove("dark", "night");
   };
 
   // Helper to map legacy theme strings to day/night
   const mapLegacyTheme = (val: string | null): ThemeId => {
     if (!val) return "day";
-    if (val === "night" || val === "dark" || val.includes("dark") || val.includes("midnight") || val.includes("black")) {
-      return "night";
-    }
     return "day";
   };
 
@@ -101,7 +95,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     try {
       const savedUser = localStorage.getItem("nexbyte_theme") || localStorage.getItem("nexbyte-theme") || localStorage.getItem("theme");
       if (savedUser) {
-        setUserTheme(mapLegacyTheme(savedUser));
+        setUserTheme(normalizeTheme(mapLegacyTheme(savedUser)));
       }
     } catch (e) {}
 
@@ -126,7 +120,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.policy) setGlobalPolicyState(data.policy);
         if (data.forcedTheme) {
-          setForcedThemeState(mapLegacyTheme(data.forcedTheme));
+          setForcedThemeState(normalizeTheme(mapLegacyTheme(data.forcedTheme)));
         }
       }
     } catch (e) {
@@ -142,7 +136,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [effectiveThemeId, mounted]);
 
   const setTheme = (newTheme: ThemeId) => {
-    const valid = newTheme === "night" ? "night" : "day";
+    const valid = normalizeTheme(newTheme);
     setUserTheme(valid);
     try {
       localStorage.setItem("nexbyte_theme", valid);
@@ -155,27 +149,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleTheme = () => {
-    const next = effectiveThemeId === "day" ? "night" : "day";
-    setTheme(next);
+    setTheme("day");
   };
 
   const setGlobalPolicy = async (policy: GlobalPolicy, forcedThemeId?: ThemeId) => {
-    const targetForced = forcedThemeId ? (forcedThemeId === "night" ? "night" : "day") : forcedTheme;
-    setGlobalPolicyState(policy);
-    setForcedThemeState(targetForced);
-
-    try {
-      await fetch("/api/system/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          policy,
-          forcedTheme: targetForced,
-        }),
-      });
-    } catch (e) {
-      console.error("Global theme policy save error", e);
+    const targetForced = normalizeTheme(forcedThemeId ?? forcedTheme);
+    const response = await fetch("/api/system/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ policy, forcedTheme: targetForced }),
+    });
+    const result = await response.json();
+    if (!response.ok || result.success === false) {
+      throw new Error(result.error || "Unable to save global appearance settings.");
     }
+
+    setGlobalPolicyState(result.policy === "forced" ? "forced" : "personal");
+    setForcedThemeState(normalizeTheme(result.forcedTheme));
   };
 
   const resetToDefault = () => {

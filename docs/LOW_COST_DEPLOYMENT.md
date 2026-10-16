@@ -1,6 +1,6 @@
 # Low-Cost Enterprise Production VPS Deployment Guide
 
-This guide details step-by-step instructions for deploying NexByte Technologies on a single low-cost Linux VPS ($6 - $12 / month) with Cloudflare Free, Nginx, PM2, and Supabase.
+This guide details step-by-step instructions for deploying Nex LapTech on a single low-cost Linux VPS ($6 - $12 / month) with Cloudflare Free, Nginx, PM2, and Supabase.
 
 ---
 

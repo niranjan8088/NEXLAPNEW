@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import BrandLogo from "@/components/BrandLogo";
 import {
   Menu,
   X,
   Sun,
-  Moon,
   ShoppingBag,
   LogOut,
   User,
@@ -29,7 +28,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cartStore";
-import { useTheme } from "@/components/ThemeProvider";
 import GlobalSearchModal from "@/components/GlobalSearchModal";
 
 // Clean Primary Navigation
@@ -56,7 +54,6 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -101,19 +98,9 @@ export default function Navbar() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Logo */}
           <Link href={isAuthenticated ? "/customer" : "/"} className="flex items-center gap-2.5 group shrink-0">
-            <div className="relative h-9 w-9 sm:h-10 sm:w-10">
-              <Image
-                src="/images/logo-icon-transparent.png"
-                alt="NexByte Technologies logo"
-                fill
-                sizes="40px"
-                className="object-contain dark:invert"
-                priority
-              />
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border border-blue-100 bg-white shadow-sm sm:h-11 sm:w-11">
+              <BrandLogo width={120} height={120} sizes="44px" priority className="h-full w-full" />
             </div>
-            <span className="font-display text-lg sm:text-xl font-extrabold tracking-tight text-black dark:text-white">
-              NEXBYTE
-            </span>
           </Link>
 
           {/* Primary Navigation Links (Desktop) */}
@@ -128,7 +115,7 @@ export default function Navbar() {
                     className={cn(
                       "px-3.5 py-1.5 text-xs font-bold transition-all rounded-full block",
                       linkActive
-                        ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
+                        ? "bg-blue-700 text-white shadow-sm"
                         : "text-neutral-700 dark:text-neutral-300 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900"
                     )}
                   >
@@ -214,24 +201,20 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Light ☀ / Night ☾ Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle Day / Night Theme"
-              title={theme === "day" ? "Switch to Night Mode" : "Switch to Day Mode"}
+            {/* Theme is fixed to light mode. */}
+            <div
+              role="status"
+              aria-label="Light theme active"
+              title="Light theme active"
               className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
             >
-              {theme === "day" ? (
-                <Moon className="h-4 w-4 text-black" />
-              ) : (
-                <Sun className="h-4 w-4 text-white" />
-              )}
-            </button>
+              <Sun className="h-4 w-4 text-amber-500" />
+            </div>
 
             {/* Get Help CTA button */}
             <Link
               href="/contact"
-              className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-black text-white dark:bg-white dark:text-black font-bold text-xs px-4 py-2 shadow-sm hover:opacity-90 transition-all"
+              className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-blue-700 text-white font-bold text-xs px-4 py-2 shadow-sm hover:bg-blue-800 transition-all"
             >
               <HelpCircle className="h-3.5 w-3.5" /> Get Help
             </Link>

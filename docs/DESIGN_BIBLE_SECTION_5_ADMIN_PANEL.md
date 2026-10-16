@@ -1,4 +1,4 @@
-# NEXBYTE TECHNOLOGIES
+# NEX LAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 5: Admin Panel Module Specifications (21 Modules)
 

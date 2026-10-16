@@ -4,6 +4,7 @@ import { business } from "@/lib/data";
 import FloatingButtons from "@/components/FloatingButtons";
 import NotificationProvider from "@/components/NotificationProvider";
 import ClientModals from "@/components/ClientModals";
+import AppExperience from "@/components/AppExperience";
 
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 
@@ -26,12 +27,12 @@ const SITE_URL = "https://nexbytetechnologies.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "NexByte Technologies | Premium Computers, Laptops & IT Services in Bengaluru",
-    template: "%s | NexByte Technologies",
+    default: "Nex LapTech | Laptops, PC Components & Accessories",
+    template: "%s | Nex LapTech",
   },
   description: business.description,
   keywords: [
-    "NexByte Technologies",
+    "Nex LapTech",
     "computer store Bengaluru",
     "laptop repair Bengaluru",
     "gaming desktops",
@@ -42,37 +43,42 @@ export const metadata: Metadata = {
     "IT services Padmanabhanagar",
     "second hand laptops Bengaluru",
   ],
-  authors: [{ name: "NexByte Technologies" }],
-  creator: "NexByte Technologies",
-  applicationName: "NexByte Technologies",
+  authors: [{ name: "Nex LapTech" }],
+  creator: "Nex LapTech",
+  applicationName: "Nex LapTech",
   formatDetection: { telephone: true, email: true, address: true },
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: SITE_URL,
-    siteName: "NexByte Technologies",
-    title: "NexByte Technologies | Premium Computers, Laptops & IT Services",
+    siteName: "Nex LapTech",
+    title: "Nex LapTech | Laptops, PC Components & Accessories",
     description: business.description,
     images: [
       {
-        url: "/images/logo-horizontal.png",
-        width: 1956,
-        height: 804,
-        alt: "NexByte Technologies",
+        url: "/assets/nexlaptech-logo.svg",
+        width: 768,
+        height: 768,
+        alt: "Nex LapTech",
+        type: "image/svg+xml",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NexByte Technologies | Premium Computers, Laptops & IT Services",
+    title: "Nex LapTech | Laptops, PC Components & Accessories",
     description: business.description,
-    images: ["/images/logo-horizontal.png"],
+    images: ["/assets/nexlaptech-logo.svg"],
   },
   icons: {
-    icon: "/images/logo-icon.png",
-    shortcut: "/images/logo-icon.png",
-    apple: "/images/logo-icon.png",
+    icon: [
+      { url: "/assets/nexlaptech-logo.svg", sizes: "32x32", type: "image/svg+xml" },
+      { url: "/assets/nexlaptech-logo.svg", sizes: "192x192", type: "image/svg+xml" },
+      { url: "/assets/nexlaptech-logo.svg", sizes: "512x512", type: "image/svg+xml" },
+    ],
+    shortcut: "/assets/nexlaptech-logo.svg",
+    apple: "/assets/nexlaptech-logo.svg",
   },
   robots: {
     index: true,
@@ -87,7 +93,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#05070C",
+  themeColor: "#F8FAFC",
   width: "device-width",
   initialScale: 1,
 };
@@ -96,7 +102,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ElectronicsStore",
   name: business.name,
-  image: `${SITE_URL}/images/logo-horizontal.png`,
+  image: `${SITE_URL}/assets/nexlaptech-logo.svg`,
   "@id": SITE_URL,
   url: SITE_URL,
   telephone: business.phones[0],
@@ -145,6 +151,33 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${inter.variable}`} data-theme="day" suppressHydrationWarning>
       <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root { --loader-bg: #f8fafc; --brand-blue: #2563eb; --brand-cyan: #0891b2; --loader-duration: 1.6s; }
+          #nexlap-entry-loader { position: fixed; inset: 0; z-index: 2147483000; display: none; align-items: center; justify-content: center; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, rgba(14,165,233,.12), transparent 58%), var(--loader-bg); color: #0f172a; }
+          html.nexlap-entry-active #nexlap-entry-loader { display: flex; }
+          html.nexlap-entry-active, html.nexlap-entry-active body { overflow: hidden; }
+          @media (prefers-reduced-motion: reduce) { html.nexlap-entry-active #nexlap-entry-loader { background: var(--loader-bg); } }
+        ` }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  if (!sessionStorage.getItem('nexlap-entry-seen')) {
+                    document.documentElement.classList.add('nexlap-entry-active');
+                    window.setTimeout(function() {
+                      var root = document.documentElement;
+                      if (root.classList.contains('nexlap-entry-active')) {
+                        root.classList.remove('nexlap-entry-active');
+                        try { sessionStorage.setItem('nexlap-entry-seen', '1'); } catch (e) {}
+                      }
+                    }, 2500);
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger
@@ -155,17 +188,10 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var saved = localStorage.getItem('nexbyte_theme') || localStorage.getItem('nexbyte-theme') || localStorage.getItem('theme');
-                  var isNight = saved === 'night' || saved === 'dark' || (saved && (saved.indexOf('dark') !== -1 || saved.indexOf('midnight') !== -1 || saved.indexOf('black') !== -1));
-                  var target = isNight ? 'night' : 'day';
-                  document.documentElement.setAttribute('data-theme', target);
-                  if (isNight) {
-                    document.documentElement.classList.add('dark', 'night');
-                    document.documentElement.classList.remove('light', 'day');
-                  } else {
-                    document.documentElement.classList.add('light', 'day');
-                    document.documentElement.classList.remove('dark', 'night');
-                  }
+                  var root = document.documentElement;
+                  root.setAttribute('data-theme', 'day');
+                  root.classList.add('light', 'day');
+                  root.classList.remove('dark', 'night');
                 } catch (e) {}
               })();
             `,
@@ -192,7 +218,7 @@ export default function RootLayout({
       <body className="font-body antialiased bg-nex-bg text-nex-text min-h-screen">
         <ThemeProvider>
           <NotificationProvider>
-            {children}
+            <AppExperience>{children}</AppExperience>
             <FloatingButtons />
             <ClientModals />
           </NotificationProvider>

@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -9,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Unified NexByte Theme Tokens
+        // Unified Nex LapTech Theme Tokens
         nex: {
           primary: "var(--color-primary, #0EA5E9)",
           primaryHover: "var(--color-primary-hover, #0284C7)",

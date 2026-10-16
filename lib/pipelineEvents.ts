@@ -1,6 +1,6 @@
 /**
  * lib/pipelineEvents.ts
- * Centralized Event & Pipeline Notification Dispatch Engine for NexByte Technologies.
+ * Centralized Event & Pipeline Notification Dispatch Engine for Nex LapTech.
  * 
  * Handles Admin ↔ Customer ↔ Reseller pipelines:
  * - Creates stored notification with role-scoped recipient (recipient_user_id or recipient_role).

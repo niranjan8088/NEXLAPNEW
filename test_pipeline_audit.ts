@@ -2,7 +2,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runPipelineAudit() {
   console.log("\n==================================================");
-  console.log("NEXBYTE REAL FUNCTIONAL PIPELINE & DATA-FLOW AUDIT");
+  console.log("NEX LAPTECH REAL FUNCTIONAL PIPELINE & DATA-FLOW AUDIT");
   console.log("==================================================\n");
 
   let passCount = 0;
@@ -206,7 +206,7 @@ async function runPipelineAudit() {
       recipient_user_id: resellerId,
       recipient_role: "reseller",
       title: "Account Approved",
-      message: "Your Reseller Hub application has been approved by NexByte Admin.",
+      message: "Your Reseller Hub application has been approved by Nex LapTech Admin.",
       type: "reseller",
       reference_id: reseller.id,
       reference_type: "reseller",

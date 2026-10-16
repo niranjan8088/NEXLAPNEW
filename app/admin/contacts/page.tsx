@@ -47,7 +47,7 @@ function AdminContactsContent() {
     // Dispatch real-time Customer notification
     await dispatchPipelineEvent({
       eventType: "MESSAGE_RECEIVED",
-      title: "💬 New reply from NexByte Support",
+      title: "💬 New reply from Nex LapTech Support",
       message: replyText.trim().substring(0, 100),
       recipientUserId: replyModal.user_id || replyModal.customer_id,
       referenceType: "message",
@@ -80,7 +80,7 @@ function AdminContactsContent() {
     });
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csv));
-    link.setAttribute("download", "NexByte_Contact_Enquiries.csv");
+    link.setAttribute("download", "NexLapTech_Contact_Enquiries.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

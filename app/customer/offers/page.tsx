@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Tag, Copy, Check, ShoppingBag, Wrench, ShieldCheck, Sparkles, Filter, ExternalLink } from "lucide-react";
-import { dbHelper } from "@/lib/dbHelper";
 import { cn } from "@/lib/utils";
 
 export default function CustomerOffersPage() {
@@ -15,18 +14,10 @@ export default function CustomerOffersPage() {
   const loadOffers = async () => {
     setLoading(true);
     try {
-      const list = await dbHelper.offers.list();
-      const todayStr = new Date().toISOString().split("T")[0];
-
-      // Filter only active, non-expired offers for customer display (Req #4)
-      const valid = list.filter((o: any) => {
-        const isActive = (o.status || "ACTIVE") === "ACTIVE";
-        const expiry = o.expiryDate || o.expiry_date || "2099-12-31";
-        const notExpired = todayStr <= expiry;
-        return isActive && notExpired;
-      });
-
-      setOffers(valid);
+      const response = await fetch("/api/offers");
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to load active offers.");
+      setOffers(data.offers || []);
     } catch (err) {
       console.error("Failed to load offers", err);
     } finally {
@@ -59,7 +50,7 @@ export default function CustomerOffersPage() {
           <Tag className="h-3.5 w-3.5 text-amber-500" /> Offers for You
         </span>
         <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-          Save More on Your NexByte Purchase
+          Save More on Your Nex LapTech Purchase
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
           Copy promo codes and apply them during checkout or service booking to unlock instant savings on laptops, parts, and technician services.
@@ -99,7 +90,9 @@ export default function CustomerOffersPage() {
             const code = offer.offerCode || offer.offer_code;
             const title = offer.offerName || offer.offer_name;
             const desc = offer.description || "Valid on eligible hardware & services.";
-            const discountLabel = offer.discountType === "percentage" ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} OFF`;
+            const discountType = offer.discountType || offer.discount_type;
+            const discountValue = offer.discountValue ?? offer.discount_value ?? 0;
+            const discountLabel = discountType === "percentage" ? `${discountValue}% OFF` : `₹${discountValue} OFF`;
             const isCopied = copiedCode === code;
             const isService = title?.toLowerCase().includes("repair") || code?.toLowerCase().includes("repair");
             const targetUrl = isService ? "/customer/services" : `/customer/shop?offer=${code}`;
@@ -127,8 +120,8 @@ export default function CustomerOffersPage() {
                   </p>
 
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5 pt-1">
-                    {offer.minimumPurchase > 0 && <div>Min. purchase: ₹{(offer.minimumPurchase).toLocaleString("en-IN")}</div>}
-                    {offer.maximumDiscount > 0 && <div>Max. discount: ₹{(offer.maximumDiscount).toLocaleString("en-IN")}</div>}
+                    {Number(offer.minimumPurchase ?? offer.minimum_purchase) > 0 && <div>Min. purchase: ₹{Number(offer.minimumPurchase ?? offer.minimum_purchase).toLocaleString("en-IN")}</div>}
+                    {Number(offer.maximumDiscount ?? offer.maximum_discount) > 0 && <div>Max. discount: ₹{Number(offer.maximumDiscount ?? offer.maximum_discount).toLocaleString("en-IN")}</div>}
                   </div>
                 </div>
 

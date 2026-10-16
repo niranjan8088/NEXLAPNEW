@@ -21,9 +21,9 @@ import {
 
 export default function CustomerCartPage() {
   const router = useRouter();
-  const { items, removeItem, updateQuantity, clearCart, getTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, clearCart, getTotal, appliedOfferCode, setAppliedOfferCode } = useCartStore();
 
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(appliedOfferCode);
   const [appliedOffer, setAppliedOffer] = useState<{ code: string; discountAmount: number } | null>(null);
   const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [isGstEnabled, setIsGstEnabled] = useState(false);
@@ -59,22 +59,26 @@ export default function CustomerCartPage() {
 
       const data = await res.json();
       if (data.valid) {
+        const discountAmount = Number(data.discountAmount) || 0;
         setAppliedOffer({
-          code: couponCode.trim().toUpperCase(),
-          discountAmount: data.discountAmount || 500,
+          code: data.offer?.code || couponCode.trim().toUpperCase(),
+          discountAmount,
         });
+        setAppliedOfferCode(data.offer?.code || couponCode.trim().toUpperCase());
         setCouponMessage({
           type: "success",
-          text: `🎉 Code ${couponCode.trim().toUpperCase()} applied! Savings: ₹${(data.discountAmount || 500).toLocaleString("en-IN")}`,
+          text: `Code ${data.offer?.code || couponCode.trim().toUpperCase()} applied! Savings: ₹${discountAmount.toLocaleString("en-IN")}`,
         });
       } else {
         setAppliedOffer(null);
+        setAppliedOfferCode("");
         setCouponMessage({
           type: "error",
           text: data.error || "Invalid or expired code.",
         });
       }
     } catch (err) {
+      setAppliedOfferCode("");
       setCouponMessage({ type: "error", text: "Failed to validate code." });
     }
   };

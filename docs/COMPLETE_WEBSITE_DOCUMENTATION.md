@@ -1,4 +1,4 @@
-# NEXBYTE TECHNOLOGIES — COMPLETE WEBSITE DOCUMENTATION
+# NEX LAPTECH — COMPLETE WEBSITE DOCUMENTATION
 
 **Document Revision Date:** October 9, 2026  
 **Project Version:** 1.0.0  
@@ -30,7 +30,7 @@
 
 ## 1. Executive Summary & Business Overview
 
-**NexByte Technologies** is a unified, full-stack B2C & B2B e-commerce platform and IT services portal. It connects retail customers, multi-vendor reseller partners, and internal company administrators under a single web application built with **Next.js 15 (App Router)** and **Supabase (PostgreSQL)**.
+**Nex LapTech** is a unified, full-stack B2C & B2B e-commerce platform and IT services portal. It connects retail customers, multi-vendor reseller partners, and internal company administrators under a single web application built with **Next.js 15 (App Router)** and **Supabase (PostgreSQL)**.
 
 ### Core Business Pillars
 1. **Direct E-Commerce Storefront:** Retail catalog for laptops, desktop computers, components, peripherals, and custom PC builds.

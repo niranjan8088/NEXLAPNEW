@@ -1,4 +1,4 @@
-# NEXBYTE TECHNOLOGIES
+# NEX LAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 1: Business Architecture, Business Models & User Journeys
 
@@ -6,7 +6,7 @@
 
 ## 1. Company Overview
 
-**NexByte Technologies** is a leading technology solutions provider headquartered in Bengaluru, Karnataka. Specializing in high-performance custom gaming PCs, enterprise laptop sales, doorstep laptop and desktop repair services, Annual Maintenance Contracts (AMC), corporate networking, CCTV surveillance installations, and technical training programs for students and professionals.
+**Nex LapTech** is a leading technology solutions provider headquartered in Bengaluru, Karnataka. Specializing in high-performance custom gaming PCs, enterprise laptop sales, doorstep laptop and desktop repair services, Annual Maintenance Contracts (AMC), corporate networking, CCTV surveillance installations, and technical training programs for students and professionals.
 
 - **Head Office Address:** #372, 1st Floor, MK Puttalingaiah Road, Uttarahalli Main Road, Padmanabhanagar, Bengaluru – 560070
 - **Branch Offices:** Bengaluru (Head Office), Tumkur Branch (Upparahalli), Hiriyur Branch (Opening Soon)
@@ -32,7 +32,7 @@ To become South India's most trusted and technologically advanced computer sales
 
 1. **Seamless Lead Capture:** Enable customers to book hardware purchases, laptop repairs, and AMC consultations in under 60 seconds with automated Reference ID (`NB-2026-XXXXXX`) generation.
 2. **Real-Time Transparency:** Provide end-to-end status visibility via a live progress timeline (`Submitted` -> `Contacted` -> `In Repair` -> `Completed`) and two-way live chat.
-3. **Automated Enterprise Management:** Equipping NexByte administrators with a 21-module real-time Admin Console featuring Kanban lead management, stock alerts, invoice printing, and certificate verification.
+3. **Automated Enterprise Management:** Equipping Nex LapTech administrators with a 21-module real-time Admin Console featuring Kanban lead management, stock alerts, invoice printing, and certificate verification.
 4. **Zero-Downtime Reliability:** Ensuring 24/7 web app uptime via PM2 process management, Nginx reverse proxying, Cloudflare edge caching, and Supabase cloud infrastructure.
 
 ***
@@ -49,7 +49,7 @@ To become South India's most trusted and technologically advanced computer sales
 ## 6. Business & Monetization Model
 
 ```
-                                NexByte Technologies Revenue Streams
+                                Nex LapTech Revenue Streams
                                                  │
       ┌──────────────────┬───────────────────────┼───────────────────────┬──────────────────┐
       ▼                  ▼                       ▼                       ▼                  ▼

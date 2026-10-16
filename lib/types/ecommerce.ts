@@ -1,5 +1,5 @@
 /**
- * NEXBYTE TECHNOLOGIES — E-COMMERCE CATALOG & DYNAMIC FILTER ARCHITECTURE
+ * NEX LAPTECH — E-COMMERCE CATALOG & DYNAMIC FILTER ARCHITECTURE
  * Phase 1 TypeScript definitions for category-aware product specifications,
  * filter definitions, normalized attributes, and catalog filter state.
  */

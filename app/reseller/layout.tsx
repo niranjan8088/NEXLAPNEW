@@ -5,11 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ShoppingBag, PlusCircle, Package,
   MessageSquare, BarChart3, User, Settings, Home, LogOut,
-  Bell, Menu, X, Building2, ChevronRight, Sun, Moon
+  Bell, Menu, X, Building2, ChevronRight, Sun
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import AiChatWidget from "@/components/AiChatWidget";
-import { useTheme } from "@/components/ThemeProvider";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/reseller", icon: LayoutDashboard },
@@ -25,7 +24,6 @@ const NAV_ITEMS = [
 export default function ResellerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [resellerName, setResellerName] = useState("Reseller");
@@ -60,7 +58,7 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
   };
 
   return (
-    <div className="flex min-h-screen bg-white text-black dark:bg-black dark:text-white overflow-hidden relative">
+    <div className="portal-light reseller-portal flex min-h-screen overflow-hidden relative bg-slate-50 text-slate-900">
       {/* Mobile overlay */}
       <div
         className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
@@ -73,11 +71,11 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
           {/* Brand */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black text-white dark:bg-white dark:text-black shadow-sm">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-700 shadow-sm">
                 <Building2 className="h-4.5 w-4.5" />
               </div>
               <div>
-                <h2 className="font-display text-sm font-extrabold text-black dark:text-white tracking-tight">NexByte</h2>
+                <h2 className="font-display text-sm font-extrabold text-slate-900 tracking-tight">Nex LapTech</h2>
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-semibold tracking-wider">RESELLER HUB</span>
               </div>
             </div>
@@ -87,13 +85,13 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
           </div>
 
           {/* Reseller info card */}
-          <div className="mb-6 p-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
+          <div className="mb-6 p-3 rounded-xl bg-blue-50 border border-blue-100">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-sm">
+              <div className="h-8 w-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-sm">
                 {resellerName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-black dark:text-white truncate">{resellerName}</p>
+                <p className="text-xs font-bold text-slate-900 truncate">{resellerName}</p>
                 <p className="text-[10px] text-neutral-500 dark:text-neutral-400 truncate">{resellerEmail}</p>
               </div>
             </div>
@@ -109,11 +107,11 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[12px] font-bold tracking-wide transition-all ${isActive
-                    ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
-                    : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-900"
+                    ? "bg-blue-700 text-white shadow-sm"
+                    : "text-slate-700 hover:bg-blue-50 hover:text-blue-800"
                   }`}
                 >
-                  <item.icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? "text-white dark:text-black" : "text-neutral-500 dark:text-neutral-400"}`} />
+                  <item.icon className={`h-4 w-4 shrink-0 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
                   <span className="truncate">{item.label}</span>
                   {isActive && <ChevronRight className="h-3 w-3 ml-auto opacity-50" />}
                 </Link>
@@ -151,31 +149,21 @@ export default function ResellerLayout({ children }: { children: React.ReactNode
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Day ☀ / Night ☾ Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle Theme"
-              title={theme === "day" ? "Switch to Night Mode" : "Switch to Day Mode"}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
-            >
-              {theme === "day" ? (
-                <Moon className="h-4 w-4 text-black" />
-              ) : (
-                <Sun className="h-4 w-4 text-white" />
-              )}
-            </button>
+            <div role="status" aria-label="Light theme active" title="Light theme active" className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white">
+              <Sun className="h-4 w-4 text-amber-500" />
+            </div>
 
             <button className="relative p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors">
               <Bell className="h-4 w-4 text-neutral-700 dark:text-neutral-300" />
             </button>
-            <div className="h-8 w-8 rounded-lg bg-black text-white dark:bg-white dark:text-black flex items-center justify-center font-bold text-sm">
+            <div className="h-8 w-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-sm">
               {resellerName.charAt(0).toUpperCase()}
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-white dark:bg-black text-black dark:text-white scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-800">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-slate-50 text-slate-900 scrollbar-thin scrollbar-thumb-slate-300">
           {children}
         </main>
         <AiChatWidget portal="reseller" />

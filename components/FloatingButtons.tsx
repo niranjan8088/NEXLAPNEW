@@ -52,7 +52,7 @@ export default function FloatingButtons() {
 
       <a
         href={`tel:${business.phoneLinks[0]}`}
-        aria-label="Call NexByte Technologies"
+        aria-label="Call Nex LapTech"
         className="flex h-11 w-11 items-center justify-center rounded-full glass-panel text-white shadow-glass transition-transform hover:scale-110 hover:border-nex-blue/50"
       >
         <Phone className="h-5 w-5" />

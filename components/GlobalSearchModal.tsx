@@ -85,7 +85,7 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
   const staticSupport = [
     { id: "sup1", title: "Track My Order or Repair Request", desc: "Enter Request ID (REQ-2026-...) to see real-time progress", href: "/customer/requests" },
     { id: "sup2", title: "Contact Customer Expert Support", desc: "Phone lines: 8088979706 / 8904760125 or WhatsApp support", href: "/contact" },
-    { id: "sup3", title: "Verify Training Certificate", desc: "Enter Certificate Registration ID to verify official NexByte credentials", href: "/verify" },
+    { id: "sup3", title: "Verify Training Certificate", desc: "Enter Certificate Registration ID to verify official Nex LapTech credentials", href: "/verify" },
   ];
 
   // Smart Intent Resolution
@@ -350,7 +350,7 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
         {/* Footer info */}
         <div className="border-t border-slate-200 dark:border-white/10 px-4 py-2.5 bg-slate-50 dark:bg-slate-950 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
           <span>Search across Products, Services, Training, Offers &amp; Tracking</span>
-          <span className="font-semibold text-nex-blue dark:text-nex-blueLight">NexByte Smart Search</span>
+          <span className="font-semibold text-nex-blue dark:text-nex-blueLight">Nex LapTech Smart Search</span>
         </div>
       </div>
     </div>

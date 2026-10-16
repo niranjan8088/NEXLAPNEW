@@ -17,7 +17,7 @@ export default function Gallery() {
         <SectionHeading
           eyebrow="Gallery"
           title="Inside the"
-          highlight="NexByte Experience"
+          highlight="Nex LapTech Experience"
           description="A look at our brand, products, and services — genuine hardware, professionally presented."
         />
 

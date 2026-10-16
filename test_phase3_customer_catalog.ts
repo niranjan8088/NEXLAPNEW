@@ -1,5 +1,5 @@
 /**
- * NEXBYTE TECHNOLOGIES — PHASE 3 CUSTOMER CATALOG & FILTER ENGINE SUITE
+ * NEX LAPTECH — PHASE 3 CUSTOMER CATALOG & FILTER ENGINE SUITE
  * Comprehensive empirical test script for Phase 3 Customer Catalog, URL Sync,
  * Dynamic Filter Control, Category Isolation, and Combination Filters.
  */
@@ -20,7 +20,7 @@ function assert(condition: boolean, message: string) {
 
 async function runPhase3Tests() {
   console.log("\n==================================================");
-  console.log("NEXBYTE PHASE 3: CUSTOMER CATALOG & FILTER SUITE");
+  console.log("NEX LAPTECH PHASE 3: CUSTOMER CATALOG & FILTER SUITE");
   console.log("==================================================\n");
 
   // TEST 1: Admin Filter Control Test (Enable / Disable Filter)

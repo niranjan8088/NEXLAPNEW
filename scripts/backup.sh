@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# NexByte Technologies Database & Application Backup Script
+# Nex LapTech Database & Application Backup Script
 set -e
 
 BACKUP_DIR="/var/backups/nexbyte"
@@ -8,7 +8,7 @@ TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 DEST_FILE="$BACKUP_DIR/nexbyte_backup_$TIMESTAMP.tar.gz"
 
 echo "========================================================="
-echo "📦 Starting NexByte System Backup..."
+echo "📦 Starting Nex LapTech System Backup..."
 echo "Timestamp: $TIMESTAMP"
 echo "========================================================="
 

@@ -1,4 +1,4 @@
-# NEXBYTE TECHNOLOGIES
+# NEX LAPTECH
 ## Master UI/UX Design Bible & Enterprise Product Design Document (PDD)
 ### Section 3: Public Website Detailed UI/UX Specifications
 
@@ -27,7 +27,7 @@ Vertical stack: Navbar -> Hero Section -> Metric Trust Strip -> Category Showcas
 ### 7. Wireframe Blueprint
 ```
 +------------------------------------------------------------------------+
-| [NEXBYTE LOGO]   Products   Services   Training   Contact   [Book Now] |
+| [NEX LAPTECH LOGO]   Products   Services   Training   Contact   [Book Now] |
 +------------------------------------------------------------------------+
 |                                                                        |
 |    ENGINEERING TOMORROW'S TECHNOLOGY, TODAY.                          |
@@ -141,7 +141,7 @@ DOMPurify sanitization and CSP headers.
 Image optimization via Next.js `<Image />` component, 0.8s LCP.
 
 ### 39. SEO
-Meta title: `NexByte Technologies | Gaming PCs, Laptop Repairs & IT Services Bengaluru`  
+Meta title: `Nex LapTech | Gaming PCs, Laptop Repairs & IT Services Bengaluru`  
 Meta description: `Bengaluru's trusted destination for custom gaming PCs, refurbished laptops, board-level repair, CCTV setup, and AMC maintenance.`
 
 ### 40. Future Improvements
@@ -211,7 +211,7 @@ Real-time tracking portal allowing customers to enter their Reference ID (`NB-20
 Reduce support call volume by providing instant self-service status tracking.
 
 ### 3. User Goal
-Track repair/order progress (`Submitted` -> `Contacted` -> `In Service` -> `Completed`) and send messages to NexByte technicians.
+Track repair/order progress (`Submitted` -> `Contacted` -> `In Service` -> `Completed`) and send messages to Nex LapTech technicians.
 
 ### 4. Navigation Entry
 Header link -> `Track Request` or URL `/track`.

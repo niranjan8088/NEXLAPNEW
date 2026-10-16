@@ -59,7 +59,7 @@ interface Conversation {
 }
 
 const AVAILABLE_MODELS = [
-  { id: "nexbyte-v2-smart", name: "NexByte Intelligence v2.5", desc: "Live DB Grounded RAG & Analytics", icon: Cpu },
+  { id: "nexbyte-v2-smart", name: "Nex LapTech Intelligence v2.5", desc: "Live DB Grounded RAG & Analytics", icon: Cpu },
   { id: "gpt-4o-mini", name: "GPT-4o Flash", desc: "OpenAI Fast Reasoning Engine", icon: Zap },
   { id: "gemini-1.5-flash", name: "Gemini 1.5 Pro", desc: "Google Multimodal & High Context", icon: Sparkles },
   { id: "grok-beta", name: "Grok-2 Engine", desc: "xAI Realtime Intelligence", icon: Layers },
@@ -79,7 +79,7 @@ export default function ChatGPTGrokAICenter() {
         {
           id: "m-1",
           role: "assistant",
-          content: "Hello! I'm **NexByte AI Assistant** — your advanced business intelligence partner.\n\nI can analyze your **products, stock levels, orders, reseller applications, and customer service bookings** using your actual database records.\n\nHow can I help you today?",
+          content: "Hello! I'm **Nex LapTech AI Assistant** — your advanced business intelligence partner.\n\nI can analyze your **products, stock levels, orders, reseller applications, and customer service bookings** using your actual database records.\n\nHow can I help you today?",
           timestamp: new Date(),
           confidence: 1.0,
         },
@@ -91,7 +91,7 @@ export default function ChatGPTGrokAICenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedModel, setSelectedModel] = useState("nexbyte-v2-smart");
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
-  const [systemPrompt, setSystemPrompt] = useState("You are NexByte AI Assistant, a helpful and accurate business intelligence AI.");
+  const [systemPrompt, setSystemPrompt] = useState("You are Nex LapTech AI Assistant, a helpful and accurate business intelligence AI.");
   const [temperature, setTemperature] = useState(0.7);
 
   // ── Input & Attachment State ──────────────────────────────────────────────
@@ -105,7 +105,7 @@ export default function ChatGPTGrokAICenter() {
   // ── Settings Modal State ──────────────────────────────────────────────────
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"general" | "ai" | "privacy" | "shortcuts">("general");
-  const [assistantName, setAssistantName] = useState("NexByte AI Assistant");
+  const [assistantName, setAssistantName] = useState("Nex LapTech AI Assistant");
   const [lineWrap, setLineWrap] = useState(true);
 
   const endRef = useRef<HTMLDivElement>(null);
@@ -239,7 +239,7 @@ export default function ChatGPTGrokAICenter() {
       content: "",
       timestamp: new Date(),
       confidence: 0.95,
-      sources: webSearchEnabled ? ["NexByte DB Grounding", "Web Knowledge 2026"] : ["NexByte DB Grounding"],
+      sources: webSearchEnabled ? ["Nex LapTech DB Grounding", "Web Knowledge 2026"] : ["Nex LapTech DB Grounding"],
     };
 
     setConversations((prev) =>
@@ -761,7 +761,7 @@ export default function ChatGPTGrokAICenter() {
                   handleSendMessage();
                 }
               }}
-              placeholder="Message NexByte AI Assistant... (Press Enter to send, Shift+Enter for new line)"
+              placeholder="Message Nex LapTech AI Assistant... (Press Enter to send, Shift+Enter for new line)"
               className="flex-1 bg-transparent py-2 px-1 text-xs text-white placeholder-white/30 focus:outline-none resize-none max-h-44 scrollbar-thin"
             />
 

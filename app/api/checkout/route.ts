@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: `Choose a valid configuration for "${prod.title}" before ordering.` }, { status: 400 });
         }
         variant = variants.find((entry: any) => entry.id === item.variantId);
-        if (!variant) {
+        if (!variant || variant.active === false) {
           return NextResponse.json({ error: `The selected configuration for "${prod.title}" is no longer available.` }, { status: 400 });
         }
       } else if (item.variantId) {
@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
     // 2. Validate Offer Discount Server-side
     let discountAmount = 0;
     let appliedOfferCode = "";
+    let appliedOfferId = "";
 
     if (offerCode && String(offerCode).trim()) {
       const valResult = await dbHelper.offers.validateForCustomer(
@@ -115,10 +116,15 @@ export async function POST(request: NextRequest) {
         serverSubtotal
       );
 
-      if (valResult.valid) {
-        discountAmount = valResult.discountAmount || 0;
-        appliedOfferCode = String(offerCode).trim().toUpperCase();
+      if (!valResult.valid) {
+        return NextResponse.json(
+          { error: valResult.message || "This offer code is no longer valid. Remove it or choose another offer." },
+          { status: 400 }
+        );
       }
+      discountAmount = Number(valResult.discountAmount) || 0;
+      appliedOfferCode = String(valResult.offer?.code || offerCode).trim().toUpperCase();
+      appliedOfferId = String(valResult.offer?.id || "");
     }
 
     // 3. Shipping Calculation
@@ -170,6 +176,15 @@ export async function POST(request: NextRequest) {
     };
 
     const savedOrder = await dbHelper.orders.create(orderPayload);
+    let offerUsageRecorded = true;
+    if (appliedOfferId) {
+      try {
+        await dbHelper.offers.incrementUsage(appliedOfferId, customer.email);
+      } catch (offerError) {
+        offerUsageRecorded = false;
+        console.error(`Order ${nextOrderId} was saved, but offer redemption tracking failed:`, offerError);
+      }
+    }
 
     // 7. Auto-Generate GST Invoice Record
     try {
@@ -217,6 +232,7 @@ export async function POST(request: NextRequest) {
       success: true,
       order: savedOrder,
       message: "Order placed successfully!",
+      warning: offerUsageRecorded ? undefined : "Your order is saved, but the offer usage counter could not be updated. Please contact support.",
     });
   } catch (err: any) {
     console.error("Checkout POST Error:", err);

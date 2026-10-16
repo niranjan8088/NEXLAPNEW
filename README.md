@@ -1,6 +1,6 @@
-# NexByte Technologies — Website
+# Nex LapTech — Website
 
-Premium, futuristic business website for **NexByte Technologies**, built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, and GSAP.
+Premium, futuristic business website for **Nex LapTech**, built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, and GSAP.
 
 ## Stack
 

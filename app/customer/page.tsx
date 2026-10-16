@@ -144,7 +144,7 @@ const QUICK_ACTIONS = [
   {
     id: "internship",
     title: "Internship",
-    description: "Apply for hands-on NexByte internship programs.",
+    description: "Apply for hands-on Nex LapTech internship programs.",
     icon: Briefcase,
     link: "/customer/internship",
     gradient: "from-[#9333EA]/10 to-[#A855F7]/5",
@@ -739,7 +739,7 @@ export default function CustomerDashboardPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-sm text-[#111827] dark:text-[#F8FAFC]">Training Courses</h3>
-                <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1">Hardware, software & IT skills. Earn a NexByte certificate.</p>
+                <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-1">Hardware, software & IT skills. Earn a Nex LapTech certificate.</p>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-[#0D9488] dark:text-[#2DD4BF] group-hover:gap-2 transition-all">
                   Browse Courses <ArrowRight className="h-3.5 w-3.5" />
                 </div>

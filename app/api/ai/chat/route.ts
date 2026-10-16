@@ -105,7 +105,7 @@ export async function POST(request: Request) {
 
       if (session.role === "user") {
         // ── CUSTOMER AI ──────────────────────────────────────────────────────
-        sources = ["Authenticated Customer Profile", "Public NexByte Catalog"];
+        sources = ["Authenticated Customer Profile", "Public Nex LapTech Catalog"];
 
         // 1. Check if asking for another user's private data
         if (
@@ -175,10 +175,10 @@ export async function POST(request: Request) {
           const list = matching
             .map((p: any) => `• **${p.title}** — ₹${(p.price || 0).toLocaleString("en-IN")} (\`${p.stock || 0} in stock\`)`)
             .join("\n");
-          generatedResponse = `💻 **NexByte Hardware Catalog Matches:**\n\n${list}\n\nExplore full catalog in [Products](/products).`;
+          generatedResponse = `💻 **Nex LapTech Hardware Catalog Matches:**\n\n${list}\n\nExplore full catalog in [Products](/products).`;
         }
         else {
-          generatedResponse = `Hello! I am your **NexByte Customer AI Assistant**.\n\nI can assist you with:\n• 📦 Checking your order status\n• 🔧 Tracking service & repair bookings\n• 💻 Finding laptops, gaming PCs, SSDs, and accessories\n• 📜 Verifying training certificates & internships\n\nHow can I help you today?`;
+          generatedResponse = `Hello! I am your **Nex LapTech Customer AI Assistant**.\n\nI can assist you with:\n• 📦 Checking your order status\n• 🔧 Tracking service & repair bookings\n• 💻 Finding laptops, gaming PCs, SSDs, and accessories\n• 📜 Verifying training certificates & internships\n\nHow can I help you today?`;
         }
 
       } else if (session.role === "reseller") {
@@ -227,7 +227,7 @@ export async function POST(request: Request) {
 
       } else {
         // ── ADMIN AI ─────────────────────────────────────────────────────────
-        sources = ["NexByte Admin Master DB", "Platform Analytics"];
+        sources = ["Nex LapTech Admin Master DB", "Platform Analytics"];
 
         if (lowerQuery.includes("reseller application") || lowerQuery.includes("pending reseller")) {
           const resellers = await dbHelper.resellers.list();
@@ -270,14 +270,14 @@ export async function POST(request: Request) {
           generatedResponse = `📈 **Platform Sales & Revenue Overview:**\n\n• Total Platform Orders: **${orders.length}**\n• Pending Fulfillment: **${pending}**\n• Total Confirmed Revenue: **₹${totalRev.toLocaleString("en-IN")}**`;
         }
         else {
-          generatedResponse = `🛡️ **NexByte Admin AI Assistant:**\n\nI can analyze platform-wide data including:\n• 🤝 Reseller applications & partner status\n• 📦 Catalog inventory & low-stock alerts\n• 📊 Orders, sales revenue, & bookings\n• 🎓 Training enrollments & verified certificates`;
+          generatedResponse = `🛡️ **Nex LapTech Admin AI Assistant:**\n\nI can analyze platform-wide data including:\n• 🤝 Reseller applications & partner status\n• 📦 Catalog inventory & low-stock alerts\n• 📊 Orders, sales revenue, & bookings\n• 🎓 Training enrollments & verified certificates`;
         }
       }
     }
 
     // Fail-safe check: Abstain if query cannot be verified
     if (!generatedResponse) {
-      generatedResponse = `I don't have enough verified information in our database to answer that accurately.\n\nWould you like me to connect you with NexByte support desk?`;
+      generatedResponse = `I don't have enough verified information in our database to answer that accurately.\n\nWould you like me to connect you with Nex LapTech support desk?`;
       confidence = 0.4;
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import {
   User,
   Building2,
@@ -47,19 +47,13 @@ export default function AuthGateway({
         <div className="mb-6 flex flex-col items-center">
           <div className="relative h-20 w-20 mb-3">
             <div className="absolute inset-0 rounded-full bg-nex-blue/25 blur-xl animate-pulse" />
-            <Image
-              src="/images/logo-icon-transparent.png"
-              alt="NexByte Technologies"
-              fill
-              className="relative object-contain drop-shadow-[0_0_25px_rgba(30,94,255,0.4)]"
-              priority
-            />
+            <BrandLogo width={160} height={160} priority className="relative h-full w-full drop-shadow-[0_0_25px_rgba(30,94,255,0.4)]" />
           </div>
           <h1 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-            NEX<span className="text-nex-blueLight">BYTE</span> <span className="font-light text-white/90">TECHNOLOGIES</span>
+            NEX <span className="text-nex-blueLight">LAPTECH</span>
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm font-medium tracking-[0.2em] text-nex-blueLight/90 uppercase">
-            Premium Technology. Engineered for Business.
+            Laptops | PC Components | Accessories | More
           </p>
         </div>
 
@@ -110,7 +104,7 @@ export default function AuthGateway({
         {/* Welcome Header */}
         <div className="mb-10 max-w-md mx-auto">
           <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
-            Welcome to <span className="text-gradient-blue">NexByte</span>
+            Welcome to <span className="text-gradient-blue">Nex LapTech</span>
           </h2>
           <p className="text-xs sm:text-sm text-nex-mist leading-relaxed">
             Choose how you want to continue:
@@ -260,7 +254,7 @@ export default function AuthGateway({
 
         {/* Footer Tagline */}
         <p className="text-[11px] text-white/30">
-          © {new Date().getFullYear()} NexByte Technologies. All rights reserved. Server-side RBAC active.
+          © {new Date().getFullYear()} Nex LapTech. All rights reserved. Server-side RBAC active.
         </p>
       </div>
     </div>

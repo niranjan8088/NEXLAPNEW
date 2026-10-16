@@ -76,12 +76,12 @@ export async function POST(request: NextRequest) {
     // Also store readable name for client
     response.cookies.set(
       "nexbyte_reseller_name",
-      encodeURIComponent(reseller.business_name || reseller.owner_name || "Reseller"),
+      reseller.business_name || reseller.owner_name || "Reseller",
       { httpOnly: false, path: "/", maxAge: sessionDuration }
     );
     response.cookies.set(
       "nexbyte_reseller_email",
-      encodeURIComponent(reseller.email),
+      reseller.email,
       { httpOnly: false, path: "/", maxAge: sessionDuration }
     );
     return response;

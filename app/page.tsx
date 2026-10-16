@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import AuthGateway from "@/components/AuthGateway";
+import MarketplaceHome from "@/components/MarketplaceHome";
 
 export const metadata: Metadata = {
-  title: "NexByte Technologies | Premium Technology Entrance Gateway",
+  title: "Nex LapTech | Shop Laptops, Components & Accessories",
 };
 
 export default async function HomePage() {
@@ -13,10 +13,9 @@ export default async function HomePage() {
   const resellerSession = cookieStore.get("nexbyte_reseller_session")?.value;
   const userSession = cookieStore.get("nexbyte_customer_session")?.value;
 
-  // Root URL / MUST ALWAYS render the NexByte Technologies entrance gateway page.
-  // Never automatically redirect to /admin, /reseller, or /login.
+  // Keep the storefront as the public home while exposing active portals in its header.
   return (
-    <AuthGateway
+    <MarketplaceHome
       hasAdminSession={Boolean(adminSession)}
       hasResellerSession={Boolean(resellerSession)}
       hasUserSession={Boolean(userSession)}

@@ -2,7 +2,7 @@
   "name": "nexbyte-backend-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Enterprise Express Backend API Server for NexByte Technologies",
+  "description": "Enterprise Express Backend API Server for Nex LapTech",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

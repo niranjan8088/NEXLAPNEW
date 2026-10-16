@@ -227,7 +227,7 @@ export default function CustomerProfilePage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
-                {profile?.full_name || "NexByte Customer"}
+                {profile?.full_name || "Nex LapTech Customer"}
               </h1>
               <span className="rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-bold flex items-center gap-1">
                 <ShieldCheck className="h-3 w-3" /> Active

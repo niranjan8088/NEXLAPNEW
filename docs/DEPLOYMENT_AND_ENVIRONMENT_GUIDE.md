@@ -1,7 +1,7 @@
 # DEPLOYMENT AND ENVIRONMENT GUIDE
 
 **Document Revision Date:** October 9, 2026  
-**Project:** NexByte Technologies
+**Project:** Nex LapTech
 
 ---
 
@@ -14,7 +14,7 @@
 ### 2. Installation & Server Launch
 ```bash
 # 1. Clone repository
-git clone https://github.com/nirajan252006/NEXBYTE.git
+git clone https://github.com/nirajan252006/NEX LAPTECH.git
 cd nexbyte
 
 # 2. Install dependencies

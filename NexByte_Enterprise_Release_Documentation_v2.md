@@ -1,10 +1,10 @@
-# NEXBYTE TECHNOLOGIES
+# NEX LAPTECH
 ## Enterprise Release & Operations Documentation Package v2.0
 
 ***
 
 ### Executive Release Metadata
-- **Release Name:** NexByte Technologies Enterprise Production Release
+- **Release Name:** Nex LapTech Enterprise Production Release
 - **Release Version:** v2.0.0 Enterprise
 - **Release Type:** Major Enterprise Release
 - **Build Number:** #1042-PROD
@@ -42,7 +42,7 @@
 ## 1. Release Management
 
 ```yaml
-Release Name: NexByte Enterprise Release v2.0
+Release Name: Nex LapTech Enterprise Release v2.0
 Release Version: v2.0.0 Enterprise
 Build Number: #1042-PROD
 Git Revision: 3f8a12c49b201e7a8
@@ -146,7 +146,7 @@ All 21 Admin Modules are documented and fully functional:
 ## 7. Customer Panel Module Guide
 
 - **Product & Service Booking:** Easy multi-step booking modal with automated Reference ID (`NB-2026-XXXXXX`) generation.
-- **Live Track & Chat:** Enter Reference ID and phone number to view live step timeline and message NexByte Support.
+- **Live Track & Chat:** Enter Reference ID and phone number to view live step timeline and message Nex LapTech Support.
 - **Online Verification (`/verify`):** Search any certificate Reg ID to view verification status and QR validation.
 
 ***
@@ -251,7 +251,7 @@ Emergency Support Phone: +91 8088979706
 ========================================================================
        ENTERPRISE RELEASE & PRODUCTION READINESS CERTIFICATE
 ========================================================================
-This certifies that NexByte Technologies Enterprise Platform v2.0.0
+This certifies that Nex LapTech Enterprise Platform v2.0.0
 has passed all quality assurance audits, security checks, and 
 real-time multi-tab synchronization benchmarks.
 

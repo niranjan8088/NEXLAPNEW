@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme, THEME_PRESETS, ThemeId, GlobalPolicy } from "@/components/ThemeProvider";
-import { CheckCircle2, RefreshCw, Lock, Globe, User, Sun, Moon } from "lucide-react";
+import { CheckCircle2, RefreshCw, Lock, Globe, User, Sun } from "lucide-react";
 
 interface ThemeSelectorProps {
   isAdmin?: boolean;
@@ -21,32 +21,72 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
 
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [policySuccessMsg, setPolicySuccessMsg] = useState("");
+  const [policyErrorMsg, setPolicyErrorMsg] = useState("");
   const [selectedAdminPolicy, setSelectedAdminPolicy] = useState<GlobalPolicy>(globalPolicy);
   const [selectedAdminForcedTheme, setSelectedAdminForcedTheme] = useState<ThemeId>(forcedTheme);
   const [showResetModal, setShowResetModal] = useState(false);
 
-  const handleSelectTheme = (id: ThemeId) => {
+  useEffect(() => {
+    setSelectedAdminPolicy(globalPolicy);
+    setSelectedAdminForcedTheme(forcedTheme);
+  }, [globalPolicy, forcedTheme]);
+
+  const handleSelectTheme = async (id: ThemeId) => {
     if (isForced && !isAdmin) return;
+
+    if (isAdmin && isForced) {
+      setSavingPolicy(true);
+      setPolicyErrorMsg("");
+      setPolicySuccessMsg("");
+      try {
+        await setGlobalPolicy("forced", id);
+        setSelectedAdminForcedTheme(id);
+        setPolicySuccessMsg("Global light theme applied.");
+        setTimeout(() => setPolicySuccessMsg(""), 4000);
+      } catch (error: any) {
+        setPolicyErrorMsg(error.message || "Failed to update global theme.");
+      } finally {
+        setSavingPolicy(false);
+      }
+      return;
+    }
+
     setTheme(id);
   };
 
   const handleSaveGlobalPolicy = async () => {
     setSavingPolicy(true);
     setPolicySuccessMsg("");
+    setPolicyErrorMsg("");
     try {
       await setGlobalPolicy(selectedAdminPolicy, selectedAdminForcedTheme);
       setPolicySuccessMsg("Global appearance settings updated.");
       setTimeout(() => setPolicySuccessMsg(""), 4000);
-    } catch (e) {
-      console.error(e);
+    } catch (error: any) {
+      setPolicyErrorMsg(error.message || "Failed to save global appearance settings.");
     } finally {
       setSavingPolicy(false);
     }
   };
 
-  const handleConfirmReset = () => {
-    resetToDefault();
+  const handleConfirmReset = async () => {
     setShowResetModal(false);
+    if (isAdmin && isForced) {
+      setSavingPolicy(true);
+      setPolicyErrorMsg("");
+      try {
+        await setGlobalPolicy("forced", "day");
+        setSelectedAdminForcedTheme("day");
+        setPolicySuccessMsg("Global light theme applied.");
+      } catch (error: any) {
+        setPolicyErrorMsg(error.message || "Failed to reset global theme.");
+      } finally {
+        setSavingPolicy(false);
+      }
+      return;
+    }
+    if (isForced && !isAdmin) return;
+    resetToDefault();
   };
 
   return (
@@ -85,6 +125,11 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
               <span>{policySuccessMsg}</span>
             </div>
           )}
+          {policyErrorMsg && (
+            <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs font-semibold text-rose-800">
+              {policyErrorMsg}
+            </div>
+          )}
 
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -108,7 +153,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
                     <User className="h-3.5 w-3.5" /> Personal Choice
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Users and resellers can individually toggle Day or Night mode.
+                    Users and resellers use the light theme.
                   </p>
                 </div>
               </label>
@@ -130,10 +175,10 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
                 />
                 <div className="space-y-0.5">
                   <span className="font-bold text-xs text-neutral-900 dark:text-white flex items-center gap-1.5">
-                    <Lock className="h-3.5 w-3.5" /> Force Theme Mode For Everyone
+                    <Lock className="h-3.5 w-3.5" /> Force Light Theme For Everyone
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Lock all portal interfaces to Day or Night mode globally.
+                    Keep every portal on the light theme.
                   </p>
                 </div>
               </label>
@@ -149,8 +194,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
                   onChange={(e) => setSelectedAdminForcedTheme(e.target.value as ThemeId)}
                   className="w-full max-w-md rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-2.5 text-xs font-bold text-neutral-900 dark:text-white shadow-sm"
                 >
-                  <option value="day">☀ DAY Mode (Pure Light #FFFFFF)</option>
-                  <option value="night">☾ NIGHT Mode (Pure Dark #000000)</option>
+                  <option value="day">Light theme</option>
                 </select>
               </div>
             )}
@@ -168,7 +212,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
         </div>
       )}
 
-      {/* Available Theme Options Grid (Day vs Night Only) */}
+      {/* Single available theme */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -176,20 +220,21 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
               Global Appearance Theme
             </h3>
             <p className="text-xs text-neutral-500">
-              Select your appearance mode. Only pure Day and Night monochrome modes are supported.
+              The Nex LapTech interface uses the light theme.
             </p>
           </div>
 
           <button
             onClick={() => setShowResetModal(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition-colors"
+            disabled={isForced && !isAdmin}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:hover:text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            <span>Reset to Default (Day)</span>
+            <span>Reset to Default (Light)</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 gap-5">
           {/* DAY THEME CARD */}
           {(() => {
             const isSelected = theme === "day";
@@ -198,6 +243,16 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
             return (
               <div
                 onClick={() => !isDisabled && handleSelectTheme("day")}
+                onKeyDown={(event) => {
+                  if (!isDisabled && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    handleSelectTheme("day");
+                  }
+                }}
+                role="button"
+                tabIndex={isDisabled ? -1 : 0}
+                aria-pressed={isSelected}
+                aria-disabled={isDisabled}
                 className={`group relative rounded-3xl border transition-all duration-300 p-6 flex flex-col justify-between space-y-5 cursor-pointer ${
                   isSelected
                     ? "bg-white text-black border-neutral-900 ring-2 ring-neutral-900/20 shadow-lg"
@@ -207,7 +262,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider bg-neutral-100 text-neutral-900 border border-neutral-300">
                     <Sun className="h-4 w-4 text-neutral-900" />
-                    <span>☀ DAY MODE</span>
+                    <span>LIGHT MODE</span>
                   </span>
 
                   {isSelected && (
@@ -239,74 +294,16 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
 
                 <div>
                   <h4 className="font-display font-extrabold text-base text-neutral-900">
-                    ☀ DAY (Pure Light)
+                    Nex LapTech Light
                   </h4>
                   <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
-                    Background: #FFFFFF, Surface: #FFFFFF, Primary Text: #000000, Border: #E5E5E5. High contrast monochrome readability.
+                    Bright surfaces, clear text, and subtle blue accents across every portal.
                   </p>
                 </div>
               </div>
             );
           })()}
 
-          {/* NIGHT THEME CARD */}
-          {(() => {
-            const isSelected = theme === "night";
-            const isDisabled = isForced && !isAdmin;
-
-            return (
-              <div
-                onClick={() => !isDisabled && handleSelectTheme("night")}
-                className={`group relative rounded-3xl border transition-all duration-300 p-6 flex flex-col justify-between space-y-5 cursor-pointer ${
-                  isSelected
-                    ? "bg-neutral-950 text-white border-white ring-2 ring-white/20 shadow-lg"
-                    : "bg-neutral-900 text-white border-neutral-800 hover:border-neutral-700 shadow-sm"
-                } ${isDisabled ? "opacity-75 cursor-not-allowed" : ""}`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider bg-neutral-800 text-white border border-neutral-700">
-                    <Moon className="h-4 w-4 text-white" />
-                    <span>☾ NIGHT MODE</span>
-                  </span>
-
-                  {isSelected && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white text-black px-3 py-1 text-xs font-extrabold">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Active</span>
-                    </span>
-                  )}
-                </div>
-
-                <div className="rounded-2xl p-4 border border-neutral-800 bg-neutral-950 space-y-3 shadow-inner">
-                  <div className="h-6 rounded-lg bg-neutral-900 px-3 flex items-center justify-between border border-neutral-800">
-                    <div className="h-2 w-16 bg-white rounded" />
-                    <div className="h-3 w-8 bg-white rounded" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="h-16 rounded-lg bg-neutral-900 border border-neutral-800 p-1.5 space-y-1">
-                      <div className="h-2 bg-neutral-700 rounded" />
-                      <div className="h-2 bg-white rounded" />
-                    </div>
-                    <div className="col-span-2 h-16 rounded-lg bg-neutral-900 border border-neutral-800 p-2 flex flex-col justify-between">
-                      <div className="h-2 w-20 bg-white rounded" />
-                      <div className="h-4 w-12 bg-white rounded text-[8px] text-black font-bold flex items-center justify-center">
-                        Button
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-display font-extrabold text-base text-white">
-                    ☾ NIGHT (Pure Dark)
-                  </h4>
-                  <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-                    Background: #000000, Surface: #111111, Primary Text: #FFFFFF, Border: #262626. Pure dark mode for night usage.
-                  </p>
-                </div>
-              </div>
-            );
-          })()}
         </div>
       </div>
 
@@ -321,7 +318,7 @@ export default function ThemeSelector({ isAdmin = false }: ThemeSelectorProps) {
               </h4>
             </div>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Reset appearance to the default Day theme (Pure Light #FFFFFF)?
+              Reset appearance to the Nex LapTech light theme?
             </p>
             <div className="flex justify-end gap-2 pt-2">
               <button

@@ -63,10 +63,11 @@ export default function AdminOrdersPage() {
   const filteredOrders = orders.filter((o) => {
     const q = search.toLowerCase();
     const matchQuery =
-      o.id.toLowerCase().includes(q) ||
+      String(o.id || o.order_id || "").toLowerCase().includes(q) ||
       (o.customer_name || "").toLowerCase().includes(q) ||
       (o.customer_email || "").toLowerCase().includes(q) ||
-      (o.shipping_address || "").toLowerCase().includes(q);
+      String(o.shipping_address || "").toLowerCase().includes(q) ||
+      String(o.applied_offer_code || o.appliedOfferCode || "").toLowerCase().includes(q);
 
     if (!matchQuery) return false;
     if (statusFilter !== "all" && o.status !== statusFilter) return false;
@@ -189,6 +190,7 @@ export default function AdminOrdersPage() {
                   <th className="py-3.5 px-4">Order ID</th>
                   <th className="py-3.5 px-4">Customer</th>
                   <th className="py-3.5 px-4">Items Count</th>
+                  <th className="py-3.5 px-4">Offer Code</th>
                   <th className="py-3.5 px-4">Total Amount</th>
                   <th className="py-3.5 px-4">Status</th>
                   <th className="py-3.5 px-4">Date</th>
@@ -207,6 +209,14 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="py-4 px-4 font-medium">
                       {o.items?.length || 1} item(s)
+                    </td>
+                    <td className="py-4 px-4">
+                      {(o.applied_offer_code || o.appliedOfferCode) ? (
+                        <div>
+                          <span className="font-mono font-bold text-amber-300">{o.applied_offer_code || o.appliedOfferCode}</span>
+                          <div className="text-[10px] text-emerald-300">₹{Number(o.discount_amount ?? o.discountAmount ?? 0).toLocaleString("en-IN")} saved</div>
+                        </div>
+                      ) : <span className="text-nex-mist">—</span>}
                     </td>
                     <td className="py-4 px-4 font-bold text-white">
                       Rs. {(Number(o.total) || 0).toLocaleString("en-IN")}
@@ -299,12 +309,22 @@ export default function AdminOrdersPage() {
                   <MapPin className="h-3.5 w-3.5 text-nex-blueLight" /> Shipping Address
                 </div>
                 <div className="text-xs text-white leading-relaxed">
-                  {selectedOrder.shipping_address || "Standard NexByte Hub Pick-Up"}
+                  {selectedOrder.shipping_address || "Standard Nex LapTech Hub Pick-Up"}
                 </div>
                 <div className="text-[11px] text-nex-mist pt-1 border-t border-white/5">
                   Payment Method: <span className="text-white font-bold uppercase">{selectedOrder.payment_method || "COD"}</span>
                 </div>
               </div>
+            </div>
+
+            <div className="rounded-xl bg-white/[0.02] border border-white/5 p-4 space-y-1">
+              <div className="text-[11px] font-bold text-nex-mist uppercase tracking-wider">Offer Applied</div>
+              {(selectedOrder.applied_offer_code || selectedOrder.appliedOfferCode) ? (
+                <>
+                  <div className="font-mono text-sm font-bold text-amber-300">{selectedOrder.applied_offer_code || selectedOrder.appliedOfferCode}</div>
+                  <div className="text-xs text-emerald-300">Discount saved: ₹{Number(selectedOrder.discount_amount ?? selectedOrder.discountAmount ?? 0).toLocaleString("en-IN")}</div>
+                </>
+              ) : <div className="text-xs text-nex-mist">No offer code was used for this order.</div>}
             </div>
 
             {/* Order Items Breakdown */}

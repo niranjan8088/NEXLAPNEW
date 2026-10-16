@@ -107,7 +107,7 @@ export default function HeroParallax({
   // Fallback featured item data if none loaded yet
   const displayProd = featuredProduct || {
     id: "featured-1",
-    name: "NexByte UltraBook Pro 15",
+    name: "Nex LapTech UltraBook Pro 15",
     price: 64999,
     originalPrice: 74999,
     category: "Laptops",
@@ -145,7 +145,7 @@ export default function HeroParallax({
             className="inline-flex items-center gap-2 rounded-full bg-white/90 dark:bg-[#162438]/90 backdrop-blur-md border border-[#0891B2]/30 px-4 py-1.5 text-xs font-extrabold text-[#0891B2] dark:text-[#CFFAFE] shadow-sm tracking-wide"
           >
             <Sparkles className="h-3.5 w-3.5 text-[#0891B2] animate-spin-slow" />
-            <span>NEXBYTE TECHNOLOGIES · SMARTER TECH SHOPPING</span>
+            <span>NEX LAPTECH · SMARTER TECH SHOPPING</span>
           </motion.div>
 
           {/* Headline */}
@@ -277,7 +277,7 @@ export default function HeroParallax({
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 transition-transform duration-500 hover:scale-105">
               <Image
                 src={displayProd.image || "/images/product-custom-pc-assembly.png"}
-                alt={displayProd.name || "NexByte Hardware"}
+                alt={displayProd.name || "Nex LapTech Hardware"}
                 fill
                 className="object-contain drop-shadow-[0_20px_35px_rgba(8,145,178,0.25)]"
                 priority

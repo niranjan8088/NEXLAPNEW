@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
 import { Mail, MapPin, Phone, Instagram } from "lucide-react";
 import { business } from "@/lib/data";
 
@@ -20,16 +20,10 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2.5">
               <div className="relative h-9 w-9">
-                <Image
-                  src="/images/logo-icon-transparent.png"
-                  alt="NexByte Technologies"
-                  fill
-                  sizes="36px"
-                  className="object-contain"
-                />
+                <BrandLogo width={72} height={72} sizes="36px" className="h-full w-full" />
               </div>
               <span className="font-display text-lg font-bold text-slate-900 dark:text-white">
-                NEX<span className="text-nex-blue">BYTE</span>
+                NEX LAPTECH
               </span>
             </div>
             <p className="mt-3 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
@@ -114,7 +108,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 dark:border-white/[0.06] pt-6 text-xs text-slate-500 dark:text-slate-400 sm:flex-row">
-          <p>© {year || 2026} NexByte Technologies. All rights reserved.</p>
+          <p>© {year || 2026} Nex LapTech. All rights reserved.</p>
           <p className="font-medium">Service Areas: Bengaluru | Tumkur | Hiriyur — Coming Soon</p>
         </div>
       </div>

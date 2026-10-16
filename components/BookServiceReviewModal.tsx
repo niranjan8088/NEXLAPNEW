@@ -128,7 +128,7 @@ export default function BookServiceReviewModal() {
                   Thank You for Choosing Us!
                 </h3>
                 <p className="mt-3 text-sm text-nex-mist leading-relaxed">
-                  Your booking form has opened. While you wait, would you mind sharing your feedback or rating your previous experience with NexByte Technologies? It helps us serve you better!
+                  Your booking form has opened. While you wait, would you mind sharing your feedback or rating your previous experience with Nex LapTech? It helps us serve you better!
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                   <button
@@ -250,7 +250,7 @@ export default function BookServiceReviewModal() {
                     className="h-4 w-4 rounded border-white/[0.08] bg-white/[0.04] text-nex-blue focus:ring-0 focus:ring-offset-0"
                   />
                   <label htmlFor="modal-recommend" className="text-xs text-white/80 cursor-pointer select-none">
-                    Yes, I recommend NexByte Technologies
+                    Yes, I recommend Nex LapTech
                   </label>
                 </div>
 

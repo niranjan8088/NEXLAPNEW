@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo, useRef } from "react";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import Link from "next/link";
 import {
   Receipt,
@@ -91,6 +91,10 @@ export default function AdminBillingPage() {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "upi" | "bank_transfer" | "card" | "other">("upi");
   const [paymentStatus, setPaymentStatus] = useState<"paid" | "pending" | "partially_paid">("pending");
   const [amountPaid, setAmountPaid] = useState<number | string>(0);
+  const [paymentReference, setPaymentReference] = useState("");
+  const [paymentBank, setPaymentBank] = useState("");
+  const [bankTransferType, setBankTransferType] = useState<"neft" | "rtgs">("neft");
+  const [cardType, setCardType] = useState<"debit" | "credit">("debit");
 
   // History State
   const [invoicesHistory, setInvoicesHistory] = useState<any[]>([]);
@@ -297,6 +301,10 @@ export default function AdminBillingPage() {
         gstin,
         paymentMethod,
         paymentStatus,
+        paymentReference,
+        paymentBank,
+        bankTransferType: paymentMethod === "bank_transfer" ? bankTransferType : "",
+        cardType: paymentMethod === "card" ? cardType : "",
         amountPaid: paymentStatus === "paid" ? calculatedTotals.grandTotal : Number(amountPaid) || 0
       };
 
@@ -350,6 +358,10 @@ export default function AdminBillingPage() {
     setPaymentMethod("upi");
     setPaymentStatus("pending");
     setAmountPaid(0);
+    setPaymentReference("");
+    setPaymentBank("");
+    setBankTransferType("neft");
+    setCardType("debit");
     setErrorMsg("");
     setSuccessMsg("");
     setLatestCreatedInvoice(null);
@@ -394,12 +406,12 @@ export default function AdminBillingPage() {
     const invNum = target.invoiceNumber || target.invoice_number;
     const token = target.shareToken || target.share_token || target.id;
     const shareUrl = `${window.location.origin}/invoice/view/${token}`;
-    const shareText = `NexByte Technologies Invoice ${invNum} for ${target.customerName || target.customer_name}. Total: ${formatRupees(target.grandTotal || target.grand_total)}`;
+    const shareText = `Nex LapTech Invoice ${invNum} for ${target.customerName || target.customer_name}. Total: ${formatRupees(target.grandTotal || target.grand_total)}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `NexByte Invoice ${invNum}`,
+          title: `Nex LapTech Invoice ${invNum}`,
           text: shareText,
           url: shareUrl
         });
@@ -449,7 +461,7 @@ export default function AdminBillingPage() {
   }, [invoicesHistory]);
 
   return (
-    <div className="space-y-6">
+    <div className="admin-billing space-y-6">
       
       {/* ── PRINT-ONLY DEDICATED INVOICE ROOT ─────────────────────────────────── */}
       <div id="invoice-print-area" className="hidden print:block text-slate-900 bg-white font-sans p-0 m-0 w-full">
@@ -488,7 +500,7 @@ export default function AdminBillingPage() {
       <div className="space-y-6 print:hidden">
 
         {/* ── SCREEN UI HEADER ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#26364D] pb-5">
+        <div className="billing-reveal billing-reveal--1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#26364D] pb-5">
           <div>
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-[#2563EB]/15 border border-[#2563EB]/40 text-[#2563EB] flex items-center justify-center shadow-md shadow-[#2563EB]/20">
@@ -499,7 +511,7 @@ export default function AdminBillingPage() {
                   Admin Billing &amp; Invoices
                 </h1>
                 <p className="text-xs text-[#94A3B8]">
-                  Create, calculate, issue &amp; manage tax-compliant NexByte invoices.
+                  Create, calculate, issue &amp; manage tax-compliant Nex LapTech invoices.
                 </p>
               </div>
             </div>
@@ -531,7 +543,7 @@ export default function AdminBillingPage() {
         </div>
 
         {/* ── METRICS BAR ──────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="billing-metrics billing-reveal billing-reveal--2 grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="p-4 rounded-xl bg-[#111B32] border border-[#26364D]">
             <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider block">Total Invoices</span>
             <span className="font-display text-xl font-bold text-[#F8FAFC] mt-1 block">{historyStats.totalCount}</span>
@@ -554,13 +566,13 @@ export default function AdminBillingPage() {
 
         {/* ── MESSAGES DISPLAY ─────────────────────────────────────────────────── */}
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+          <div className="billing-message p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
         {successMsg && (
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between">
+          <div className="billing-message p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 shrink-0" />
               <span>{successMsg}</span>
@@ -576,7 +588,7 @@ export default function AdminBillingPage() {
 
         {/* ── CREATE INVOICE WORKSPACE ────────────────────────────────────────── */}
         {activeTab === "create" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="billing-reveal billing-reveal--3 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* LEFT COLUMN: INVOICE FORM (7 cols) */}
             <div className="lg:col-span-7 space-y-6 min-w-0">
@@ -857,7 +869,7 @@ export default function AdminBillingPage() {
                   <Sparkles className="h-4 w-4 text-[#8B5CF6]" /> 3. Global Discount &amp; GST Configuration
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                   <div>
                     <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">
                       Global Discount (₹)
@@ -928,7 +940,7 @@ export default function AdminBillingPage() {
                     >
                       <option value="cash" className="bg-[#17243B] text-[#F8FAFC]">Cash</option>
                       <option value="upi" className="bg-[#17243B] text-[#F8FAFC]">UPI / QR Code</option>
-                      <option value="bank_transfer" className="bg-[#17243B] text-[#F8FAFC]">Bank Transfer / NEFT</option>
+                      <option value="bank_transfer" className="bg-[#17243B] text-[#F8FAFC]">Bank Transfer (NEFT / RTGS)</option>
                       <option value="card" className="bg-[#17243B] text-[#F8FAFC]">Credit / Debit Card</option>
                       <option value="other" className="bg-[#17243B] text-[#F8FAFC]">Other</option>
                     </select>
@@ -959,6 +971,96 @@ export default function AdminBillingPage() {
                         className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs focus:border-[#2563EB] focus:outline-none transition-colors"
                       />
                     </div>
+                  )}
+
+                  {paymentMethod === "upi" && (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">UPI Transaction ID</label>
+                      <input
+                        type="text"
+                        maxLength={120}
+                        value={paymentReference}
+                        onChange={(e) => setPaymentReference(e.target.value)}
+                        placeholder="Enter UPI transaction / reference ID"
+                        className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs placeholder:text-[#94A3B8]/60 focus:border-[#2563EB] focus:outline-none transition-colors"
+                      />
+                    </div>
+                  )}
+
+                  {paymentMethod === "bank_transfer" && (
+                    <>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">Transfer Type</label>
+                        <select
+                          value={bankTransferType}
+                          onChange={(e) => setBankTransferType(e.target.value as "neft" | "rtgs")}
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs focus:border-[#2563EB] focus:outline-none transition-colors"
+                        >
+                          <option value="neft">NEFT</option>
+                          <option value="rtgs">RTGS</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">Bank Name</label>
+                        <input
+                          type="text"
+                          maxLength={120}
+                          value={paymentBank}
+                          onChange={(e) => setPaymentBank(e.target.value)}
+                          placeholder="Enter bank name"
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs placeholder:text-[#94A3B8]/60 focus:border-[#2563EB] focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">{bankTransferType.toUpperCase()} UTR / Transaction ID</label>
+                        <input
+                          type="text"
+                          maxLength={120}
+                          value={paymentReference}
+                          onChange={(e) => setPaymentReference(e.target.value)}
+                          placeholder={`Enter ${bankTransferType.toUpperCase()} UTR`}
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs placeholder:text-[#94A3B8]/60 focus:border-[#2563EB] focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {paymentMethod === "card" && (
+                    <>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">Card Type</label>
+                        <select
+                          value={cardType}
+                          onChange={(e) => setCardType(e.target.value as "debit" | "credit")}
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs focus:border-[#2563EB] focus:outline-none transition-colors"
+                        >
+                          <option value="debit">Debit Card</option>
+                          <option value="credit">Credit Card</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">Bank / Card Issuer</label>
+                        <input
+                          type="text"
+                          maxLength={120}
+                          value={paymentBank}
+                          onChange={(e) => setPaymentBank(e.target.value)}
+                          placeholder="Enter bank / card issuer"
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs placeholder:text-[#94A3B8]/60 focus:border-[#2563EB] focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#CBD5E1] mb-1.5">Card Transaction ID</label>
+                        <input
+                          type="text"
+                          maxLength={120}
+                          value={paymentReference}
+                          onChange={(e) => setPaymentReference(e.target.value)}
+                          placeholder="Enter card transaction ID"
+                          className="w-full rounded-xl bg-[#17243B] border border-[#26364D] px-3.5 py-2.5 text-[#F8FAFC] text-xs placeholder:text-[#94A3B8]/60 focus:border-[#2563EB] focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -994,7 +1096,7 @@ export default function AdminBillingPage() {
             </div>
 
             {/* RIGHT COLUMN: LIVE INVOICE PREVIEW (5 cols) Sticky Desktop Panel */}
-            <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto pr-1">
+            <div className="billing-preview lg:col-span-5 space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto pr-1">
               <div className="flex items-center justify-between bg-[#111B32] p-4 rounded-2xl border border-[#26364D]">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -1037,15 +1139,10 @@ export default function AdminBillingPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <div className="relative h-8 w-8">
-                        <Image
-                          src="/images/logo-icon-transparent.png"
-                          alt="NexByte"
-                          fill
-                          className="object-contain"
-                        />
+                        <BrandLogo width={64} height={64} className="h-full w-full" />
                       </div>
                       <span className="font-bold text-base tracking-tight text-slate-900">
-                        NEX<span className="text-blue-600">BYTE</span> TECHNOLOGIES
+                        Nex LapTech
                       </span>
                     </div>
                     <p className="text-[10px] text-slate-500 font-medium">
@@ -1216,7 +1313,7 @@ export default function AdminBillingPage() {
 
                 {/* Footer Terms */}
                 <div className="border-t border-slate-200 pt-3 text-[9px] text-slate-400 text-center space-y-0.5">
-                  <p>Thank you for choosing NexByte Technologies!</p>
+                  <p>Thank you for choosing Nex LapTech!</p>
                   <p>Computers • Laptop Service • Gaming PCs • Bulk IT Hardware • CCTV Systems</p>
                 </div>
 
@@ -1228,7 +1325,7 @@ export default function AdminBillingPage() {
 
         {/* ── INVOICE HISTORY TABLE WORKSPACE ──────────────────────────────────── */}
         {activeTab === "history" && (
-          <div className="space-y-4">
+          <div className="billing-reveal billing-reveal--3 space-y-4">
             
             {/* Filters & Search Header */}
             <div className="p-4 rounded-2xl bg-[#111B32] border border-[#26364D] flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -1404,13 +1501,13 @@ export default function AdminBillingPage() {
 
         {/* ── SAVED INVOICE VIEW MODAL ────────────────────────────────────────── */}
         {viewingInvoice && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="billing-modal-backdrop fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
             <div
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
               onClick={() => setViewingInvoice(null)}
             />
 
-            <div className="relative bg-[#111B32] border border-[#26364D] rounded-2xl max-w-2xl w-full p-6 space-y-4 my-8 shadow-2xl">
+            <div className="billing-modal-card relative bg-[#111B32] border border-[#26364D] rounded-2xl max-w-2xl w-full p-6 space-y-4 my-8 shadow-2xl">
               
               {/* Modal Header */}
               <div className="flex items-center justify-between border-b border-[#26364D] pb-3">
@@ -1491,6 +1588,11 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
   const payStatus = invoice.paymentStatus || invoice.payment_status || "pending";
   const amountPaid = Number(invoice.amountPaid || invoice.amount_paid) || 0;
   const balanceDue = Number(invoice.balanceDue || invoice.balance_due) || 0;
+  const paymentMethod = invoice.paymentMethod || invoice.payment_method || "";
+  const paymentReference = invoice.paymentReference || invoice.payment_reference || "";
+  const paymentBank = invoice.paymentBank || invoice.payment_bank || "";
+  const bankTransferType = invoice.bankTransferType || invoice.bank_transfer_type || "";
+  const cardType = invoice.cardType || invoice.card_type || "";
 
   return (
     <div id="invoice-print-area" className="w-full text-slate-900 bg-white font-sans text-xs space-y-4">
@@ -1499,15 +1601,10 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="relative h-8 w-8">
-              <Image
-                src="/images/logo-icon-transparent.png"
-                alt="NexByte"
-                fill
-                className="object-contain"
-              />
+                      <BrandLogo width={64} height={64} className="h-full w-full" />
             </div>
             <span className="font-bold text-base tracking-tight text-slate-900">
-              NEX<span className="text-blue-600">BYTE</span> TECHNOLOGIES
+              Nex LapTech
             </span>
           </div>
           <p className="text-[10px] text-slate-500 font-semibold">
@@ -1636,6 +1733,32 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
           </div>
 
           <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mt-2 space-y-1 text-[10px]">
+            {paymentMethod && (
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Payment Method:</span>
+                <span className="font-semibold text-slate-700 text-right">
+                  {paymentMethod === "bank_transfer"
+                    ? `${String(bankTransferType || "Bank Transfer").toUpperCase()} Transfer`
+                    : paymentMethod === "card"
+                    ? `${String(cardType || "Card").toUpperCase()} Card`
+                    : paymentMethod === "upi"
+                    ? "UPI"
+                    : paymentMethod.replace("_", " ").toUpperCase()}
+                </span>
+              </div>
+            )}
+            {paymentBank && (
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Bank / Issuer:</span>
+                <span className="font-semibold text-slate-700 text-right">{paymentBank}</span>
+              </div>
+            )}
+            {paymentReference && (
+              <div className="flex justify-between gap-3">
+                <span className="text-slate-500">Transaction / UTR ID:</span>
+                <span className="font-semibold text-slate-700 text-right break-all">{paymentReference}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-slate-500">Payment Status:</span>
               <span className={`font-bold uppercase ${
@@ -1660,7 +1783,7 @@ function PrintableInvoiceDocument({ invoice }: { invoice: any }) {
 
       {/* Footer */}
       <div className="border-t border-slate-200 pt-3 text-[9px] text-slate-400 text-center space-y-0.5">
-        <p>Thank you for choosing NexByte Technologies!</p>
+        <p>Thank you for choosing Nex LapTech!</p>
         <p>Computers • Laptop Service • Gaming PCs • Bulk IT Hardware • CCTV Systems</p>
       </div>
     </div>

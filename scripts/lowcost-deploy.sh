@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# NexByte Technologies Low-Cost VPS Deployment Script
+# Nex LapTech Low-Cost VPS Deployment Script
 set -e
 
 echo "========================================================="
-echo "🚀 Starting NexByte Low-Cost Production Deployment..."
+echo "🚀 Starting Nex LapTech Low-Cost Production Deployment..."
 echo "Timestamp: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "========================================================="
 
@@ -44,7 +44,7 @@ echo "🌐 Verifying & reloading Nginx dual-subdomain configuration..."
 sudo nginx -t && sudo systemctl reload nginx
 
 echo "========================================================="
-echo "✅ NexByte Deployment Succeeded!"
+echo "✅ Nex LapTech Deployment Succeeded!"
 echo "Frontend: https://www.nexbyte.com"
 echo "Backend:  https://api.nexbyte.com/health"
 echo "========================================================="

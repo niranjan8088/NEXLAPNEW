@@ -139,7 +139,7 @@ const ReviewsPdfDocument = ({ reviews }: { reviews: any[] }) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
       <View style={pdfStyles.header}>
-        <Text style={pdfStyles.title}>NexByte Technologies - Customer Reviews Log</Text>
+        <Text style={pdfStyles.title}>Nex LapTech - Customer Reviews Log</Text>
         <Text style={pdfStyles.subtitle}>Generated on {new Date().toLocaleString("en-IN")}</Text>
       </View>
       {reviews.map((r) => (
@@ -158,7 +158,7 @@ const ReviewsPdfDocument = ({ reviews }: { reviews: any[] }) => (
           <Text style={pdfStyles.message}>{r.review_message}</Text>
           {r.admin_reply && (
             <View style={pdfStyles.reply}>
-              <Text style={pdfStyles.replyHeader}>NexByte Response:</Text>
+              <Text style={pdfStyles.replyHeader}>Nex LapTech Response:</Text>
               <Text style={pdfStyles.message}>{r.admin_reply}</Text>
             </View>
           )}

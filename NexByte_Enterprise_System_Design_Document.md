@@ -1,11 +1,11 @@
-# NEXBYTE TECHNOLOGIES
+# NEX LAPTECH
 ## Enterprise System Design Document (SDD) & Master Technical Documentation
 
 ***
 
 ### Document Control & Metadata
 - **Document Title:** Master Enterprise System Design Document (SDD)
-- **Project Name:** NexByte Technologies Enterprise Platform
+- **Project Name:** Nex LapTech Enterprise Platform
 - **Version:** v2.0 Enterprise Release
 - **Build Number:** #1042-PROD
 - **Git Commit:** `3f8a12c49b201e7a8`
@@ -52,13 +52,13 @@
 
 ## 1. Cover & Document Control
 
-This document constitutes the official System Design Document (SDD) and Master Engineering Reference for NexByte Technologies. It outlines the end-to-end architecture, business logic, component libraries, database schemas, deployment pipelines, and operational procedures for the production platform.
+This document constitutes the official System Design Document (SDD) and Master Engineering Reference for Nex LapTech. It outlines the end-to-end architecture, business logic, component libraries, database schemas, deployment pipelines, and operational procedures for the production platform.
 
 ***
 
 ## 2. Executive Summary
 
-NexByte Technologies provides premium IT infrastructure, computer sales, laptop repair, CCTV installation, AMC maintenance, and technical training in Bengaluru. This web application transforms NexByte's operations into an automated, real-time enterprise platform.
+Nex LapTech provides premium IT infrastructure, computer sales, laptop repair, CCTV installation, AMC maintenance, and technical training in Bengaluru. This web application transforms Nex LapTech's operations into an automated, real-time enterprise platform.
 
 ```yaml
 System Quality Score: 98.6% (Grade A+)
@@ -331,7 +331,7 @@ The standalone Express server (`server/index.js`) runs on Port 3001:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/nirajan252006/NEXBYTE.git /var/www/nexbyte
+git clone https://github.com/nirajan252006/NEX LAPTECH.git /var/www/nexbyte
 cd /var/www/nexbyte
 
 # 2. Build Next.js & Start PM2
@@ -396,7 +396,7 @@ sudo systemctl reload nginx
 ========================================================================
        MASTER ENTERPRISE SYSTEM DESIGN & READINESS CERTIFICATE
 ========================================================================
-This certifies that NexByte Technologies Enterprise Platform v2.0
+This certifies that Nex LapTech Enterprise Platform v2.0
 has passed all system architecture, QA audit, security, and load
 benchmarks. Certified 100% Production Ready.
 

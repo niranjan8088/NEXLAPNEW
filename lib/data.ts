@@ -1,11 +1,11 @@
-// Central source of truth for all NexByte Technologies business content.
+// Central source of truth for all Nex LapTech business content.
 // Keeping this separate from components makes copy edits a one-file change.
 
 export const business = {
-  name: "NexByte Technologies",
-  tagline: "Engineering Tomorrow's Technology, Today.",
+  name: "Nex LapTech",
+  tagline: "Laptops | PC Components | Accessories | More",
   description:
-    "Your trusted destination for fast computer sales, laptop repair, CCTV installation, and doorstep IT support across Karnataka.",
+    "Nex LapTech brings you laptops, PC components, accessories, repairs, CCTV installation, and doorstep IT support across Karnataka.",
   phones: ["+91 8088979706", "+91 8904760125"],
   phoneLinks: ["+918088979706", "+918904760125"],
   email: "nexbytetechnologies@gmail.com",
@@ -17,7 +17,7 @@ export const business = {
     line1: "Service Areas: Bengaluru | Tumkur | Hiriyur — Coming Soon",
     line2: "Doorstep & On-Site Support",
     city: "Karnataka, India",
-    mapsQuery: "NexByte+Technologies+Karnataka",
+    mapsQuery: "Nex+LapTech+Karnataka",
   },
   branches: [
     { name: "Bengaluru Service Area", location: "Bengaluru & Surrounding Regions", status: "active" },
@@ -90,6 +90,7 @@ export type ProductVariant = {
   stock?: number;
   image?: string;
   attributes?: Record<string, string>;
+  active?: boolean;
 };
 
 export type Product = {
@@ -195,7 +196,7 @@ export const products: Product[] = [
   },
   {
     id: "gaming-pc-pro",
-    title: "NexByte ROG Slayer R15 Gaming PC",
+    title: "Nex LapTech ROG Slayer R15 Gaming PC",
     description: "High-refresh, RGB-tuned gaming rig built around Nvidia RTX 4070 and Intel i7 14th Gen for zero-compromise frame rates.",
     image: "/images/product-gaming-desktops.png",
     tags: ["Custom Build", "RTX 4070", "Intel i7"],
@@ -227,7 +228,7 @@ export const products: Product[] = [
       Storage: "512GB High-Speed Apple SSD",
       OS: "macOS Sonoma",
       Battery: "92% Health (Original Charger)",
-      Condition: "Excellent (Grade A, 6 Months NexByte Warranty)",
+      Condition: "Excellent (Grade A, 6 Months Nex LapTech Warranty)",
     },
   },
   {
@@ -245,7 +246,7 @@ export const products: Product[] = [
       Storage: "256GB PCIe NVMe M.2 SSD",
       OS: "Windows 11 Professional Genuine",
       Battery: "85% Health (Type-C Charger)",
-      Condition: "Very Good (Grade B+, 6 Months NexByte Warranty)",
+      Condition: "Very Good (Grade B+, 6 Months Nex LapTech Warranty)",
     },
   },
   {
@@ -268,7 +269,7 @@ export const products: Product[] = [
   },
   {
     id: "server-rack-xeon",
-    title: "NexByte Xeon Enterprise Rack Server 1U",
+    title: "Nex LapTech Xeon Enterprise Rack Server 1U",
     description: "High-density compute infrastructure for offices, virtualization, databases, and heavy processing networks.",
     image: "/images/product-bulk-laptop-supply.png",
     tags: ["Xeon Silver", "Dual CPU", "64GB ECC"],
@@ -286,7 +287,7 @@ export const products: Product[] = [
   },
   {
     id: "desktop-office-workstation",
-    title: "NexByte Office Workstation Intel i5",
+    title: "Nex LapTech Office Workstation Intel i5",
     description: "Standardised, highly reliable corporate desktops for offices, schools, billing centers, and call units.",
     image: "/images/product-bulk-desktop-supply.png",
     tags: ["Intel i5", "Micro ATX", "Office Pack"],
@@ -298,13 +299,13 @@ export const products: Product[] = [
       Motherboard: "MSI PRO H610M-E Motherboard",
       Storage: "512GB Crucial P3 NVMe M.2 SSD",
       OS: "Windows 11 Home & Office Student 2021",
-      Cabinet: "NexByte Business Micro-ATX Cabinet with 450W PSU",
+      Cabinet: "Nex LapTech Business Micro-ATX Cabinet with 450W PSU",
       Condition: "Brand New (2 Years Component Warranty)",
     },
   },
   {
     id: "accessories-keyboard-mouse",
-    title: "NexByte Mechanical Gaming Combo RGB",
+    title: "Nex LapTech Mechanical Gaming Combo RGB",
     description: "Anti-ghosting key layout mechanical switch keyboard paired with high-DPI ergonomic RGB gaming mouse.",
     image: "/images/product-computer-accessories.png",
     tags: ["Blue Switches", "RGB", "USB Wired"],
@@ -321,7 +322,7 @@ export const products: Product[] = [
   },
   {
     id: "storage-nvme-ssd",
-    title: "NexByte Black NVMe M.2 1TB SSD Upgrade Kit",
+    title: "Nex LapTech Black NVMe M.2 1TB SSD Upgrade Kit",
     description: "Blazing fast PCIe Gen 4 SSD with read speeds up to 7000MB/s, compatible with desktop and laptops.",
     image: "/images/product-custom-pc-assembly.png",
     tags: ["SSD Upgrade", "PCIe Gen 4", "7000MB/s"],
@@ -338,7 +339,7 @@ export const products: Product[] = [
   },
   {
     id: "networking-gigabit-router",
-    title: "NexByte AX3000 WiFi 6 Dual-Band Router",
+    title: "Nex LapTech AX3000 WiFi 6 Dual-Band Router",
     description: "Seamless wireless coverage and ultra-low latency Gigabit speeds for smart homes and offices.",
     image: "/images/product-cctv-systems.png",
     tags: ["WiFi 6", "AX3000", "Dual Band"],
@@ -355,7 +356,7 @@ export const products: Product[] = [
   },
   {
     id: "monitor-ips-gaming",
-    title: "NexByte 27\" IPS 165Hz QHD Gaming Monitor",
+    title: "Nex LapTech 27\" IPS 165Hz QHD Gaming Monitor",
     description: "Premium display featuring 99% sRGB color accuracy, 1ms response time, and AMD FreeSync support.",
     image: "/images/product-gaming-desktops.png",
     tags: ["2K QHD", "IPS Panel", "165Hz"],
@@ -373,7 +374,7 @@ export const products: Product[] = [
   },
   {
     id: "cctv-outdoor-camera",
-    title: "NexByte Smart Outdoor CCTV Camera Dome Kit",
+    title: "Nex LapTech Smart Outdoor CCTV Camera Dome Kit",
     description: "Complete 4-Camera HD 4MP color night-vision setup with 1TB surveillance HDD and remote phone viewing app.",
     image: "/images/product-cctv-systems.png",
     tags: ["4MP HD", "Color Night Vision", "Remote App"],
@@ -452,7 +453,7 @@ export const testimonials: Testimonial[] = [
     name: "Ramesh Kumar",
     role: "Small Business Owner, Bengaluru",
     quote:
-      "NexByte set up our entire office network and desktops in a single weekend. Everything just works, and their AMC keeps it that way.",
+      "Nex LapTech set up our entire office network and desktops in a single weekend. Everything just works, and their AMC keeps it that way.",
     rating: 5,
   },
   {
@@ -527,8 +528,8 @@ export const faqs: FAQItem[] = [
 ];
 
 export const galleryImages = [
-  { src: "/images/logo-icon.png", alt: "NexByte Technologies emblem" },
-  { src: "/images/poster-products.png", alt: "NexByte product range — desktops, laptops, accessories, CCTV" },
-  { src: "/images/poster-services.png", alt: "NexByte service range — repair, networking, AMC and more" },
-  { src: "/images/logo-horizontal.png", alt: "NexByte Technologies brand logo" },
+  { src: "/assets/nexlaptech-logo.svg", alt: "Nex LapTech emblem" },
+  { src: "/images/poster-products.png", alt: "Nex LapTech product range — desktops, laptops, accessories, CCTV" },
+  { src: "/images/poster-services.png", alt: "Nex LapTech service range — repair, networking, AMC and more" },
+  { src: "/assets/nexlaptech-logo.svg", alt: "Nex LapTech brand logo" },
 ];

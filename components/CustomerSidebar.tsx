@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -242,27 +242,9 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen }: CustomerS
         {/* Branding */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-[#DCEAF2] dark:border-[#2A3B50] shrink-0">
           <Link href="/customer" className="flex items-center gap-3 group overflow-hidden">
-            <div className="relative h-9 w-9 shrink-0 rounded-xl overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#7C3AED] flex items-center justify-center shadow-md">
-              <Image
-                src="/images/logo-icon-transparent.png"
-                alt="NexByte Logo"
-                fill
-                sizes="36px"
-                className="object-contain p-1"
-                priority
-                onError={() => {}}
-              />
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-[#020b1f] shadow-[0_0_16px_rgba(59,130,246,0.25)] ring-2 ring-cyan-400/70">
+              <BrandLogo width={120} height={120} sizes="44px" priority className="h-full w-full" />
             </div>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="font-display text-sm font-extrabold tracking-tight text-[#111827] dark:text-[#F8FAFC] leading-none">
-                  NEXBYTE
-                </span>
-                <span className="text-[10px] font-semibold text-[#64748B] dark:text-[#94A3B8] tracking-wide mt-0.5">
-                  Technology Store
-                </span>
-              </div>
-            )}
           </Link>
           <button
             onClick={toggleCollapsed}
@@ -331,21 +313,8 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen }: CustomerS
             >
               <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] dark:border-[#263247]">
                 <div className="flex items-center gap-3">
-                  <div className="relative h-9 w-9 rounded-xl overflow-hidden bg-gradient-to-br from-[#2563EB] to-[#7C3AED] flex items-center justify-center shadow-md">
-                    <Image
-                      src="/images/logo-icon-transparent.png"
-                      alt="NexByte Logo"
-                      fill
-                      sizes="36px"
-                      className="object-contain p-1"
-                      onError={() => {}}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-extrabold text-[#111827] dark:text-[#F8FAFC] text-sm">
-                      NEXBYTE
-                    </h3>
-                    <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] font-medium">Technology Store</p>
+                  <div className="relative h-11 w-11 overflow-hidden rounded-full bg-[#020b1f] shadow-[0_0_16px_rgba(59,130,246,0.25)] ring-2 ring-cyan-400/70">
+                    <BrandLogo width={120} height={120} sizes="44px" className="h-full w-full" />
                   </div>
                 </div>
                 <button
@@ -406,7 +375,7 @@ export default function CustomerSidebar({ mobileOpen, setMobileOpen }: CustomerS
               </div>
 
               <p className="text-xs text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
-                Sign out of your NexByte account? You will need to sign in again to access your orders, bookings, and profile.
+                Sign out of your Nex LapTech account? You will need to sign in again to access your orders, bookings, and profile.
               </p>
 
               <div className="flex items-center justify-end gap-2 pt-2">

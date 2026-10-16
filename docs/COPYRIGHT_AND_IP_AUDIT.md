@@ -1,4 +1,4 @@
-# NEXBYTE TECHNOLOGIES — COPYRIGHT & INTELLECTUAL PROPERTY AUDIT
+# NEX LAPTECH — COPYRIGHT & INTELLECTUAL PROPERTY AUDIT
 
 **Document Reference**: `docs/COPYRIGHT_AND_IP_AUDIT.md`  
 **Audit Date**: October 9, 2026  
@@ -8,7 +8,7 @@
 
 ## 1. EXECUTIVE SUMMARY & OWNERSHIP OVERVIEW
 
-This audit evaluates the intellectual property (IP) assets, branding materials, software components, icons, fonts, product images, and third-party code embedded within the NexByte Technologies web application platform.
+This audit evaluates the intellectual property (IP) assets, branding materials, software components, icons, fonts, product images, and third-party code embedded within the Nex LapTech web application platform.
 
 > [!IMPORTANT]
 > **Legal Notice**: This document provides a technical IP inventory and licensing audit based on codebase inspection. It does not constitute formal legal counsel. Formal trademark registration and copyright filing must be reviewed by a qualified Intellectual Property Attorney.
@@ -17,13 +17,13 @@ This audit evaluates the intellectual property (IP) assets, branding materials, 
 
 ## 2. ASSET INVENTORY & LICENSING BREAKDOWN
 
-### A. NexByte Original Assets (Exclusively Owned by NexByte Technologies)
+### A. Nex LapTech Original Assets (Exclusively Owned by Nex LapTech)
 | Asset Category | Asset Description | Source / Location | License / Ownership | Permitted Usage | Verification Status |
 | :--- | :--- | :--- | :--- | :--- | :---: |
-| **Brand Identity** | NexByte Technologies Name, Slogan & Product Badging | `components/` UI Headers | Proprietary / NexByte | Internal & Commercial | **PASS** |
-| **Custom Codebase** | Next.js 15 App Router API routes, custom hooks, dbHelper abstraction, server commission engine | `app/`, `lib/dbHelper.ts` | Proprietary / NexByte | Exclusive Ownership | **PASS** |
-| **Store Metadata** | Product specification schemas, category filters, internal CRM database definitions | `lib/filterEngine.ts`, `lib/data.ts` | Proprietary / NexByte | Exclusive Ownership | **PASS** |
-| **PDF Templates** | Tax Invoice & E-Warranty PDF generation templates | `components/InvoicePDF.tsx` | Proprietary / NexByte | Store Billing | **PASS** |
+| **Brand Identity** | Nex LapTech Name, Slogan & Product Badging | `components/` UI Headers | Proprietary / Nex LapTech | Internal & Commercial | **PASS** |
+| **Custom Codebase** | Next.js 15 App Router API routes, custom hooks, dbHelper abstraction, server commission engine | `app/`, `lib/dbHelper.ts` | Proprietary / Nex LapTech | Exclusive Ownership | **PASS** |
+| **Store Metadata** | Product specification schemas, category filters, internal CRM database definitions | `lib/filterEngine.ts`, `lib/data.ts` | Proprietary / Nex LapTech | Exclusive Ownership | **PASS** |
+| **PDF Templates** | Tax Invoice & E-Warranty PDF generation templates | `components/InvoicePDF.tsx` | Proprietary / Nex LapTech | Store Billing | **PASS** |
 
 ### B. UI Frameworks & Open-Source Software Libraries
 | Library / Dependency | Version | Source | License | Attribution Requirement | Commercial Use Permitted? |
@@ -45,7 +45,7 @@ This audit evaluates the intellectual property (IP) assets, branding materials, 
 | :--- | :--- | :--- | :--- | :--- |
 | **Typography** | Google Fonts (`Inter`, `Outfit`) | Google Fonts API | SIL Open Font License 1.1 | Permitted for commercial use |
 | **Product Mock Images** | `public/images/*` | Generated via AI tool (`generate_image`) | Permitted for store demo | Replace with actual product photos before public launch |
-| **Brand Logos** | `public/images/logo-icon.png` | NexByte Graphic Assets | Proprietary to NexByte | Register trademark |
+| **Brand Logos** | `public/assets/nexlaptech-logo.png` | Nex LapTech Graphic Assets | Proprietary to Nex LapTech | Register trademark |
 
 ---
 
@@ -54,7 +54,7 @@ This audit evaluates the intellectual property (IP) assets, branding materials, 
 - [x] **Verified**: All third-party node packages use permissive open-source licenses (MIT, Apache 2.0, ISC).
 - [x] **Verified**: No GPL-v3 or copyleft dependencies detected in production build bundle.
 - [ ] **Action Required**: Replace demo AI-generated laptop image placeholders with high-resolution original photography of actual reseller/store inventory prior to production launch.
-- [ ] **Action Required**: File trademark application with the Indian Trade Marks Registry for "NexByte" and the NexByte logo.
+- [ ] **Action Required**: File trademark application with the Indian Trade Marks Registry for "Nex LapTech" and the Nex LapTech logo.
 
 ---
 

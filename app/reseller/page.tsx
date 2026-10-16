@@ -95,7 +95,7 @@ export default function ResellerDashboard() {
               Welcome back, {resellerName}!
             </h1>
             <p className="text-xs text-nex-mist mt-1">
-              Manage your products, track orders, and grow your business with NexByte.
+              Manage your products, track orders, and grow your business with Nex LapTech.
             </p>
           </div>
           <Link href="/reseller/products/add"
@@ -242,7 +242,7 @@ export default function ResellerDashboard() {
               {pendingProducts.length} product{pendingProducts.length > 1 ? "s" : ""} pending admin approval
             </p>
             <p className="text-[11px] text-nex-mist mt-0.5">
-              Products must be approved by NexByte admin before appearing in the public catalog.
+              Products must be approved by Nex LapTech admin before appearing in the public catalog.
             </p>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { dbHelper } from "./lib/dbHelper";
 
 async function runPhase7MarketplaceTests() {
   console.log("==================================================");
-  console.log("NEXBYTE PHASE 7: RESELLER MARKETPLACE & COMMISSION SUITE");
+  console.log("NEX LAPTECH PHASE 7: RESELLER MARKETPLACE & COMMISSION SUITE");
   console.log("==================================================");
 
   let passed = 0;

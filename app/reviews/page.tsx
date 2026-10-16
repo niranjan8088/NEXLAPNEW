@@ -33,7 +33,11 @@ export interface ProductReviewItem {
 export default function CustomerReviewsPage() {
   const [reviews, setReviews] = useState<ProductReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [filterRating, setFilterRating] = useState<number | "all">("all");
+  const [reviewerName, setReviewerName] = useState("");
+  const [reviewerCity, setReviewerCity] = useState("");
+  const [votingId, setVotingId] = useState<string | null>(null);
 
   // Modal
   const [showWriteModal, setShowWriteModal] = useState(false);
@@ -45,61 +49,29 @@ export default function CustomerReviewsPage() {
 
   const loadReviews = async () => {
     setLoading(true);
+    setLoadError("");
     try {
-      const mockReviews: ProductReviewItem[] = [
-        {
-          id: "rev-1",
-          productTitle: "Samsung 980 PRO 1TB PCIe 4.0 NVMe SSD",
-          productCategory: "Storage",
-          reviewerName: "Rohan Sharma",
-          rating: 5,
-          title: "Mindblowing speed upgrade! Boot time reduced to 4 seconds.",
-          comment: "Installed this Samsung 980 Pro SSD in my Dell workstation. Read speed reached 6,950 MB/s on benchmark tests. Highly recommended from NexByte with original brand warranty!",
-          date: "2026-03-28",
-          verifiedPurchase: true,
-          helpfulCount: 24
-        },
-        {
-          id: "rev-2",
-          productTitle: "Lenovo ThinkPad T490 (Certified Refurbished)",
-          productCategory: "Business Laptops",
-          reviewerName: "Priya Nair",
-          rating: 5,
-          title: "Clean like brand new, battery health is great!",
-          comment: "I was hesitant about buying refurbished, but NexByte delivered in mint condition. Keyboard, display, and battery backup are top-notch. Came with genuine 1-year warranty card.",
-          date: "2026-03-20",
-          verifiedPurchase: true,
-          helpfulCount: 18
-        },
-        {
-          id: "rev-3",
-          productTitle: "NexByte ROG Slayer R15 Gaming PC",
-          productCategory: "Gaming PCs",
-          reviewerName: "Aditya Verma",
-          rating: 5,
-          title: "Beast of a gaming rig! Cable management is ultra-clean.",
-          comment: "Running Cyberpunk 2077 at 144 FPS smooth. Thermal liquid cooling keeps CPU temperatures under 65°C under heavy loads. Excellent post-sales technician assistance!",
-          date: "2026-03-15",
-          verifiedPurchase: true,
-          helpfulCount: 31
-        },
-        {
-          id: "rev-4",
-          productTitle: "EVM 512GB NVMe M.2 SSD",
-          productCategory: "Storage",
-          reviewerName: "Vikram R.",
-          rating: 4,
-          title: "Best budget SSD for laptop upgrade.",
-          comment: "Great value for money. Transferred Windows OS seamlessly with NexByte technician support.",
-          date: "2026-03-10",
-          verifiedPurchase: true,
-          helpfulCount: 12
-        }
-      ];
-
-      setReviews(mockReviews);
-    } catch (e) {
-      console.error(e);
+      const response = await fetch("/api/reviews?sort=newest&limit=100", { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to load reviews.");
+      setReviews((data.reviews || []).map((review: any) => {
+        const createdAt = review.created_at ? new Date(review.created_at) : null;
+        return {
+          id: String(review.id),
+          productId: review.product_id,
+          productTitle: review.product_purchased || review.product_title || "Nex LapTech product or service",
+          productCategory: review.product_category || review.category || "Customer experience",
+          reviewerName: review.customer_name || review.customerName || "Nex LapTech customer",
+          rating: Number(review.rating) || 0,
+          title: review.overall_experience || "Customer review",
+          comment: review.review_message || review.review || "",
+          date: createdAt && !Number.isNaN(createdAt.getTime()) ? createdAt.toLocaleDateString("en-IN") : "Recently",
+          verifiedPurchase: review.verified === true && review.source === "purchase",
+          helpfulCount: Number(review.helpful_count) || 0,
+        };
+      }));
+    } catch (error: any) {
+      setLoadError(error.message || "Unable to load reviews.");
     } finally {
       setLoading(false);
     }
@@ -109,37 +81,51 @@ export default function CustomerReviewsPage() {
     loadReviews();
   }, []);
 
-  const handleHelpful = (id: string) => {
-    setReviews((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, helpfulCount: r.helpfulCount + 1 } : r))
-    );
+  const handleHelpful = async (id: string) => {
+    if (votingId) return;
+    setVotingId(id);
+    try {
+      const response = await fetch("/api/reviews/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ review_id: id, vote_type: "helpful" }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to record your vote.");
+      setReviews((current) => current.map((review) => review.id === id
+        ? { ...review, helpfulCount: Number(data.count) || review.helpfulCount + 1 }
+        : review));
+    } catch (error: any) {
+      setLoadError(error.message || "Unable to record your vote.");
+    } finally {
+      setVotingId(null);
+    }
   };
 
-  const handleWriteSubmit = (e: React.FormEvent) => {
+  const handleWriteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReviewTitle.trim() || !newReviewComment.trim()) return;
-
-    const created: ProductReviewItem = {
-      id: `rev-${Date.now()}`,
-      productTitle: newReviewProduct,
-      productCategory: "Hardware",
-      reviewerName: "Valued Customer",
-      rating: newReviewRating,
-      title: newReviewTitle.trim(),
-      comment: newReviewComment.trim(),
-      date: new Date().toISOString().split("T")[0],
-      verifiedPurchase: true,
-      helpfulCount: 1
-    };
-
-    setReviews((prev) => [created, ...prev]);
-    setSuccessMsg("Thank you! Your verified review has been posted.");
-    setTimeout(() => {
-      setShowWriteModal(false);
-      setNewReviewTitle("");
-      setNewReviewComment("");
-      setSuccessMsg("");
-    }, 2000);
+    if (!reviewerName.trim() || !reviewerCity.trim() || !newReviewTitle.trim() || !newReviewComment.trim()) return;
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: reviewerName.trim(),
+          city: reviewerCity.trim(),
+          product_purchased: newReviewProduct,
+          overall_experience: newReviewTitle.trim(),
+          review_message: newReviewComment.trim(),
+          rating: newReviewRating,
+          recommend: true,
+          source: "public_form",
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to submit review.");
+      setSuccessMsg("Thank you. Your review has been submitted for moderation.");
+    } catch (error: any) {
+      setLoadError(error.message || "Failed to submit review.");
+    }
   };
 
   const filteredReviews = reviews.filter((r) => filterRating === "all" || r.rating === filterRating);
@@ -177,7 +163,7 @@ export default function CustomerReviewsPage() {
                   <Star key={s} className="h-5 w-5 fill-amber-400" />
                 ))}
               </div>
-              <p className="text-xs text-slate-500 font-semibold pt-1">Based on {reviews.length} Verified Buyer Reviews</p>
+              <p className="text-xs text-slate-500 font-semibold pt-1">Based on {reviews.length} published reviews</p>
             </div>
 
             <div className="space-y-1.5 text-xs">
@@ -197,10 +183,10 @@ export default function CustomerReviewsPage() {
             </div>
 
             <div className="text-center space-y-3">
-              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Bought from NexByte?</h3>
+              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-white">Bought from Nex LapTech?</h3>
               <p className="text-xs text-slate-500">Share your hardware experience with other buyers.</p>
               <button
-                onClick={() => setShowWriteModal(true)}
+                onClick={() => { setLoadError(""); setShowWriteModal(true); }}
                 className="btn-primary !py-2.5 !px-6 text-xs inline-flex items-center gap-1.5 shadow-md"
               >
                 <PlusCircle className="h-4 w-4" /> Write a Review
@@ -233,6 +219,13 @@ export default function CustomerReviewsPage() {
 
           {/* Reviews Grid */}
           <div className="space-y-4">
+            {loadError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{loadError}</p>}
+            {loading && <p role="status" className="py-8 text-center text-sm text-slate-500">Loading published reviews...</p>}
+            {!loading && !filteredReviews.length && (
+              <p className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+                No published reviews match this rating yet.
+              </p>
+            )}
             {filteredReviews.map((rev) => (
               <div
                 key={rev.id}
@@ -277,7 +270,8 @@ export default function CustomerReviewsPage() {
 
                   <button
                     onClick={() => handleHelpful(rev.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-slate-100 text-slate-600 dark:text-slate-300 font-semibold text-[11px] transition-colors"
+                    disabled={votingId !== null}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 dark:bg-white/5 hover:bg-slate-100 text-slate-600 dark:text-slate-300 font-semibold text-[11px] transition-colors disabled:opacity-50"
                   >
                     <ThumbsUp className="h-3.5 w-3.5 text-sky-500" />
                     <span>Helpful ({rev.helpfulCount})</span>
@@ -312,6 +306,19 @@ export default function CustomerReviewsPage() {
               </div>
             ) : (
               <form onSubmit={handleWriteSubmit} className="space-y-4">
+                {loadError && <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">{loadError}</p>}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="space-y-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Your Name *
+                    <input required value={reviewerName} onChange={(e) => setReviewerName(e.target.value)} maxLength={100}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none" />
+                  </label>
+                  <label className="space-y-1 text-xs font-bold text-slate-700 dark:text-slate-300">
+                    City *
+                    <input required value={reviewerCity} onChange={(e) => setReviewerCity(e.target.value)} maxLength={100}
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none" />
+                  </label>
+                </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300">Select Product *</label>
                   <select
@@ -321,7 +328,7 @@ export default function CustomerReviewsPage() {
                   >
                     <option value="Samsung 980 PRO 1TB NVMe SSD">Samsung 980 PRO 1TB NVMe SSD</option>
                     <option value="Lenovo ThinkPad T490 (Refurbished)">Lenovo ThinkPad T490 (Refurbished)</option>
-                    <option value="NexByte ROG Slayer R15 Gaming PC">NexByte ROG Slayer R15 Gaming PC</option>
+                    <option value="Nex LapTech ROG Slayer R15 Gaming PC">Nex LapTech ROG Slayer R15 Gaming PC</option>
                     <option value="Dell Latitude 5440 Pro Laptop">Dell Latitude 5440 Pro Laptop</option>
                     <option value="EVM 512GB NVMe M.2 SSD">EVM 512GB NVMe M.2 SSD</option>
                   </select>
@@ -374,7 +381,7 @@ export default function CustomerReviewsPage() {
                     Cancel
                   </button>
                   <button type="submit" className="btn-primary !py-2 !px-5 text-xs flex items-center gap-1.5 shadow-md">
-                    Submit Verified Review
+                    <PlusCircle className="h-4 w-4" /> Submit Review
                   </button>
                 </div>
               </form>

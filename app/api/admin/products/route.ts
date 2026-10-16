@@ -174,6 +174,7 @@ export async function POST(request: NextRequest) {
         stock: parsedStock,
         image,
         attributes,
+        active: variant.active !== false,
       };
     });
 

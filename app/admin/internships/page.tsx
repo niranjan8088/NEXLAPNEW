@@ -142,7 +142,7 @@ export default function AdminInternshipsPage() {
   const handleConfirmApproval = async () => {
     await handleSaveAppDetails({
       status: "approved",
-      mentor: mentorText || "NexByte Senior Tech Lead",
+      mentor: mentorText || "Nex LapTech Senior Tech Lead",
       batch: batchText || "Batch A - 2026",
       customer_reply: `Congratulations! Your internship application ${selectedApp?.application_id} has been approved.`
     });
@@ -224,7 +224,7 @@ export default function AdminInternshipsPage() {
     });
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csv));
-    link.setAttribute("download", "NexByte_Internship_Applications.csv");
+    link.setAttribute("download", "NexLapTech_Internship_Applications.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

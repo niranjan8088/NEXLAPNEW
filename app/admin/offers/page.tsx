@@ -87,11 +87,13 @@ export default function AdminOffersPage() {
   const loadOffersData = async () => {
     setLoading(true);
     try {
-      const [oList, pList] = await Promise.all([
-        dbHelper.offers.list(),
+      const [offerResponse, pList] = await Promise.all([
+        fetch("/api/admin/offers"),
         dbHelper.products.list()
       ]);
-      setOffers(oList);
+      const offerData = await offerResponse.json();
+      if (!offerResponse.ok) throw new Error(offerData.error || "Failed to load offers.");
+      setOffers(offerData.offers || []);
       setProductsCatalog(pList);
     } catch (e) {
       console.error("Failed to load offers:", e);
@@ -323,7 +325,7 @@ export default function AdminOffersPage() {
   }, [offers, searchQuery, statusFilter, typeFilter, sortBy]);
 
   return (
-    <div className="space-y-6">
+    <div className="admin-offers space-y-6">
       
       {/* ── HEADER ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-5">

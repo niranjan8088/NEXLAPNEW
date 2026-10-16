@@ -16,13 +16,11 @@ import {
   Package,
   Calendar,
   Sun,
-  Moon,
   Tag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/lib/cartStore";
-import { useTheme } from "@/components/ThemeProvider";
 import GlobalSearchModal from "@/components/GlobalSearchModal";
 import QuickNotificationsPopover from "@/components/QuickNotificationsPopover";
 
@@ -54,7 +52,6 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps) {
   const pathname = usePathname() || "/customer";
-  const { theme, toggleTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -120,7 +117,7 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
             {/* Page title — desktop only */}
             <div className="hidden sm:flex flex-col min-w-0">
               <span className="text-[10px] font-bold text-[#0891B2] dark:text-[#0891B2] tracking-wider uppercase">
-                NexByte Technologies
+                Nex LapTech
               </span>
               <h1 className="text-base font-extrabold text-[#0F172A] dark:text-[#F8FAFC] truncate">
                 {getPageTitle()}
@@ -168,20 +165,16 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
             {/* Notifications */}
             <QuickNotificationsPopover role="customer" />
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
+            {/* Theme is fixed to light mode. */}
+            <div
+              role="status"
+              aria-label="Light theme active"
               id="customer-theme-btn"
               className="p-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#263247] bg-white dark:bg-[#111827] text-[#111827] dark:text-[#F8FAFC] hover:bg-[#EEF6FF] dark:hover:bg-[#1a2744] transition-colors"
-              title={theme === "day" ? "Switch to Night Mode" : "Switch to Day Mode"}
+              title="Light theme active"
             >
-              {theme === "day" ? (
-                <Moon className="h-4.5 w-4.5" />
-              ) : (
-                <Sun className="h-4.5 w-4.5 text-[#60A5FA]" />
-              )}
-            </button>
+              <Sun className="h-4.5 w-4.5 text-amber-500" />
+            </div>
 
             {/* Profile Dropdown */}
             {isAuthenticated && userProfile ? (
@@ -221,7 +214,7 @@ export default function CustomerHeader({ onOpenMobileMenu }: CustomerHeaderProps
                       {/* User info */}
                       <div className="px-3 py-2.5 border-b border-[#E2E8F0] dark:border-[#263247] mb-1">
                         <p className="font-bold text-xs text-[#111827] dark:text-[#F8FAFC] truncate">
-                          {userProfile.full_name || "NexByte Customer"}
+                          {userProfile.full_name || "Nex LapTech Customer"}
                         </p>
                         <p className="text-[10px] text-[#64748B] dark:text-[#94A3B8] truncate mt-0.5">{userProfile.email}</p>
                       </div>

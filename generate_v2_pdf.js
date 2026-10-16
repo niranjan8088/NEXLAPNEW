@@ -167,7 +167,7 @@
       // PAGE 1: TITLE PAGE, RELEASE METADATA & EXECUTIVE SUMMARY
       React.createElement(Page, { size: "A4", style: styles.page },
         React.createElement(View, { style: styles.coverHeader },
-          React.createElement(Text, { style: styles.brandTitle }, "NEXBYTE TECHNOLOGIES"),
+          React.createElement(Text, { style: styles.brandTitle }, "NEX LAPTECH"),
           React.createElement(Text, { style: styles.brandSub }, "ENTERPRISE RELEASE & OPERATIONS DOCUMENTATION PACKAGE v2.0"),
           React.createElement(View, { style: styles.metaRow },
             React.createElement(Text, { style: styles.metaText }, "Version: v2.0.0 Enterprise (#1042-PROD)"),
@@ -182,7 +182,7 @@
           React.createElement(View, { style: styles.card },
             React.createElement(Text, { style: styles.cardTitle }, "Release Identification"),
             React.createElement(Text, { style: styles.cardText },
-              "• Release Name: NexByte Enterprise v2.0\n" +
+              "• Release Name: Nex LapTech Enterprise v2.0\n" +
               "• Version Type: Major Production Release\n" +
               "• Build Number: #1042-PROD\n" +
               "• Git Revision: 3f8a12c49b201e7a8\n" +
@@ -232,7 +232,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Release Package v2.0"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Release Package v2.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 1 of 5")
         )
       ),
@@ -275,7 +275,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Release Package v2.0"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Release Package v2.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 2 of 5")
         )
       ),
@@ -306,7 +306,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Release Package v2.0"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Release Package v2.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 3 of 5")
         )
       ),
@@ -337,7 +337,7 @@
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Release Package v2.0"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Release Package v2.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 4 of 5")
         )
       ),
@@ -348,12 +348,12 @@
         React.createElement(View, { style: styles.banner },
           React.createElement(Text, { style: styles.bannerTitle }, "✓ ENTERPRISE RELEASE & ACCEPTANCE CERTIFICATE v2.0"),
           React.createElement(Text, { style: styles.bannerText },
-            "This certifies that NexByte Technologies Enterprise Platform v2.0.0 has passed all QA, security, performance, and bi-directional realtime synchronization requirements. The application is officially handed over for production deployment."
+            "This certifies that Nex LapTech Enterprise Platform v2.0.0 has passed all QA, security, performance, and bi-directional realtime synchronization requirements. The application is officially handed over for production deployment."
           )
         ),
 
         React.createElement(View, { style: styles.footer },
-          React.createElement(Text, { style: styles.footerText }, "NexByte Technologies Enterprise Release Package v2.0"),
+          React.createElement(Text, { style: styles.footerText }, "Nex LapTech Enterprise Release Package v2.0"),
           React.createElement(Text, { style: styles.footerText }, "Page 5 of 5")
         )
       )

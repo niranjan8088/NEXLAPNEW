@@ -36,6 +36,35 @@ const supabase =
     ? createClient(supabaseUrl, supabaseAnonKey)
     : null;
 
+function normalizeProductRow(row: Record<string, any>) {
+  const { original_price, cost_price, images, ...product } = row;
+  return {
+    ...product,
+    images: Array.isArray(images) ? images.map((image, index) => typeof image === "string"
+      ? { id: `image-${index + 1}`, url: image, is_primary: index === 0, sort_order: index + 1 }
+      : image
+    ) : images,
+    compareAtPrice: product.compareAtPrice ?? original_price ?? undefined,
+    costPrice: product.costPrice ?? cost_price ?? undefined,
+  };
+}
+
+function toProductDatabaseFields(fields: Record<string, any>) {
+  const payload = { ...fields };
+  if ("compareAtPrice" in payload) {
+    payload.original_price = payload.compareAtPrice;
+    delete payload.compareAtPrice;
+  }
+  if ("costPrice" in payload) {
+    payload.cost_price = payload.costPrice;
+    delete payload.costPrice;
+  }
+  if (Array.isArray(payload.images)) {
+    payload.images = payload.images.map((image: any) => typeof image === "string" ? image : image?.url).filter(Boolean);
+  }
+  return payload;
+}
+
 // Mock Local Memory for Server-side compilation fallback
 const globalRef = globalThis as any;
 if (!globalRef.__nexbyteMockDb) {
@@ -52,7 +81,7 @@ if (!globalRef.__nexbyteMockDb) {
       ...p,
       stock: p.stock ?? 12,
       discount: 10,
-      warranty: "1 Year NexByte Warranty",
+      warranty: "1 Year Nex LapTech Warranty",
       condition: p.category.includes("used") || p.category.includes("second") ? "premium_used" : "new",
       status: "show",
       featured: p.id === "p1" || p.id === "p2",
@@ -185,21 +214,21 @@ if (!globalRef.__nexbyteMockDb) {
     ],
     cms_content: {
       hero: {
-        headline: "Premium IT Solutions — NexByte Technologies",
+        headline: "Premium IT Solutions — Nex LapTech",
         subheadline: "Laptops, Gaming PCs, Servers, Accessories, Repairs & Academy Training.",
         cta: "Explore Products",
         secondary_cta: "Book a Service",
       },
       seo: {
-        title: "NexByte Technologies — Hardware, Repairs & IT Training",
-        description: "NexByte Technologies offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training.",
-        keywords: "laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, NexByte",
+        title: "Nex LapTech — Hardware, Repairs & IT Training",
+        description: "Nex LapTech offers premium laptops, gaming PCs, servers, bulk hardware supply, CCTV installation, software support, and IT academy training.",
+        keywords: "laptop repair, gaming PC, computer service, bulk supply, IT training, CCTV installation, Nex LapTech",
         og_image: "/images/poster-products.png",
       },
       footer: {
         tagline: "Your trusted partner for premium IT solutions.",
         address: "Bengaluru, Karnataka",
-        copyright: "© 2026 NexByte Technologies. All rights reserved.",
+        copyright: "© 2026 Nex LapTech. All rights reserved.",
       },
       contact_info: {
         phone1: "+91 8088979706",
@@ -215,7 +244,7 @@ if (!globalRef.__nexbyteMockDb) {
         registrationId: "NBT-TR-2026-001",
         certificateId: "NBT-TR-2026-001",
         studentName: "Niranjan M",
-        photoUrl: "/images/logo-icon.png",
+        photoUrl: "/assets/nexlaptech-logo.svg",
         courseTitle: "Full Stack Web Development",
         trainingType: "Advanced Web Technologies",
         internshipType: "N/A",
@@ -267,7 +296,7 @@ if (!globalRef.__nexbyteMockDb) {
       {
         id: "m-1",
         title: "Logo Horizontal",
-        url: "/images/logo-horizontal.png",
+        url: "/assets/nexlaptech-logo.svg",
         fileType: "image/png",
         created_at: new Date().toISOString()
       }
@@ -275,6 +304,28 @@ if (!globalRef.__nexbyteMockDb) {
     inventory: [],
     activity_logs: [],
     certificate_sequences: {},
+    protection_plans: [
+      {
+        id: "care-device-1y",
+        title: "Extended 1-Year Device Care",
+        description: "Covers hardware breakdown, accidental spills, and doorstep technician service.",
+        price: 499,
+        duration: "Year",
+        accent: "purple",
+        is_active: true,
+        sort_order: 1,
+      },
+      {
+        id: "care-damage-1y",
+        title: "Full Display & Damage Protection",
+        description: "Free screen replacement and zero-cost parts warranty for 12 months.",
+        price: 299,
+        duration: "Year",
+        accent: "blue",
+        is_active: true,
+        sort_order: 2,
+      },
+    ],
     offers: [
       {
         id: "off-1",
@@ -491,6 +542,31 @@ if (!globalRef.__nexbyteMockDb) {
     messages: [],
     filterDefinitions: DEFAULT_FILTER_DEFINITIONS,
   };
+}
+
+if (!Array.isArray(globalRef.__nexbyteMockDb.protection_plans)) {
+  globalRef.__nexbyteMockDb.protection_plans = [
+    {
+      id: "care-device-1y",
+      title: "Extended 1-Year Device Care",
+      description: "Covers hardware breakdown, accidental spills, and doorstep technician service.",
+      price: 499,
+      duration: "Year",
+      accent: "purple",
+      is_active: true,
+      sort_order: 1,
+    },
+    {
+      id: "care-damage-1y",
+      title: "Full Display & Damage Protection",
+      description: "Free screen replacement and zero-cost parts warranty for 12 months.",
+      price: 299,
+      duration: "Year",
+      accent: "blue",
+      is_active: true,
+      sort_order: 2,
+    },
+  ];
 }
 
 function safeParse<T>(value: string | null | undefined, fallback: T): T {
@@ -875,8 +951,9 @@ export const dbHelper = {
   products: {
     async list() {
       if (supabase) {
-        const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-        return data || [];
+        const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+        if (error) throw new Error(`Could not load products: ${error.message}`);
+        return (data || []).map((row) => normalizeProductRow(row));
       }
       return getMockData("products");
     },
@@ -917,8 +994,10 @@ export const dbHelper = {
       };
 
       if (supabase) {
-        const { data } = await supabase.from("products").insert([payload]).select().single();
-        savedData = data;
+        const { data, error } = await supabase.from("products").insert([toProductDatabaseFields(payload)]).select().single();
+        if (error) throw new Error(`Could not create product: ${error.message}`);
+        if (!data) throw new Error("Could not create product: the database returned no product.");
+        savedData = normalizeProductRow(data);
       } else {
         const list = getMockData("products");
         savedData = { id: `p-${Date.now()}`, ...payload };
@@ -958,7 +1037,8 @@ export const dbHelper = {
       let existingProd: any = null;
 
       if (supabase) {
-        const { data: current } = await supabase.from("products").select("*").eq("id", id).single();
+        const { data: current, error } = await supabase.from("products").select("*").eq("id", id).single();
+        if (error) throw new Error(`Could not load product "${id}" for update: ${error.message}`);
         existingProd = current;
       } else {
         const list = getMockData("products");
@@ -1004,8 +1084,10 @@ export const dbHelper = {
       updates.updated_at = new Date().toISOString();
 
       if (supabase) {
-        const { data } = await supabase.from("products").update(updates).eq("id", id).select().single();
-        savedData = data;
+        const { data, error } = await supabase.from("products").update(toProductDatabaseFields(updates)).eq("id", id).select().single();
+        if (error) throw new Error(`Could not update product "${id}": ${error.message}`);
+        if (!data) throw new Error(`Could not update product "${id}": the database returned no product.`);
+        savedData = normalizeProductRow(data);
       } else {
         const list = getMockData("products");
         const updated = list.map((p) => (p.id === id ? { ...p, ...updates } : p));
@@ -1579,7 +1661,7 @@ export const dbHelper = {
       // 1. Create Admin Notification
       await dbHelper.notifications.create({
         title: "⭐ New Customer Review",
-        message: `${savedData.customer_name || "Customer"} left a ${savedData.rating}★ review for ${savedData.service_used || savedData.product_purchased || "NexByte Services"}`,
+        message: `${savedData.customer_name || "Customer"} left a ${savedData.rating}★ review for ${savedData.service_used || savedData.product_purchased || "Nex LapTech Services"}`,
         type: "review",
         meta: { review_id: savedData.id }
       });
@@ -1622,7 +1704,7 @@ export const dbHelper = {
         });
         await dbHelper.notifications.create({
           title: "✅ Review Approved!",
-          message: "Your review has been approved and is now publicly visible on NexByte.",
+          message: "Your review has been approved and is now publicly visible on Nex LapTech.",
           type: "review_update",
           customer_email: savedData.email
         });
@@ -1665,7 +1747,7 @@ export const dbHelper = {
         if (updates.admin_reply) {
           await dbHelper.notifications.create({
             title: "💬 Admin Replied to Your Review",
-            message: `NexByte Team replied: "${updates.admin_reply}"`,
+            message: `Nex LapTech Team replied: "${updates.admin_reply}"`,
             type: "review_reply",
             customer_email: savedData.email
           });
@@ -2776,7 +2858,7 @@ export const dbHelper = {
 
       return savedData;
     },
-    async reply(id: string, replyText: string, replyBy: string = "NexByte Support") {
+    async reply(id: string, replyText: string, replyBy: string = "Nex LapTech Support") {
       const payload = {
         admin_reply: replyText,
         reply: replyText,
@@ -2892,6 +2974,13 @@ export const dbHelper = {
     },
 
     async create(invoiceData: any) {
+      const {
+        paymentReference,
+        paymentBank,
+        bankTransferType,
+        cardType,
+        ...invoiceFields
+      } = invoiceData;
       const year = new Date().getFullYear();
       const seqInfo = await this.getNextSequenceInfo(year);
       const invoiceNumber = seqInfo.invoiceNumber;
@@ -2919,7 +3008,11 @@ export const dbHelper = {
         shareToken: `tok-${invoiceNumber.toLowerCase()}-${Date.now().toString(36)}`,
         share_token: `tok-${invoiceNumber.toLowerCase()}-${Date.now().toString(36)}`,
         status: "active",
-        ...invoiceData,
+        ...invoiceFields,
+        payment_reference: paymentReference || "",
+        payment_bank: paymentBank || "",
+        bank_transfer_type: bankTransferType || "",
+        card_type: cardType || "",
         // Enforce immutable invoice number & sequence
         invoiceNumber,
         invoice_number: invoiceNumber,
@@ -2969,8 +3062,9 @@ export const dbHelper = {
   offers: {
     async list() {
       if (supabase) {
-        const { data } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
-        if (data && data.length > 0) return data;
+        const { data, error } = await supabase.from("offers").select("*").order("created_at", { ascending: false });
+        if (error) throw error;
+        return data || [];
       }
       const list = getMockData("offers");
       return (list || []).sort((a: any, b: any) => new Date(b.createdAt || b.created_at).getTime() - new Date(a.createdAt || a.created_at).getTime());
@@ -2978,8 +3072,9 @@ export const dbHelper = {
 
     async getById(id: string) {
       if (supabase) {
-        const { data } = await supabase.from("offers").select("*").or(`id.eq.${id},offer_code.eq.${id}`).single();
-        if (data) return data;
+        const { data, error } = await supabase.from("offers").select("*").or(`id.eq.${id},offer_code.eq.${id}`).single();
+        if (error && error.code !== "PGRST116") throw error;
+        return data || null;
       }
       const list = getMockData("offers");
       return list.find((o: any) => o.id === id || (o.offerCode || o.offer_code || "").toUpperCase() === id.toUpperCase()) || null;
@@ -2989,8 +3084,9 @@ export const dbHelper = {
       const cleanCode = (code || "").trim().toUpperCase();
       if (!cleanCode) return null;
       if (supabase) {
-        const { data } = await supabase.from("offers").select("*").eq("offer_code", cleanCode).single();
-        if (data) return data;
+        const { data, error } = await supabase.from("offers").select("*").eq("offer_code", cleanCode).single();
+        if (error && error.code !== "PGRST116") throw error;
+        return data || null;
       }
       const list = getMockData("offers");
       return list.find((o: any) => (o.offerCode || o.offer_code || "").toUpperCase() === cleanCode) || null;
@@ -3041,11 +3137,31 @@ export const dbHelper = {
       };
 
       if (supabase) {
-        const { data, error } = await supabase.from("offers").insert([payload]).select().single();
-        if (data && !error) {
-          notifyDataChange("offers", "insert", data);
-          return data;
-        }
+        const databasePayload = {
+          id: payload.id,
+          offer_name: payload.offerName,
+          offer_code: payload.offerCode,
+          description: payload.description,
+          discount_type: payload.discountType,
+          discount_value: payload.discountValue,
+          eligible_products: payload.eligibleProducts,
+          minimum_purchase: payload.minimumPurchase,
+          maximum_discount: payload.maximumDiscount,
+          start_date: payload.startDate,
+          expiry_date: payload.expiryDate,
+          usage_limit: payload.usageLimit,
+          per_customer_limit: payload.perCustomerLimit,
+          usage_count: payload.usageCount,
+          status: payload.status,
+          created_at: payload.createdAt,
+          updated_at: payload.updatedAt,
+          used_by: payload.usedBy,
+        };
+        const { data, error } = await supabase.from("offers").insert([databasePayload]).select().single();
+        if (error) throw error;
+        if (!data) throw new Error("Offer creation did not return a saved record.");
+        notifyDataChange("offers", "insert", data);
+        return data;
       }
 
       const list = getMockData("offers");
@@ -3072,24 +3188,47 @@ export const dbHelper = {
         }
       }
 
-      const payload = {
+      const fields: Array<[string, string]> = [
+        ["offerName", "offer_name"],
+        ["description", "description"],
+        ["discountType", "discount_type"],
+        ["discountValue", "discount_value"],
+        ["eligibleProducts", "eligible_products"],
+        ["minimumPurchase", "minimum_purchase"],
+        ["maximumDiscount", "maximum_discount"],
+        ["startDate", "start_date"],
+        ["expiryDate", "expiry_date"],
+        ["usageLimit", "usage_limit"],
+        ["perCustomerLimit", "per_customer_limit"],
+        ["usageCount", "usage_count"],
+        ["usedBy", "used_by"],
+        ["status", "status"],
+        ["archived", "archived"],
+      ];
+      const databasePayload: Record<string, any> = { offer_code: cleanCode, updated_at: new Date().toISOString() };
+      for (const [camelCase, snakeCase] of fields) {
+        if (camelCase in updates || snakeCase in updates) {
+          databasePayload[snakeCase] = updates[camelCase] ?? updates[snakeCase];
+        }
+      }
+      const mockPayload = {
         ...updates,
         offerCode: cleanCode,
         offer_code: cleanCode,
-        updatedAt: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updatedAt: databasePayload.updated_at,
+        updated_at: databasePayload.updated_at,
       };
 
       if (supabase) {
-        const { data } = await supabase.from("offers").update(payload).eq("id", existing.id).select().single();
-        if (data) {
-          notifyDataChange("offers", "update", data);
-          return data;
-        }
+        const { data, error } = await supabase.from("offers").update(databasePayload).eq("id", existing.id).select().single();
+        if (error) throw error;
+        if (!data) throw new Error("Offer update did not return a saved record.");
+        notifyDataChange("offers", "update", data);
+        return data;
       }
 
       const list = getMockData("offers");
-      const updated = list.map((o: any) => (o.id === existing.id ? { ...o, ...payload } : o));
+      const updated = list.map((o: any) => (o.id === existing.id ? { ...o, ...mockPayload } : o));
       saveMockData("offers", updated);
       notifyDataChange("offers", "update", updated.find((o: any) => o.id === existing.id));
       return updated.find((o: any) => o.id === existing.id);
@@ -3114,7 +3253,8 @@ export const dbHelper = {
       }
 
       if (supabase) {
-        await supabase.from("offers").delete().eq("id", existing.id);
+        const { error } = await supabase.from("offers").delete().eq("id", existing.id);
+        if (error) throw error;
       }
       const list = getMockData("offers");
       const updated = list.filter((o: any) => o.id !== existing.id);
@@ -3201,6 +3341,7 @@ export const dbHelper = {
           name: offer.offerName || offer.offer_name,
           discountType: discType,
           discountValue: discValue,
+          maximumDiscount: maxDiscount,
           discountAmount,
           description: offer.description
         },
@@ -3219,7 +3360,9 @@ export const dbHelper = {
         throw new Error("Offer usage limit reached.");
       }
 
-      const usedBy: string[] = Array.from(new Set([...(offer.usedBy || offer.used_by || []), customerEmail?.trim().toLowerCase()].filter(Boolean)));
+      const usedBy: string[] = [...(offer.usedBy || offer.used_by || [])];
+      const normalizedEmail = customerEmail?.trim().toLowerCase();
+      if (normalizedEmail) usedBy.push(normalizedEmail);
       const updates = {
         usageCount: currentUsage + 1,
         usage_count: currentUsage + 1,
@@ -3231,6 +3374,101 @@ export const dbHelper = {
     }
   },
 
+  protectionPlans: {
+    normalize(plan: any) {
+      return {
+        id: plan.id,
+        title: plan.title || "",
+        description: plan.description || "",
+        price: Number(plan.price) || 0,
+        duration: plan.duration || "Year",
+        accent: plan.accent || "purple",
+        isActive: plan.is_active ?? plan.isActive ?? true,
+        sortOrder: Number(plan.sort_order ?? plan.sortOrder) || 0,
+      };
+    },
+
+    async list() {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from("product_protection_plans")
+          .select("*")
+          .order("sort_order", { ascending: true });
+        if (error) throw error;
+        return (data || []).map((plan) => this.normalize(plan));
+      }
+      return getMockData("protection_plans")
+        .map((plan: any) => this.normalize(plan))
+        .sort((left, right) => left.sortOrder - right.sortOrder);
+    },
+
+    async create(planData: any) {
+      const now = new Date().toISOString();
+      const plan = {
+        id: `plan-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        title: planData.title.trim(),
+        description: planData.description.trim(),
+        price: Number(planData.price),
+        duration: planData.duration.trim(),
+        accent: planData.accent,
+        is_active: planData.isActive !== false,
+        sort_order: Number(planData.sortOrder) || 0,
+        created_at: now,
+        updated_at: now,
+      };
+      if (supabase) {
+        const { data, error } = await supabase.from("product_protection_plans").insert([plan]).select().single();
+        if (error) throw error;
+        if (!data) throw new Error("Protection plan creation did not return a saved record.");
+        notifyDataChange("product_protection_plans", "insert", data);
+        return this.normalize(data);
+      }
+      const updated = [...getMockData("protection_plans"), plan];
+      saveMockData("protection_plans", updated);
+      notifyDataChange("product_protection_plans", "insert", plan);
+      return this.normalize(plan);
+    },
+
+    async update(id: string, updates: any) {
+      const payload = {
+        title: updates.title.trim(),
+        description: updates.description.trim(),
+        price: Number(updates.price),
+        duration: updates.duration.trim(),
+        accent: updates.accent,
+        is_active: updates.isActive !== false,
+        sort_order: Number(updates.sortOrder) || 0,
+        updated_at: new Date().toISOString(),
+      };
+      if (supabase) {
+        const { data, error } = await supabase.from("product_protection_plans").update(payload).eq("id", id).select().single();
+        if (error) throw error;
+        if (!data) throw new Error("Protection plan not found.");
+        notifyDataChange("product_protection_plans", "update", data);
+        return this.normalize(data);
+      }
+      const plans = getMockData("protection_plans");
+      const updated = plans.map((plan: any) => plan.id === id ? { ...plan, ...payload } : plan);
+      if (!updated.some((plan: any) => plan.id === id)) throw new Error("Protection plan not found.");
+      saveMockData("protection_plans", updated);
+      const saved = updated.find((plan: any) => plan.id === id);
+      notifyDataChange("product_protection_plans", "update", saved);
+      return this.normalize(saved);
+    },
+
+    async delete(id: string) {
+      if (supabase) {
+        const { error } = await supabase.from("product_protection_plans").delete().eq("id", id);
+        if (error) throw error;
+      } else {
+        const plans = getMockData("protection_plans");
+        saveMockData("protection_plans", plans.filter((plan: any) => plan.id !== id));
+      }
+      notifyDataChange("product_protection_plans", "delete", { id });
+      return true;
+    },
+  },
+
   systemSettings: {
     async get() {
       if (supabase) {
@@ -3239,18 +3477,18 @@ export const dbHelper = {
           if (data) {
             return {
               policy: data.global_theme_policy || "personal",
-              forcedTheme: data.forced_theme || "white-sky-pink",
+              forcedTheme: data.forced_theme === "night" ? "night" : "day",
             };
           }
         } catch (e) {}
       }
       const mock = globalRef.__nexbyteMockDb.systemSettings || {
         global_theme_policy: "personal",
-        forced_theme: "white-sky-pink",
+        forced_theme: "day",
       };
       return {
         policy: mock.global_theme_policy || "personal",
-        forcedTheme: mock.forced_theme || "white-sky-pink",
+        forcedTheme: mock.forced_theme === "night" ? "night" : "day",
       };
     },
 
@@ -3258,7 +3496,7 @@ export const dbHelper = {
       if (!globalRef.__nexbyteMockDb.systemSettings) {
         globalRef.__nexbyteMockDb.systemSettings = {
           global_theme_policy: "personal",
-          forced_theme: "white-sky-pink",
+          forced_theme: "day",
         };
       }
       globalRef.__nexbyteMockDb.systemSettings.global_theme_policy = policy;
@@ -3271,7 +3509,7 @@ export const dbHelper = {
           await supabase.from("system_settings").upsert({
             id: "global",
             global_theme_policy: policy,
-            forced_theme: forcedTheme || "white-sky-pink",
+            forced_theme: forcedTheme === "night" ? "night" : "day",
             updated_at: new Date().toISOString(),
           });
         } catch (e) {}
@@ -3279,12 +3517,12 @@ export const dbHelper = {
 
       notifyDataChange("system_settings", "UPDATE", {
         policy,
-        forcedTheme: forcedTheme || "white-sky-pink",
+        forcedTheme: forcedTheme === "night" ? "night" : "day",
       });
 
       return {
         policy,
-        forcedTheme: forcedTheme || "white-sky-pink",
+        forcedTheme: forcedTheme === "night" ? "night" : "day",
       };
     },
   },

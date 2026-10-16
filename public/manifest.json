@@ -1,23 +1,23 @@
 {
-  "name": "NexByte Technologies",
-  "short_name": "NexByte",
-  "description": "Premium Computers, Laptops & IT Services in Bengaluru",
+  "name": "Nex LapTech",
+  "short_name": "Nex LapTech",
+  "description": "Nex LapTech laptops, PC components, accessories, and more.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#05070C",
-  "theme_color": "#05070C",
+  "background_color": "#020b1f",
+  "theme_color": "#1e6bff",
   "orientation": "any",
   "icons": [
     {
-      "src": "/images/logo-icon.png",
-      "sizes": "192x192",
-      "type": "image/png",
+      "src": "/assets/nexlaptech-logo.svg",
+      "sizes": "32x32 192x192",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/images/logo-icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/assets/nexlaptech-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }

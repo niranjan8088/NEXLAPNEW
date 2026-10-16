@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# NexByte Technologies One-Click Rollback Script
+# Nex LapTech One-Click Rollback Script
 set -e
 
 echo "========================================================="

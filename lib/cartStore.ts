@@ -16,7 +16,9 @@ export interface CartItem {
 
 interface CartStore {
   items: CartItem[];
+  appliedOfferCode: string;
   isOpen: boolean;
+  setAppliedOfferCode: (code: string) => void;
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
@@ -41,8 +43,10 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      appliedOfferCode: "",
       isOpen: false,
 
+      setAppliedOfferCode: (code) => set({ appliedOfferCode: code.trim().toUpperCase() }),
       openCart: () => set({ isOpen: true }),
       closeCart: () => set({ isOpen: false }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
@@ -92,7 +96,7 @@ export const useCartStore = create<CartStore>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedOfferCode: "" }),
 
       getTotal: () => {
         return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);

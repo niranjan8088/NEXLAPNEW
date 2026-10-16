@@ -65,7 +65,7 @@ export default function CustomerMessagesPage() {
           Customer Messages
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-          Communicate directly with NexByte hardware technicians regarding repair inquiries, service quotes, and custom PC builds.
+          Communicate directly with Nex LapTech hardware technicians regarding repair inquiries, service quotes, and custom PC builds.
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export default function CustomerMessagesPage() {
                     <div className="p-3.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 space-y-1">
                       <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-700 dark:text-indigo-300">
                         <ShieldCheck className="h-3.5 w-3.5 text-indigo-600" />
-                        <span>NexByte Support Team Reply:</span>
+                        <span>Nex LapTech Support Team Reply:</span>
                       </div>
                       <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
                         {msg.admin_reply || msg.reply}

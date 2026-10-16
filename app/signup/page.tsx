@@ -11,14 +11,14 @@ import {
   EyeOff,
   AlertTriangle,
   ArrowRight,
-  ShieldCheck,
   Phone,
   FileText,
   CheckCircle2,
   Calendar,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function SignupPage() {
   const [selectedRole, setSelectedRole] = useState<"user" | "reseller">("user");
@@ -105,300 +105,301 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="relative flex min-h-[100svh] w-full items-center justify-center bg-nex-black px-5 py-12 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-hero-radial opacity-80" />
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-nex-blue/15 blur-[120px]" />
-
-      <div className="relative z-10 w-full max-w-md">
-        {/* Branding Header */}
-        <div className="mb-6 text-center">
-          <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
-            <div className="relative h-10 w-10">
-              <div className="absolute inset-0 rounded-full bg-nex-blue/30 blur-md group-hover:bg-nex-blue/50 transition-colors" />
-              <Image
-                src="/images/logo-icon-transparent.png"
-                alt="NexByte Technologies"
-                fill
-                className="relative object-contain"
-                priority
-              />
-            </div>
-            <span className="font-display text-xl font-bold tracking-tight text-white">
-              NEX<span className="text-nex-blueLight">BYTE</span>
-            </span>
-          </Link>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            Create an <span className="text-gradient-blue">Account.</span>
-          </h1>
-          <p className="mt-1 text-xs text-nex-mist">
-            Join NexByte to access hardware, IT services, or partner tools.
-          </p>
-        </div>
-
-        {/* Card Panel */}
-        <div className="glass-card border border-white/10 bg-nex-ink p-7 shadow-glow-blue sm:p-8">
-          {/* Role Selection — Admin not available */}
-          <div className="mb-6">
-            <label className="text-[11px] font-bold text-nex-mist uppercase tracking-wider block mb-2">
-              Select Account Type
-            </label>
-            <div className="grid grid-cols-2 gap-2 bg-nex-black p-1.5 rounded-xl border border-white/10">
-              <button
-                type="button"
-                onClick={() => { setSelectedRole("user"); setErrorMsg(""); }}
-                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg text-xs font-semibold transition-all ${
-                  selectedRole === "user"
-                    ? "bg-nex-blue text-white shadow-glow-blue font-bold"
-                    : "text-nex-mist hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <User className="h-4 w-4 mb-1" />
-                <span>CUSTOMER</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setSelectedRole("reseller"); setErrorMsg(""); }}
-                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-lg text-xs font-semibold transition-all ${
-                  selectedRole === "reseller"
-                    ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)] font-bold"
-                    : "text-nex-mist hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Building2 className="h-4 w-4 mb-1" />
-                <span>RESELLER</span>
-              </button>
-            </div>
-            <p className="mt-2 text-[10px] text-nex-mist/60 text-center">
-              Admin accounts cannot be self-assigned. Admins are created by authorized administrators.
-            </p>
-          </div>
-
-          {/* Info bar for reseller */}
-          {selectedRole === "reseller" && (
-            <div className="mb-5 rounded-xl bg-purple-500/10 border border-purple-500/20 p-3 text-[11px] text-purple-300 leading-relaxed">
-              <strong>Reseller Application</strong> — Your account will be reviewed by NexByte Admin. You&apos;ll be notified once approved.
-            </div>
-          )}
-
-          {/* Banners */}
-          {errorMsg && (
-            <div className="mb-5 rounded-xl bg-red-500/10 border border-red-500/20 p-3.5 text-xs text-red-400 flex items-start gap-2.5">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-red-400" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {successMsg && (
-            <div className="mb-5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3.5 text-xs text-emerald-400 flex items-start gap-2.5">
-              <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-emerald-400" />
-              <span>{successMsg}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSignup} className="space-y-3.5">
-            {/* Full Name */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/80">
-                {selectedRole === "reseller" ? "Full Name / Business Owner" : "Full Name"} *
-              </label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Ramesh Kumar"
-                className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] px-3.5 py-3 text-xs text-white placeholder-white/20 focus:border-nex-blue/50 focus:outline-none focus:ring-1 focus:ring-nex-blue/30"
-              />
-            </div>
-
-            {/* Reseller fields */}
-            {selectedRole === "reseller" && (
-              <>
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-white/80">Business Name *</label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                    <input
-                      type="text"
-                      required
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder="TechZone Computers"
-                      className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 py-3 text-xs text-white placeholder-white/20 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30"
-                    />
-                  </div>
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)] lg:grid lg:grid-cols-[1.1fr_0.9fr]">
+          <aside className="relative hidden overflow-hidden bg-gradient-to-br from-blue-700 via-sky-600 to-cyan-500 p-8 text-white lg:flex lg:flex-col lg:justify-between">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.26),transparent_35%)]" />
+            <div className="relative z-10">
+              <div className="mb-8 flex items-center gap-3">
+                <div className="rounded-full border border-white/30 bg-white/10 p-2 backdrop-blur-sm">
+                  <BrandLogo width={64} height={64} sizes="36px" priority className="h-9 w-9" />
                 </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-white/80">GSTIN (Optional)</label>
-                  <div className="relative">
-                    <FileText className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                    <input
-                      type="text"
-                      value={gstin}
-                      onChange={(e) => setGstin(e.target.value)}
-                      placeholder="29ABCDE1234F1Z5"
-                      className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 py-3 text-xs text-white placeholder-white/20 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-white/80">Business Description</label>
-                  <textarea
-                    value={businessDescription}
-                    onChange={(e) => setBusinessDescription(e.target.value)}
-                    placeholder="Tell us about your business, products you sell, areas you serve..."
-                    rows={2}
-                    className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] px-3.5 py-3 text-xs text-white placeholder-white/20 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30 resize-none"
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Email */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/80">Email Address *</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@domain.com"
-                  className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 py-3 text-xs text-white placeholder-white/20 focus:border-nex-blue/50 focus:outline-none focus:ring-1 focus:ring-nex-blue/30"
-                />
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/80">Phone Number *</label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="9876543210"
-                  className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 py-3 text-xs text-white placeholder-white/20 focus:border-nex-blue/50 focus:outline-none focus:ring-1 focus:ring-nex-blue/30"
-                />
-              </div>
-            </div>
-
-            {/* Date of Birth */}
-            {selectedRole === "user" && (
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-white/80">Date of Birth *</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                  <input
-                    type="date"
-                    required
-                    max={new Date().toISOString().split("T")[0]}
-                    value={dateOfBirth}
-                    onChange={(e) => setDateOfBirth(e.target.value)}
-                    className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-4 py-3 text-xs text-white placeholder-white/20 focus:border-nex-blue/50 focus:outline-none focus:ring-1 focus:ring-nex-blue/30 text-white"
-                  />
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-100">Nex LapTech</p>
+                  <p className="text-xl font-bold">Join the network</p>
                 </div>
               </div>
-            )}
 
-            {/* Password */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/80">Password *</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  className="w-full rounded-xl bg-white/[0.04] border border-white/[0.08] pl-10 pr-12 py-3 text-xs text-white placeholder-white/20 focus:border-nex-blue/50 focus:outline-none focus:ring-1 focus:ring-nex-blue/30"
-                />
+              <h1 className="max-w-sm text-4xl font-black leading-tight">Build an account designed for growth.</h1>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-blue-50/90">
+                Create a customer or reseller account and unlock faster shopping, stronger support, and business-ready tools.
+              </p>
+            </div>
+
+            <div className="relative z-10 grid gap-3 text-sm text-blue-50/90">
+              {[
+                "Instant access to your portal",
+                "Trusted commerce and support",
+                "Fast onboarding for partners",
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-base font-bold">✓</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </aside>
+
+          <div className="p-6 sm:p-8 lg:p-10">
+            <div className="mb-8 flex items-center justify-between gap-3">
+              <Link href="/" className="inline-flex items-center gap-3" aria-label="Nex LapTech home">
+                <div className="rounded-full border border-slate-200 bg-slate-50 p-2">
+                  <BrandLogo width={72} height={72} sizes="36px" priority className="h-9 w-9" />
+                </div>
+                <span className="font-display text-lg font-extrabold tracking-tight text-slate-900">NEX LAPTECH</span>
+              </Link>
+
+              <Link href="/login" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100">
+                Sign in
+              </Link>
+            </div>
+
+            <div className="mb-6">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700">Create account</p>
+              <h2 className="font-display text-3xl font-black text-slate-900">Get started</h2>
+              <p className="mt-2 text-sm text-slate-600">Choose your account type and complete your profile.</p>
+            </div>
+
+            <div className="mb-6">
+              <div className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-100 p-1.5">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-nex-mist hover:text-white transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-white/80">Confirm Password *</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-nex-mist" />
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter your password"
-                  className={`w-full rounded-xl bg-white/[0.04] border px-3.5 pl-10 pr-12 py-3 text-xs text-white placeholder-white/20 focus:outline-none focus:ring-1 ${
-                    confirmPassword && confirmPassword !== password
-                      ? "border-red-500/30 focus:border-red-500/50 focus:ring-red-500/30"
-                      : "border-white/[0.08] focus:border-nex-blue/50 focus:ring-nex-blue/30"
+                  onClick={() => {
+                    setSelectedRole("user");
+                    setErrorMsg("");
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-xl px-2 py-3 text-[11px] font-bold transition-all ${
+                    selectedRole === "user" ? "bg-white text-blue-700 shadow-sm ring-1 ring-blue-200" : "text-slate-500 hover:bg-white hover:text-slate-900"
                   }`}
-                />
+                >
+                  <User className="mb-1 h-4 w-4" />
+                  CUSTOMER
+                </button>
+
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-nex-mist hover:text-white transition-colors"
+                  onClick={() => {
+                    setSelectedRole("reseller");
+                    setErrorMsg("");
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-xl px-2 py-3 text-[11px] font-bold transition-all ${
+                    selectedRole === "reseller" ? "bg-white text-violet-700 shadow-sm ring-1 ring-violet-200" : "text-slate-500 hover:bg-white hover:text-slate-900"
+                  }`}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  <Building2 className="mb-1 h-4 w-4" />
+                  RESELLER
                 </button>
               </div>
-              {confirmPassword && confirmPassword !== password && (
-                <p className="text-[10px] text-red-400 mt-1">Passwords do not match.</p>
-              )}
             </div>
 
-            {/* Submit */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-3 text-xs font-bold flex items-center justify-center gap-2 rounded-xl transition-all ${
-                  selectedRole === "reseller"
-                    ? "bg-purple-600 hover:bg-purple-500 text-white shadow-[0_0_20px_rgba(147,51,234,0.3)]"
-                    : "btn-primary shadow-glow-blue"
-                }`}
-              >
+            {selectedRole === "reseller" && (
+              <div className="mb-5 rounded-2xl border border-violet-200 bg-violet-50 p-3 text-[12px] leading-6 text-violet-800">
+                <strong className="font-bold">Reseller application:</strong> your account will be reviewed by Nex LapTech admin before approval.
+              </div>
+            )}
+
+            {errorMsg && (
+              <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {successMsg && (
+              <div className="mb-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm text-emerald-700">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSignup} className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                  {selectedRole === "reseller" ? "Full Name / Business Owner" : "Full Name"} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Ramesh Kumar"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+
+              {selectedRole === "reseller" && (
+                <>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">Business Name *</label>
+                    <div className="relative">
+                      <Building2 className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        value={businessName}
+                        onChange={(e) => setBusinessName(e.target.value)}
+                        placeholder="TechZone Computers"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">GSTIN (Optional)</label>
+                    <div className="relative">
+                      <FileText className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={gstin}
+                        onChange={(e) => setGstin(e.target.value)}
+                        placeholder="29ABCDE1234F1Z5"
+                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-700">Business Description</label>
+                    <textarea
+                      value={businessDescription}
+                      onChange={(e) => setBusinessDescription(e.target.value)}
+                      placeholder="Tell us about your business, products you sell, areas you serve..."
+                      rows={2}
+                      className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-100"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">Email Address *</label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@domain.com"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">Phone Number *</label>
+                  <div className="relative">
+                    <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="tel"
+                      required
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="9876543210"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {selectedRole === "user" && (
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">Date of Birth *</label>
+                  <div className="relative">
+                    <Calendar className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="date"
+                      required
+                      max={new Date().toISOString().split("T")[0]}
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">Password *</label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="At least 6 characters"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((current) => !current)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-700">Confirm Password *</label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter your password"
+                      className={`w-full rounded-xl border bg-white py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 ${
+                        confirmPassword && confirmPassword !== password
+                          ? "border-red-300 focus:border-red-400 focus:ring-red-100"
+                          : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((current) => !current)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {confirmPassword && confirmPassword !== password && (
+                    <p className="mt-1 text-[10px] text-red-600">Passwords do not match.</p>
+                  )}
+                </div>
+              </div>
+
+              <button type="submit" disabled={loading} className="btn-primary w-full py-3.5 text-sm">
                 {loading ? (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/80 border-t-transparent" />
+                    Creating account...
+                  </span>
                 ) : (
-                  <>
-                    <span>
-                      {selectedRole === "reseller" ? "Submit Reseller Application" : "Create Account"}
-                    </span>
+                  <span className="inline-flex items-center gap-2">
+                    {selectedRole === "reseller" ? "Submit Reseller Application" : "Create Account"}
                     <ArrowRight className="h-4 w-4" />
-                  </>
+                  </span>
                 )}
               </button>
-            </div>
-          </form>
-        </div>
+            </form>
 
-        {/* Footer */}
-        <div className="mt-6 text-center space-y-2">
-          <p className="text-xs text-nex-mist">
-            Already have an account?{" "}
-            <Link href="/login" className="text-nex-blueLight hover:underline font-bold">
-              Sign In
-            </Link>
-          </p>
-          <p className="text-xs text-nex-mist">
-            <Link href="/" className="text-white/40 hover:text-white/60 hover:underline text-[10px]">
-              ← Back to NexByte
-            </Link>
-          </p>
+            <div className="mt-5 border-t border-slate-200 pt-5 text-center text-xs text-slate-500">
+              Already have an account? <Link href="/login" className="font-bold text-blue-700 hover:underline">Sign in</Link>
+            </div>
+
+            <div className="mt-3 flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                <ShieldCheck className="h-3.5 w-3.5 text-blue-700" />
+                Secure onboarding
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

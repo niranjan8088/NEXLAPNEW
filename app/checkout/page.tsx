@@ -24,7 +24,7 @@ import {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, clearCart, getTotal } = useCartStore();
+  const { items, clearCart, getTotal, appliedOfferCode, setAppliedOfferCode } = useCartStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,7 +51,7 @@ export default function CheckoutPage() {
   const [gstin, setGstin] = useState("");
 
   // Coupon & Offer State
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(appliedOfferCode);
   const [appliedOffer, setAppliedOffer] = useState<{ code: string; discountAmount: number } | null>(null);
   const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -108,22 +108,26 @@ export default function CheckoutPage() {
 
       const data = await res.json();
       if (data.valid) {
+        const discountAmount = Number(data.discountAmount) || 0;
         setAppliedOffer({
-          code: couponCode.trim().toUpperCase(),
-          discountAmount: data.discountAmount || 500,
+          code: data.offer?.code || couponCode.trim().toUpperCase(),
+          discountAmount,
         });
+        setAppliedOfferCode(data.offer?.code || couponCode.trim().toUpperCase());
         setCouponMessage({
           type: "success",
-          text: `🎉 Code applied! You save ₹${(data.discountAmount || 500).toLocaleString("en-IN")}`,
+          text: `Code ${data.offer?.code || couponCode.trim().toUpperCase()} applied! You save ₹${discountAmount.toLocaleString("en-IN")}`,
         });
       } else {
         setAppliedOffer(null);
+        setAppliedOfferCode("");
         setCouponMessage({
           type: "error",
           text: data.error || "Invalid or expired offer code.",
         });
       }
     } catch (err) {
+      setAppliedOfferCode("");
       setCouponMessage({ type: "error", text: "Failed to validate coupon code." });
     }
   };
@@ -191,7 +195,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      setOrderPlaced(data.order);
+      setOrderPlaced({ ...data.order, warning: data.warning });
       clearCart();
     } catch (err: any) {
       setError("Network error. Please try placing your order again.");
@@ -230,7 +234,11 @@ export default function CheckoutPage() {
               <p><strong className="text-slate-900">Deliver to:</strong> {customerName}, {addressLine1}, {city} - {pincode}</p>
               <p><strong className="text-slate-900">Delivery Status:</strong> {orderPlaced.status || "Confirmed"} via {orderPlaced.courier}</p>
               <p><strong className="text-slate-900">Tracking Number:</strong> <span className="font-mono">{orderPlaced.tracking_number}</span></p>
+              {orderPlaced.applied_offer_code && (
+                <p><strong className="text-slate-900">Offer Applied:</strong> {orderPlaced.applied_offer_code} (₹{Number(orderPlaced.discount_amount || 0).toLocaleString("en-IN")} saved)</p>
+              )}
             </div>
+            {orderPlaced.warning && <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">{orderPlaced.warning}</p>}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -473,7 +481,7 @@ export default function CheckoutPage() {
                     <label className="block text-slate-700 font-semibold mb-1">Company Registered Name</label>
                     <input
                       type="text"
-                      placeholder="e.g. NexByte Private Limited"
+                      placeholder="e.g. Nex LapTech Private Limited"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -658,7 +666,7 @@ export default function CheckoutPage() {
 
               <div className="text-[11px] text-slate-400 text-center space-y-1 pt-1">
                 <p>🔒 256-Bit SSL Encrypted &amp; Server-Verified Transaction</p>
-                <p>Official NexByte Tax Invoice generated automatically upon placement.</p>
+                <p>Official Nex LapTech Tax Invoice generated automatically upon placement.</p>
               </div>
             </div>
 

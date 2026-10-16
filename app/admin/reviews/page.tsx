@@ -4,7 +4,7 @@ import { testimonials } from "@/lib/data";
 import AdminReviewsContainer from "@/components/AdminReviewsContainer";
 
 export const metadata: Metadata = {
-  title: "Admin Reviews Feed | NexByte Technologies Console",
+  title: "Admin Reviews Feed | Nex LapTech Console",
   robots: "noindex, nofollow",
 };
 

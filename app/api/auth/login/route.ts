@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         account = {
           id: "admin-1",
           email: "admin@nexbyte.com",
-          full_name: "NexByte Admin",
+          full_name: "Nex LapTech Admin",
           phone: "8088979706",
           role: "admin",
           is_active: true,
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
 
       if (account.status === "suspended") {
         return NextResponse.json(
-          { error: "Your reseller account has been suspended. Please contact NexByte Admin." },
+          { error: "Your reseller account has been suspended. Please contact Nex LapTech Admin." },
           { status: 403 }
         );
       }

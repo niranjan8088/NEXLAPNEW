@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# NexByte Technologies Zero-Downtime Production Deployment Script
+# Nex LapTech Zero-Downtime Production Deployment Script
 # Target: Cloud VPS (Ubuntu/Debian) running PM2 & Nginx
 
 set -e
 
 echo "========================================================="
-echo "🚀 Starting NexByte Production Deployment..."
+echo "🚀 Starting Nex LapTech Production Deployment..."
 echo "Timestamp: $(date '+%Y-%m-%d %H:%M:%S')"
 echo "========================================================="
 
@@ -52,6 +52,6 @@ if command -v nginx &> /dev/null; then
 fi
 
 echo "========================================================="
-echo "✅ NexByte Deployment Completed Successfully!"
+echo "✅ Nex LapTech Deployment Completed Successfully!"
 echo "Health Check: http://localhost:3001/health"
 echo "========================================================="

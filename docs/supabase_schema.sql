@@ -1,5 +1,5 @@
 -- ====================================================================
--- NEXBYTE TECHNOLOGIES — PRODUCTION SUPABASE POSTGRESQL SCHEMA
+-- NEX LAPTECH — PRODUCTION SUPABASE POSTGRESQL SCHEMA
 -- Target Database: Supabase PostgreSQL
 -- Realtime Tables: Enabled via supabase_realtime publication
 -- ====================================================================
@@ -30,12 +30,15 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- 2. PRODUCTS TABLE
 CREATE TABLE IF NOT EXISTS public.products (
   id TEXT PRIMARY KEY,
+  sku TEXT,
+  brand TEXT,
   title TEXT NOT NULL,
   category TEXT NOT NULL,
   price NUMERIC NOT NULL,
   original_price NUMERIC,
   discount NUMERIC DEFAULT 0,
   stock INT DEFAULT 10,
+  cost_price NUMERIC,
   condition TEXT DEFAULT 'new' CHECK (condition IN ('new', 'refurbished', 'premium_used')),
   status TEXT DEFAULT 'show' CHECK (status IN ('show', 'hidden', 'deleted')),
   featured BOOLEAN DEFAULT FALSE,
@@ -45,10 +48,55 @@ CREATE TABLE IF NOT EXISTS public.products (
   specs JSONB,
   variants JSONB NOT NULL DEFAULT '[]'::jsonb,
   description TEXT,
-  warranty TEXT DEFAULT '1 Year NexByte Warranty',
+  warranty TEXT DEFAULT '1 Year Nex LapTech Warranty',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS products_sku_normalized_unique
+  ON public.products (UPPER(BTRIM(sku)))
+  WHERE sku IS NOT NULL AND BTRIM(sku) <> '';
+
+-- 2.1 PRODUCT CARE & PROTECTION PLANS
+CREATE TABLE IF NOT EXISTS public.product_protection_plans (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  price NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (price >= 0),
+  duration TEXT NOT NULL DEFAULT 'Year',
+  accent TEXT NOT NULL DEFAULT 'purple' CHECK (accent IN ('purple', 'blue')),
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  sort_order INTEGER NOT NULL DEFAULT 0 CHECK (sort_order >= 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 2.2 CUSTOMER OFFERS
+CREATE TABLE IF NOT EXISTS public.offers (
+  id TEXT PRIMARY KEY,
+  offer_name TEXT NOT NULL,
+  offer_code TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value NUMERIC(12, 2) NOT NULL CHECK (discount_value > 0),
+  eligible_products JSONB NOT NULL DEFAULT '["all"]'::jsonb,
+  minimum_purchase NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (minimum_purchase >= 0),
+  maximum_discount NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (maximum_discount >= 0),
+  start_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  expiry_date DATE NOT NULL,
+  usage_limit INTEGER NOT NULL DEFAULT 100 CHECK (usage_limit > 0),
+  per_customer_limit INTEGER NOT NULL DEFAULT 1 CHECK (per_customer_limit > 0),
+  usage_count INTEGER NOT NULL DEFAULT 0 CHECK (usage_count >= 0),
+  used_by JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+  archived BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT offers_expiry_after_start CHECK (expiry_date >= start_date)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS offers_code_normalized_unique
+  ON public.offers (UPPER(BTRIM(offer_code)));
 
 -- 3. SERVICES TABLE
 CREATE TABLE IF NOT EXISTS public.services (

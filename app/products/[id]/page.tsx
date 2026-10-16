@@ -36,6 +36,7 @@ interface Variant {
   price: number;
   compareAtPrice?: number;
   stock?: number;
+  active?: boolean;
   attributes?: Record<string, string>;
   image?: string;
 }
@@ -61,6 +62,7 @@ interface Product {
   specs?: Record<string, any>;
   attributes?: Record<string, any>;
   variants?: Variant[];
+  hasVariants?: boolean;
   rating?: number;
   reviewsCount?: number;
   warrantyText?: string;
@@ -111,6 +113,8 @@ export default function ProductDetailPage({
   const [couponCode, setCouponCode] = useState("");
   const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
+  const [availableOffers, setAvailableOffers] = useState<any[]>([]);
+  const [protectionPlans, setProtectionPlans] = useState<any[]>([]);
 
   // Ask Seller Modal
   const [isAskSellerOpen, setIsAskSellerOpen] = useState(false);
@@ -137,6 +141,35 @@ export default function ProductDetailPage({
 
   const addItemToCart = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
+  const setCartOfferCode = useCartStore((s) => s.setAppliedOfferCode);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/offers")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to load offers.");
+        if (!cancelled) setAvailableOffers(data.offers || []);
+      })
+      .catch((error) => console.error("Failed to load product offers:", error));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/protection-plans")
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to load protection plans.");
+        if (!cancelled) setProtectionPlans(data.plans || []);
+      })
+      .catch((error) => console.error("Failed to load protection plans:", error));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const redirectToSignIn = () => {
     const next = `${pathname}${window.location.search}`;
@@ -187,17 +220,24 @@ export default function ProductDetailPage({
         }
 
         const prod: Product = data.product;
-        setProduct(prod);
+        const configuredVariants = Array.isArray(prod.variants) ? prod.variants : [];
+        const activeVariants = configuredVariants.filter((variant) => variant.active !== false);
+        const customerProduct: Product = {
+          ...prod,
+          variants: activeVariants,
+          hasVariants: configuredVariants.length > 0,
+        };
+        setProduct(customerProduct);
 
         // Images set
-        const imagesList = Array.isArray(prod.images) && prod.images.length > 0
-          ? prod.images
-          : [prod.image || "/images/poster-products.png"];
+        const imagesList = Array.isArray(customerProduct.images) && customerProduct.images.length > 0
+          ? customerProduct.images
+          : [customerProduct.image || "/images/poster-products.png"];
         setSelectedImage(imagesList[0]);
 
         // Variants initialization
-        if (prod.variants && prod.variants.length > 0) {
-          const first = prod.variants[0];
+        if (activeVariants.length > 0) {
+          const first = activeVariants[0];
           setSelectedVariant(first);
           if (first.name) {
             if (first.name.includes("GB") || first.name.includes("TB")) {
@@ -213,7 +253,7 @@ export default function ProductDetailPage({
           const listData = await listRes.json();
           const allProds: Product[] = Array.isArray(listData) ? listData : (listData.products || []);
           const matched = allProds.filter(
-            (p) => p.id !== prod.id && p.category === prod.category
+            (p) => p.id !== customerProduct.id && p.category === customerProduct.category
           ).slice(0, 4);
           setSimilarProducts(matched);
         } catch (err) {
@@ -307,12 +347,16 @@ export default function ProductDetailPage({
 
       const data = await res.json();
       if (data.valid) {
-        setAppliedDiscount(data.discountAmount || 500);
+        const discountAmount = Number(data.discountAmount) || 0;
+        const appliedCode = data.offer?.code || couponCode.trim().toUpperCase();
+        setCartOfferCode(appliedCode);
+        setAppliedDiscount(discountAmount);
         setCouponMessage({
           type: "success",
-          text: `🎉 Coupon applied! You save ₹${(data.discountAmount || 500).toLocaleString("en-IN")}`,
+          text: `Coupon ${appliedCode} validated and saved for checkout. Current savings: ₹${discountAmount.toLocaleString("en-IN")}.`,
         });
       } else {
+        setCartOfferCode("");
         setAppliedDiscount(0);
         setCouponMessage({
           type: "error",
@@ -320,6 +364,7 @@ export default function ProductDetailPage({
         });
       }
     } catch (err) {
+      setCartOfferCode("");
       setCouponMessage({ type: "error", text: "Failed to validate coupon code." });
     }
   };
@@ -407,8 +452,10 @@ export default function ProductDetailPage({
       return false;
     }
     if (!product) return false;
-    if (product.variants?.length && !selectedVariant) {
-      alert("Choose a product configuration before adding it to your cart.");
+    if (product.hasVariants && !selectedVariant) {
+      alert(product.variants?.length
+        ? "Choose an active product configuration before adding it to your cart."
+        : "This product has no active configurations available.");
       return false;
     }
     const availableStock = selectedVariant?.stock ?? product.stock ?? 10;
@@ -501,7 +548,9 @@ export default function ProductDetailPage({
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
   const displayMrp = selectedVariant?.compareAtPrice || product.compareAtPrice || product.mrp || Math.round(displayPrice * 1.35);
   const discountPercent = product.discount || Math.round(((displayMrp - displayPrice) / displayMrp) * 100);
-  const displayStock = selectedVariant?.stock ?? product.stock ?? 10;
+  const displayStock = product.hasVariants && product.variants?.length === 0
+    ? 0
+    : selectedVariant?.stock ?? product.stock ?? 10;
 
   // Gallery list
   const galleryImages = Array.isArray(product.images) && product.images.length > 0
@@ -663,13 +712,16 @@ export default function ProductDetailPage({
               <p className="text-xs text-slate-500">Inclusive of all taxes & GST invoice options available</p>
 
               {/* VARIANTS PICKER */}
-              {product.variants && product.variants.length > 0 && (
+              {product.hasVariants && (
                 <div className="pt-4 border-t border-slate-100 space-y-3">
                   <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
                     Configuration Options
                   </label>
+                  {product.variants?.length === 0 && (
+                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">No active configurations are currently available.</p>
+                  )}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {product.variants.map((variant) => {
+                    {(product.variants || []).map((variant) => {
                       const isSelected = selectedVariant?.id === variant.id;
                       const isAvailable = (variant.stock ?? product.stock ?? 10) > 0;
 
@@ -760,14 +812,30 @@ export default function ProductDetailPage({
                   <Tag className="w-4 h-4 text-[#2563EB]" />
                   <span>Available Offers & Coupons</span>
                 </div>
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 p-3.5 rounded-xl border border-amber-200/80 space-y-2 text-xs">
-                  <div className="flex items-start space-x-2 text-amber-900">
-                    <CheckCircle2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <span className="font-bold">Special Festival Offer:</span> Get 10% instant discount up to ₹1,500 using code <code className="bg-amber-100 px-1 py-0.5 rounded font-mono font-bold text-amber-900">NEX10</code>
-                    </div>
-                  </div>
-                </div>
+                {availableOffers.filter((offer) =>
+                  (offer.eligibleProducts || ["all"]).includes("all") ||
+                  (offer.eligibleProducts || []).includes(String(product?.id))
+                ).map((offer) => (
+                  <button
+                    key={offer.id}
+                    type="button"
+                    onClick={() => {
+                      setCouponCode(offer.offerCode);
+                      setCouponMessage(null);
+                    }}
+                    className="w-full text-left bg-gradient-to-r from-amber-50 to-orange-50/50 p-3.5 rounded-xl border border-amber-200/80 text-xs text-amber-900 hover:border-amber-400 transition"
+                  >
+                    <span className="font-bold">{offer.offerName}:</span>{" "}
+                    {offer.discountType === "percentage" ? `${offer.discountValue}% off` : `₹${offer.discountValue} off`}
+                    {offer.maximumDiscount > 0 ? ` (up to ₹${offer.maximumDiscount.toLocaleString("en-IN")})` : ""}
+                    {" with code "}
+                    <code className="bg-amber-100 px-1 rounded font-mono font-bold">{offer.offerCode}</code>
+                    {offer.minimumPurchase > 0 ? ` on purchases over ₹${offer.minimumPurchase.toLocaleString("en-IN")}` : ""}
+                  </button>
+                ))}
+                {availableOffers.length === 0 && (
+                  <p className="text-xs text-slate-500">No active offers are available right now.</p>
+                )}
 
                 {/* Coupon Code Input */}
                 <form onSubmit={handleApplyCoupon} className="flex space-x-2 pt-1">
@@ -792,6 +860,9 @@ export default function ProductDetailPage({
                   }`}>
                     {couponMessage.text}
                   </p>
+                )}
+                {appliedDiscount > 0 && (
+                  <p className="text-xs text-slate-500">Offer savings apply to this purchase at checkout.</p>
                 )}
               </div>
 
@@ -969,25 +1040,24 @@ export default function ProductDetailPage({
             <ShieldCheck className="w-5 h-5 text-[#7C3AED]" />
             <span>Nex LapTech Care & Protection Plans</span>
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 border border-purple-100 bg-purple-50/40 rounded-xl flex items-start justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Extended 1-Year Device Care</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Covers hardware breakdown, accidental spills, and doorstep technician service.</p>
-                <span className="text-xs font-bold text-[#7C3AED] mt-2 inline-block">₹499 / Year</span>
-              </div>
-              <input type="checkbox" className="w-4 h-4 text-[#7C3AED] rounded border-slate-300 mt-1" />
+          {protectionPlans.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {protectionPlans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`p-4 rounded-xl border ${plan.accent === "blue" ? "border-blue-100 bg-blue-50/40" : "border-purple-100 bg-purple-50/40"}`}
+                >
+                  <h3 className="text-xs font-bold text-slate-900">{plan.title}</h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{plan.description}</p>
+                  <span className={`text-xs font-bold mt-2 inline-block ${plan.accent === "blue" ? "text-[#2563EB]" : "text-[#7C3AED]"}`}>
+                    ₹{Number(plan.price).toLocaleString("en-IN")} / {plan.duration}
+                  </span>
+                </div>
+              ))}
             </div>
-
-            <div className="p-4 border border-blue-100 bg-blue-50/40 rounded-xl flex items-start justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-slate-900">Full Display & Damage Protection</h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Free screen replacement & zero-cost parts warranty for 12 months.</p>
-                <span className="text-xs font-bold text-[#2563EB] mt-2 inline-block">₹299 / Year</span>
-              </div>
-              <input type="checkbox" className="w-4 h-4 text-[#2563EB] rounded border-slate-300 mt-1" />
-            </div>
-          </div>
+          ) : (
+            <p className="text-xs text-slate-500">No care plans are currently available.</p>
+          )}
         </div>
 
         {/* COMBO SAVINGS */}

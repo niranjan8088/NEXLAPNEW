@@ -65,6 +65,72 @@ export type ProductImageItem = {
   uploadError?: string;
 };
 
+type ProductVariantDraft = {
+  id: string;
+  sku: string;
+  name: string;
+  price: string;
+  compareAtPrice: string;
+  costPrice: string;
+  stock: string;
+  image: string;
+  attributesJson: string;
+  active: boolean;
+};
+
+const MAX_PRODUCT_IMAGE_BYTES = 99_000;
+
+async function compressProductImage(source: File): Promise<File> {
+  const bitmap = await createImageBitmap(source);
+  try {
+    let width = bitmap.width;
+    let height = bitmap.height;
+    const maxDimension = 1800;
+    const initialScale = Math.min(1, maxDimension / Math.max(width, height));
+    width = Math.max(1, Math.round(width * initialScale));
+    height = Math.max(1, Math.round(height * initialScale));
+
+    let quality = 0.82;
+    const canvas = document.createElement("canvas");
+
+    for (let attempt = 0; attempt < 18; attempt++) {
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Image compression is unavailable in this browser.");
+      context.drawImage(bitmap, 0, 0, width, height);
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/webp", quality)
+      );
+      if (!blob || blob.type !== "image/webp") {
+        throw new Error("This browser could not convert the image to WebP.");
+      }
+      if (blob.size <= MAX_PRODUCT_IMAGE_BYTES) {
+        const baseName = source.name.replace(/\.[^.]+$/, "") || "product-image";
+        return new File([blob], `${baseName}.webp`, {
+          type: "image/webp",
+          lastModified: Date.now(),
+        });
+      }
+
+      if (quality > 0.42) {
+        quality = Math.max(0.38, quality - 0.11);
+      } else if (Math.max(width, height) > 360) {
+        width = Math.max(1, Math.round(width * 0.82));
+        height = Math.max(1, Math.round(height * 0.82));
+        quality = 0.82;
+      } else {
+        break;
+      }
+    }
+
+    throw new Error(`Could not compress "${source.name}" below 99 KB. Choose a smaller image.`);
+  } finally {
+    bitmap.close();
+  }
+}
+
 export default function AdminProductsManager() {
   const [products, setProducts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -88,6 +154,7 @@ export default function AdminProductsManager() {
   const [discount, setDiscount] = useState("");
   const [stock, setStock] = useState("");
   const [lowStockThreshold, setLowStockThreshold] = useState("5");
+  const [productVariants, setProductVariants] = useState<ProductVariantDraft[]>([]);
 
   // Warranty Config
   const [warrantyEnabled, setWarrantyEnabled] = useState(true);
@@ -149,6 +216,7 @@ export default function AdminProductsManager() {
   // Multi-Image Upload State
   const [productImages, setProductImages] = useState<ProductImageItem[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [compressingImages, setCompressingImages] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [imageError, setImageError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
@@ -178,6 +246,7 @@ export default function AdminProductsManager() {
     setDiscount("15");
     setStock("12");
     setLowStockThreshold("5");
+    setProductVariants([]);
 
     setWarrantyEnabled(true);
     setWarrantyDuration("3 Years");
@@ -219,6 +288,18 @@ export default function AdminProductsManager() {
     setDiscount(String(p.discount || 0));
     setStock(String(p.stock || 0));
     setLowStockThreshold(String(p.lowStockThreshold || 5));
+    setProductVariants(Array.isArray(p.variants) ? p.variants.map((variant: any, index: number) => ({
+      id: String(variant.id || `variant-${index + 1}-${Date.now()}`),
+      sku: String(variant.sku || ""),
+      name: String(variant.name || ""),
+      price: variant.price == null ? "" : String(variant.price),
+      compareAtPrice: variant.compareAtPrice == null ? "" : String(variant.compareAtPrice),
+      costPrice: variant.costPrice == null ? "" : String(variant.costPrice),
+      stock: variant.stock == null ? "" : String(variant.stock),
+      image: String(variant.image || ""),
+      attributesJson: JSON.stringify(variant.attributes || {}),
+      active: variant.active !== false,
+    })) : []);
 
     setWarrantyEnabled(p.warrantyEnabled !== undefined ? Boolean(p.warrantyEnabled) : true);
     setWarrantyDuration(p.warrantyDuration || "3 Years");
@@ -265,7 +346,8 @@ export default function AdminProductsManager() {
   };
 
   // Image Upload File Handlers
-  const handleFileSelect = (files: File[]) => {
+  const handleFileSelect = async (files: File[]) => {
+    if (uploading || compressingImages) return;
     setImageError("");
     const validMimeTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     const validFiles: File[] = [];
@@ -294,22 +376,45 @@ export default function AdminProductsManager() {
     }
 
     const allowedFiles = validFiles.slice(0, Math.max(0, 10 - currentCount));
-    const newItems: ProductImageItem[] = allowedFiles.map((file, idx) => ({
-      id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      url: URL.createObjectURL(file),
-      file,
-      is_primary: currentCount === 0 && idx === 0,
-      sort_order: currentCount + idx + 1,
-      alt_text: ""
-    }));
+    if (allowedFiles.length === 0) return;
 
-    setProductImages((prev) => {
-      const combined = [...prev, ...newItems];
-      if (combined.length > 0 && !combined.some((i) => i.is_primary)) {
-        combined[0].is_primary = true;
+    setCompressingImages(true);
+    const newItems: ProductImageItem[] = [];
+    const compressionErrors: string[] = [];
+    try {
+      for (const [idx, source] of allowedFiles.entries()) {
+        setUploadProgress(`Compressing image ${idx + 1} of ${allowedFiles.length}...`);
+        try {
+          const file = await compressProductImage(source);
+          newItems.push({
+            id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+            url: URL.createObjectURL(file),
+            file,
+            is_primary: currentCount === 0 && idx === 0,
+            sort_order: currentCount + idx + 1,
+            alt_text: "",
+          });
+        } catch (error: any) {
+          compressionErrors.push(error.message || `Failed to compress ${source.name}.`);
+        }
       }
-      return combined;
-    });
+
+      if (newItems.length > 0) {
+        setProductImages((prev) => {
+          const combined = [...prev, ...newItems];
+          if (combined.length > 0 && !combined.some((item) => item.is_primary)) {
+            combined[0].is_primary = true;
+          }
+          return combined;
+        });
+      }
+      if (compressionErrors.length > 0) {
+        setImageError(compressionErrors.join(" "));
+      }
+    } finally {
+      setCompressingImages(false);
+      setUploadProgress("");
+    }
   };
 
   const handleSetPrimary = (id: string) => {
@@ -338,7 +443,7 @@ export default function AdminProductsManager() {
   };
 
   const handleCloseModal = () => {
-    if (uploading) return;
+    if (uploading || compressingImages) return;
     productImages.forEach((img) => {
       if (img.url && img.url.startsWith("blob:")) {
         try {
@@ -371,6 +476,10 @@ export default function AdminProductsManager() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (compressingImages) {
+      setImageError("Wait for image compression to finish before saving.");
+      return;
+    }
     if (!title || !price || !category) return;
 
     const cleanSku = sku ? sku.trim().toUpperCase() : `NEX-SKU-${Date.now()}`;
@@ -380,6 +489,89 @@ export default function AdminProductsManager() {
     if (duplicateSku) {
       setSkuError(`SKU "${cleanSku}" is already taken by another product. SKU must be unique.`);
       return;
+    }
+    const knownSkus = new Set<string>();
+    products.filter((product) => product.id !== editingProduct?.id).forEach((product) => {
+      if (product.sku) knownSkus.add(String(product.sku).trim().toUpperCase());
+      if (Array.isArray(product.variants)) {
+        product.variants.forEach((variant: any) => {
+          if (variant.sku) knownSkus.add(String(variant.sku).trim().toUpperCase());
+        });
+      }
+    });
+    if (knownSkus.has(cleanSku)) {
+      setSkuError(`SKU "${cleanSku}" is already used by a product variant.`);
+      return;
+    }
+    const variantSkus = new Set<string>();
+    const variantConfigurations = new Set<string>();
+    const normalizedVariants = [];
+    for (const [index, variant] of productVariants.entries()) {
+      const variantSku = variant.sku.trim().toUpperCase();
+      const variantName = variant.name.trim();
+      const variantPrice = Number(variant.price);
+      const variantCompareAtPrice = variant.compareAtPrice.trim() ? Number(variant.compareAtPrice) : undefined;
+      const variantCostPrice = variant.costPrice.trim() ? Number(variant.costPrice) : undefined;
+      const variantStock = Number(variant.stock);
+      if (!variantSku || !variantName || !variant.price || !variant.stock) {
+        setImageError(`Variant ${index + 1} requires a SKU, option name, price, and stock quantity.`);
+        return;
+      }
+      if (variantSku === cleanSku || variantSkus.has(variantSku) || knownSkus.has(variantSku)) {
+        setImageError(`Variant SKU "${variantSku}" is duplicated or already in use.`);
+        return;
+      }
+      if (!Number.isFinite(variantPrice) || variantPrice < 0 ||
+        !Number.isInteger(variantStock) || variantStock < 0) {
+        setImageError(`Variant ${index + 1} needs a non-negative price and whole-number stock quantity.`);
+        return;
+      }
+      if ((variantCompareAtPrice !== undefined && (!Number.isFinite(variantCompareAtPrice) || variantCompareAtPrice < 0)) ||
+        (variantCostPrice !== undefined && (!Number.isFinite(variantCostPrice) || variantCostPrice < 0))) {
+        setImageError(`Variant ${index + 1} compare-at/cost prices must be valid non-negative numbers.`);
+        return;
+      }
+      if (variant.image && !/^https?:\/\//i.test(variant.image) && !variant.image.startsWith("/")) {
+        setImageError(`Variant ${index + 1} image must be an http(s) URL or a site-relative path.`);
+        return;
+      }
+      let attributes: Record<string, string> = {};
+      if (variant.attributesJson.trim()) {
+        try {
+          const parsed: unknown = JSON.parse(variant.attributesJson);
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed) ||
+            Object.values(parsed).some((value) => value !== null && !["string", "number", "boolean"].includes(typeof value))) {
+            throw new Error("invalid");
+          }
+          attributes = Object.fromEntries(
+            Object.entries(parsed).map(([key, value]) => [key.trim(), String(value).trim()])
+          );
+        } catch {
+          setImageError(`Variant ${index + 1} specifications must be a JSON object with text or numeric values.`);
+          return;
+        }
+      }
+      const configuration = Object.keys(attributes).length
+        ? JSON.stringify(Object.entries(attributes).sort(([left], [right]) => left.localeCompare(right)))
+        : variantName.toLowerCase();
+      if (variantConfigurations.has(configuration)) {
+        setImageError(`Variant ${index + 1} duplicates a configuration already listed for this product.`);
+        return;
+      }
+      variantConfigurations.add(configuration);
+      variantSkus.add(variantSku);
+      normalizedVariants.push({
+        id: variant.id,
+        sku: variantSku,
+        name: variantName,
+        price: variantPrice,
+        compareAtPrice: variantCompareAtPrice,
+        costPrice: variantCostPrice,
+        stock: variantStock,
+        image: variant.image.trim() || undefined,
+        attributes,
+        active: variant.active,
+      });
     }
     const numPrice = Number(price);
     if (isNaN(numPrice) || numPrice <= 0) {
@@ -487,6 +679,7 @@ export default function AdminProductsManager() {
         condition,
         featured,
         latest,
+        variants: normalizedVariants,
         image: primaryImageUrl,
         images: uploadedImages.map((img) => ({
           id: img.id,
@@ -533,6 +726,9 @@ export default function AdminProductsManager() {
         await dbHelper.products.create(payload);
       }
 
+      productImages.forEach((img) => {
+        if (img.url.startsWith("blob:")) URL.revokeObjectURL(img.url);
+      });
       setIsModalOpen(false);
       setEditingProduct(null);
       loadProducts();
@@ -645,9 +841,10 @@ export default function AdminProductsManager() {
   });
 
   const pendingCount = products.filter((p) => p.approval_status === "pending" || p.status === "pending").length;
+  const compressedUploadBytes = productImages.reduce((total, image) => total + (image.file?.size || 0), 0);
 
   return (
-    <div className="space-y-6">
+    <div className="admin-products-light space-y-6">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1197,6 +1394,104 @@ export default function AdminProductsManager() {
                 </div>
               </div>
 
+              <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-nex-blueLight">Product variants</h4>
+                    <p className="mt-1 text-[10px] leading-4 text-white/60">Each sellable option needs its own SKU, price, and stock. Inactive variants remain saved but cannot be purchased.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setProductVariants((current) => [...current, {
+                      id: `variant-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                      sku: "",
+                      name: "",
+                      price: "",
+                      compareAtPrice: "",
+                      costPrice: "",
+                      stock: "",
+                      image: "",
+                      attributesJson: "{}",
+                      active: true,
+                    }])}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-blue-400/30 bg-blue-500/10 px-2.5 py-1.5 text-[10px] font-bold text-blue-200 hover:bg-blue-500/20"
+                  >
+                    <PlusCircle className="h-3.5 w-3.5" /> Add variant
+                  </button>
+                </div>
+                {productVariants.length === 0 ? (
+                  <p className="rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-white/50">No variants are configured for this product.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {productVariants.map((variant, index) => (
+                      <div key={variant.id} className="rounded-lg border border-white/10 bg-black/10 p-3">
+                        <div className="mb-2 flex items-center justify-between">
+                          <p className="text-[10px] font-bold uppercase tracking-wide text-white/70">Variant {index + 1}</p>
+                          <div className="flex items-center gap-3">
+                            <label className="flex items-center gap-1.5 text-[10px] font-semibold text-white/70">
+                              <input
+                                type="checkbox"
+                                checked={variant.active}
+                                onChange={(event) => setProductVariants((current) => current.map((item) =>
+                                  item.id === variant.id ? { ...item, active: event.target.checked } : item
+                                ))}
+                                className="h-3.5 w-3.5 rounded border-white/30 bg-white/10 text-blue-500"
+                              />
+                              Active
+                            </label>
+                            <button
+                              type="button"
+                              aria-label={`Remove variant ${index + 1}`}
+                              onClick={() => setProductVariants((current) => current.filter((item) => item.id !== variant.id))}
+                              className="rounded p-1 text-red-300 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                          {([
+                            ["SKU", "sku", "text"],
+                            ["Option name", "name", "text"],
+                            ["Price", "price", "number"],
+                            ["Compare-at price", "compareAtPrice", "number"],
+                            ["Cost price (admin)", "costPrice", "number"],
+                            ["Stock", "stock", "number"],
+                            ["Image URL", "image", "url"],
+                          ] as const).map(([label, field, type]) => (
+                            <label key={field} className="space-y-1">
+                              <span className="text-[10px] font-semibold text-white/70">{label}{["sku", "name", "price", "stock"].includes(field) ? " *" : ""}</span>
+                              <input
+                                type={type}
+                                min={type === "number" ? "0" : undefined}
+                                step={type === "number" && field === "stock" ? "1" : type === "number" ? "0.01" : undefined}
+                                value={variant[field]}
+                                onChange={(event) => setProductVariants((current) => current.map((item) =>
+                                  item.id === variant.id ? { ...item, [field]: event.target.value } : item
+                                ))}
+                                className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11px] text-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+                              />
+                            </label>
+                          ))}
+                          <label className="space-y-1 sm:col-span-2 lg:col-span-3">
+                            <span className="text-[10px] font-semibold text-white/70">Variant specifications / attributes (JSON)</span>
+                            <input
+                              type="text"
+                              value={variant.attributesJson}
+                              onChange={(event) => setProductVariants((current) => current.map((item) =>
+                                item.id === variant.id ? { ...item, attributesJson: event.target.value } : item
+                              ))}
+                              placeholder='{"capacity":"512GB","interface":"NVMe"}'
+                              className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11px] text-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+
               {/* COMPATIBILITY METADATA */}
               <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
                 <h4 className="text-xs text-nex-blueLight font-bold uppercase tracking-wider">Hardware Compatibility Details</h4>
@@ -1426,9 +1721,16 @@ export default function AdminProductsManager() {
                   <label className="text-xs text-white/90 font-bold uppercase tracking-wider">
                     Product Images *
                   </label>
-                  <span className={`text-[11px] font-bold ${productImages.length >= 10 ? "text-amber-400" : "text-nex-mist"}`}>
-                    {productImages.length} / 10 images
-                  </span>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span className={`text-[11px] font-bold ${productImages.length >= 10 ? "text-amber-400" : "text-nex-mist"}`}>
+                      {productImages.length} / 10 images
+                    </span>
+                    {compressedUploadBytes > 0 && (
+                      <span className="text-[10px] text-nex-mist">
+                        Compressed total: {(compressedUploadBytes / 1024).toFixed(0)} / 967 KB
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {imageError && (
@@ -1469,7 +1771,7 @@ export default function AdminProductsManager() {
                         e.target.value = "";
                       }}
                       className="absolute inset-0 z-10 opacity-0 cursor-pointer"
-                      disabled={uploading}
+                      disabled={uploading || compressingImages}
                     />
                     <div className="flex flex-col items-center justify-center gap-2 pointer-events-none">
                       <div className="h-10 w-10 rounded-full bg-nex-blue/10 border border-nex-blue/20 text-nex-blueLight flex items-center justify-center">
@@ -1477,7 +1779,7 @@ export default function AdminProductsManager() {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-white">Drag &amp; Drop Product Images Here</p>
-                        <p className="text-[11px] text-nex-mist mt-0.5">JPG, PNG or WebP • Maximum 10 images (Up to 5MB each)</p>
+                        <p className="text-[11px] text-nex-mist mt-0.5">JPG, PNG or WebP • Each compressed below 100 KB • Under 1 MB total</p>
                       </div>
                       <button
                         type="button"
@@ -1490,7 +1792,7 @@ export default function AdminProductsManager() {
                 )}
 
                 {/* Upload Progress Bar */}
-                {uploading && (
+                {(uploading || compressingImages) && (
                   <div className="rounded-xl bg-nex-blue/10 border border-nex-blue/20 p-3 text-xs text-nex-blueLight flex items-center gap-3">
                     <Loader2 className="h-4 w-4 animate-spin shrink-0 text-nex-blueLight" />
                     <span>{uploadProgress || "Uploading product images..."}</span>
@@ -1522,12 +1824,12 @@ export default function AdminProductsManager() {
                             <img
                               src={img.url}
                               alt={img.alt_text || `Product image ${index + 1}`}
-                              className="object-contain max-h-full max-w-full"
+                              className="h-full w-full object-contain"
                               onError={(e) => { (e.target as HTMLImageElement).src = "/images/poster-products.png"; }}
                             />
                             {img.file && (
                               <span className="absolute bottom-1 right-1 bg-nex-blue/90 text-white text-[8px] font-bold px-1 rounded">
-                                New
+                                New · {Math.max(1, Math.round(img.file.size / 1024))} KB
                               </span>
                             )}
                           </div>
@@ -1627,7 +1929,7 @@ export default function AdminProductsManager() {
                   type="button"
                   onClick={() => !uploading && setIsModalOpen(false)}
                   className="btn-secondary !py-2 !px-4"
-                  disabled={uploading}
+                  disabled={uploading || compressingImages}
                 >
                   Cancel
                 </button>
