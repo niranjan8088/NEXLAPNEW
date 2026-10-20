@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import {
   User,
   Package,
@@ -283,10 +282,8 @@ export default function CustomerAccountPortal() {
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-nex-black pt-28 pb-20 text-white relative">
-        <div className="pointer-events-none absolute inset-0 bg-hero-radial opacity-60" />
+    <div className="min-h-[calc(100vh-10rem)] py-6 text-white relative">
+      <div className="pointer-events-none absolute inset-0 bg-hero-radial opacity-60" />
 
         <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
           {/* Header Banner */}
@@ -1030,8 +1027,6 @@ export default function CustomerAccountPortal() {
           )}
 
         </div>
-      </main>
-      <Footer />
-    </>
+    </div>
   );
 }

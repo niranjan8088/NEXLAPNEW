@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import {
   Laptop,
   Monitor,
@@ -102,10 +101,7 @@ export default function ServicesPage() {
   };
 
   return (
-    <>
-      <Navbar />
-
-      <main className="relative min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-[calc(100vh-10rem)] py-6 px-2 sm:px-4">
         <div className="mx-auto max-w-7xl">
           
           {/* Header Banner */}
@@ -198,9 +194,6 @@ export default function ServicesPage() {
           </div>
 
         </div>
-      </main>
-
-      <Footer />
-    </>
+    </div>
   );
 }

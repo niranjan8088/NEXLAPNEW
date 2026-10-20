@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Star, ThumbsUp, HelpCircle, MessageSquare, ShieldCheck, Heart, Maximize2, X } from "lucide-react";
-import StarRating from "./ui/StarRating";
+import StarRating from "@/components/ui/StarRating";
 import { cn } from "@/lib/utils";
 
 type Review = {

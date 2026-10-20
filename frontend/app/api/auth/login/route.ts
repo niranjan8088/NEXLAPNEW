@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         ? account.password === password
         : expectedAdminPassword
         ? password === expectedAdminPassword
-        : true; // If no password constraint configured in dev
+        : process.env.NODE_ENV !== "production"; // In production, always require ADMIN_PASSWORD
 
       if (!isPasswordValid) {
         return NextResponse.json(

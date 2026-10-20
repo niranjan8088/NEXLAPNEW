@@ -36,6 +36,19 @@ class RealtimeSyncManager {
   private initialized = false;
   private eventSource: EventSource | null = null;
   private sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private dispatchTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingEvents: RealtimeEvent[] = [];
+
+  private queueRealtimeDispatch(event: RealtimeEvent) {
+    if (typeof window === "undefined") return;
+    this.pendingEvents.push(event);
+    if (this.dispatchTimer) clearTimeout(this.dispatchTimer);
+    this.dispatchTimer = setTimeout(() => {
+      const lastEvent = this.pendingEvents[this.pendingEvents.length - 1] || event;
+      this.pendingEvents = [];
+      window.dispatchEvent(new CustomEvent("nexbyte-realtime", { detail: lastEvent }));
+    }, 350);
+  }
 
   init() {
     if (this.initialized) return;

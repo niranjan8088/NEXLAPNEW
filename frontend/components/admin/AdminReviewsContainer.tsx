@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Star, CheckCircle, XCircle, Trash2, Reply, Search, Download, ShieldAlert, Check } from "lucide-react";
-import StarRating from "./ui/StarRating";
+import StarRating from "@/components/ui/StarRating";
 import Counter from "@/components/ui/Counter";
 import { cn } from "@/lib/utils";
 import { dbHelper } from "@/lib/dbHelper";

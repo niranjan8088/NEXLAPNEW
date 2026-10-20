@@ -17,10 +17,12 @@ export function registerClient(callback: (event: any) => void) {
 
 export function broadcastServerEvent(table: string, action: string, data: any) {
   const event = {
+    id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     table,
     eventType: action === "delete" ? "DELETE" : action === "update" ? "UPDATE" : "INSERT",
     new: data || {},
     old: {},
+    timestamp: new Date().toISOString(),
   };
   
   console.log(`[SERVER] SSE client count: ${clients.size}`);

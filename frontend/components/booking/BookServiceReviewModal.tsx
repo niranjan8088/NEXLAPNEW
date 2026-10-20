@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, CheckCircle, Send, Star } from "lucide-react";
-import StarRating from "./ui/StarRating";
+import StarRating from "@/components/ui/StarRating";
 import { services } from "@/lib/data";
 
 export default function BookServiceReviewModal() {

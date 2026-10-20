@@ -2006,7 +2006,8 @@ export const dbHelper = {
         registrationId = await this.getNextRegistrationId(issueYear);
       }
 
-      const qrData = `https://nexbytetechnologies.com/verify?regid=${encodeURIComponent(registrationId)}`;
+      const _siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://nexlaptech.in";
+      const qrData = `${_siteUrl}/verify?regid=${encodeURIComponent(registrationId)}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
 
       const newCert = {
